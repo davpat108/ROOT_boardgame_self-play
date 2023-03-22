@@ -27,17 +27,22 @@ class Map_object:
 			self.neighbors.append((clearing, to_forest))
 			self.neighbors.sort()
 
-	def update_pieces(self, buildings, soldiers, tokens, vagabond_is_here=False):
+	def update_pieces(self, buildings = None, soldiers = None, tokens = None, vagabond_is_here=None):
 		"""
 		Sets the pices based on arguments
 		"""
-		self.vagabond_is_here = vagabond_is_here
+		if vagabond_is_here is not None:
+			self.vagabond_is_here = vagabond_is_here
+
 		if not self.forest:
-			if len(self.building_slots) != len(buildings):
-				raise ValueError("New building slot number doesn't match old")
-			self.building_slots = buildings
-			self.soldiers = soldiers
-			self.tokens = tokens
+			if buildings is not None:
+				if len(self.building_slots) != len(buildings):
+					raise ValueError("New building slot number doesn't match old")
+				self.building_slots = buildings
+			if soldiers is not None:
+				self.soldiers = soldiers
+			if tokens is not None:
+				self.tokens = tokens
 
 	def update_owner(self):
 		"""
@@ -71,8 +76,8 @@ class Map_object:
 
 
 class Map:
-	objects = {}
 	def __init__(self, object_num, clearing_num, suits, building_slots, vagabond_index, ruin_indeces, paths):
+		self.places = {}
 		for i in range(object_num):
 			# Assuming vagabond can only start in the forest
 			if i>=clearing_num:
@@ -91,40 +96,40 @@ class Map:
 
 	def check_vagabond(self):
 		vagabond_num = 0
-		for key in sorted(list(self.objects.keys())):
-			vagabond_num += self.objects[key].vagabond_is_here
+		for key in sorted(list(self.places.keys())):
+			vagabond_num += self.places[key].vagabond_is_here
 		assert vagabond_num == 1
 
 	def add_object(self, object):
-		if isinstance(object, Map_object) and object.name not in self.objects:
-			self.objects[object.name] = object
+		if isinstance(object, Map_object) and object.name not in self.places:
+			self.places[object.name] = object
 			return True
 		else:
 			return False
 	
 	def add_path(self, object1, object2):
-		if object1 in self.objects and object2 in self.objects:
+		if object1 in self.places and object2 in self.places:
 			if ord(object1)>ord('L') or ord(object2)>ord('L'):
-				self.objects[object1].add_neighbor(object2, to_forest = True)
-				self.objects[object2].add_neighbor(object1, to_forest = True)
+				self.places[object1].add_neighbor(object2, to_forest = True)
+				self.places[object2].add_neighbor(object1, to_forest = True)
 			else:
-				self.objects[object1].add_neighbor(object2, to_forest = False)
-				self.objects[object2].add_neighbor(object1, to_forest = False)
+				self.places[object1].add_neighbor(object2, to_forest = False)
+				self.places[object2].add_neighbor(object1, to_forest = False)
 			return True
 		else:
 			return False
 
 	def count_paths(self):
 		i = 0
-		for key in sorted(list(self.objects.keys())):
-			i+=len(self.objects[key].neighbors)
+		for key in sorted(list(self.places.keys())):
+			i+=len(self.places[key].neighbors)
 		print(i)
 
 	def print_graph(self):
-		for key in sorted(list(self.objects.keys())):
+		for key in sorted(list(self.places.keys())):
 			
-			print(key + str(self.objects[key].neighbors))
-			#print(self.objects[key].suit, self.objects[key].building_slots)
+			#print(key + str(self.places[key].neighbors))
+			print(key, self.places[key].soldiers, self.places[key].building_slots)
 
 
 def build_regular_forest():
@@ -139,8 +144,25 @@ def build_regular_forest():
 		  'HL', 'HI', 'IO', 'IS', 'IL', "JF", 'JK', 'JQ', 'JT', 'KL', 'KT',
 		    'KR', 'KQ', 'LT', 'LS', 'LR']
 	map = Map(20, clearing_num=clearing_num, building_slots=building_slots, suits=suits, vagabond_index=vagabond_index, ruin_indeces=ruin_indeces, paths=paths)
-	map.check_vagabond()
-	map.count_paths()
 	map.print_graph()
+
+	starting_pieces = [('A', {'soldiers' : {'cat': 1, 'bird' : 0, 'alliance' : 0}, 'buildings': [('sawmill', 'cat')], 'tokens' : [('keep', 'cat')]}),
+		     ('D', {'soldiers' : {'cat': 1, 'bird' : 0, 'alliance' : 0}, 'buildings': [('workshop', 'cat'), ('ruin', 'No one')]}),
+			   ('E', {'soldiers' : {'cat': 1, 'bird' : 0, 'alliance' : 0}, 'buildings': [('recruiter', 'cat'), ('empty', 'No one')]}),
+			     ('L', {'soldiers' : {'cat': 0, 'bird' : 6, 'alliance' : 0}, 'buildings': [('roost', 'bird')]})]
+	basic = {'soldiers' : {'cat': 1, 'bird' : 0, 'alliance' : 0}}
+	i = 0
+	for key in sorted(list(map.places.keys())):
+		if not map.places[key].forest:
+			if map.places[key].name == starting_pieces[i][0]:
+				map.places[key].update_pieces(**starting_pieces[i][1])
+				i += 1
+			else:
+				map.places[key].update_pieces(**basic)
+
+
+	#map.check_vagabond()
+	#map.count_paths()
+	#map.print_graph()
 
 	return map

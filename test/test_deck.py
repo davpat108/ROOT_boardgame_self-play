@@ -1,4 +1,4 @@
-from deck import Deck, Card
+from deck import Deck, Card, QuestCard, QuestDeck
 
 def test_deck_init():
     deck = Deck()
@@ -44,6 +44,36 @@ def test_add_card():
     deck = Deck(empty=True)
 
     discarded_card = Card(*[53, "bird", "royal_claim", 4, "anything"])
+    deck.add_card(discarded_card)
+    assert len(deck.cards) == 1
+
+    card = deck.draw_card()
+    assert card == discarded_card
+
+def test_questdeck_init():
+    deck = QuestDeck()
+    assert len(deck.cards) == 15
+
+    deck = QuestDeck(empty=True)
+    assert len(deck.cards) == 0
+
+def test_draw_questcard():
+    deck = QuestDeck()
+    card_IDs = []
+
+    while True:
+        card = deck.draw_card()
+        if card == "Deck Empty":
+            break
+        card_IDs.append(card.ID)
+        # Check if no duplicates
+        assert len(card_IDs) == len(set(card_IDs))
+
+
+def test_add_questcard():
+    deck = QuestDeck(empty=True)
+
+    discarded_card = QuestCard(*[14, "sword", "sword", "mouse"])
     deck.add_card(discarded_card)
     assert len(deck.cards) == 1
 

@@ -1,6 +1,6 @@
 from random import shuffle
 
-total_card_info = [[0, "rabbit", "command_warren", 2, "rabbit"],
+total_common_card_info = [[0, "rabbit", "command_warren", 2, "rabbit"],
                [1, "rabbit", "command_warren", 2, "rabbit"],
                [2, "rabbit", "sack", 1, "mouse"],
                [3, "rabbit", "money", 2, "rabbit"],
@@ -26,7 +26,7 @@ total_card_info = [[0, "rabbit", "command_warren", 2, "rabbit"],
                [23, "mouse", "boot", 1, "rabbit"],
                [24, "mouse", "sack", 1, "mouse"],
                [25, "mouse", "ambush", 0, "anything"],
-               [26, "fox", "anvil", 1, "fox"],
+               [26, "fox", "hammer", 1, "fox"],
                [27, "fox", "stand_and_deliver", 3, "mouse"],
                [28, "fox", "stand_and_deliver", 3, "mouse"],
                [29, "fox", "tax_collector", 3, "all"],
@@ -55,6 +55,22 @@ total_card_info = [[0, "rabbit", "command_warren", 2, "rabbit"],
                [52, "bird", "crossbow", 1, "fox"],
                [53, "bird", "royal_claim", 4, "anything"]]
 
+vagabond_quest_card_info = [[0, "root_tea", "money", "fox"],
+                            [1, "boot", "sack", "fox"],
+                            [2, "torch", "hammer", "fox"],
+                            [3, "root_tea", "torch", "fox"],
+                            [4, "root_tea", "boot", "fox"],
+                            [5, "torch", "sword", "rabbit"],
+                            [6, "sword", "sword", "rabbit"],
+                            [7, "torch", "crossbow", "rabbit"],
+                            [8, "torch", "root_tea", "rabbit"],
+                            [9, "boot", "root_tea", "rabbit"],
+                            [10, "torch", "crossbow", "mouse"],
+                            [11, "torch", "sword", "mouse"],
+                            [12, "boot", "sack", "mouse"],
+                            [13, "boot", "boot", "mouse"],
+                            [14, "sword", "sword", "mouse"]]
+
 class Card:
     def __init__(self, ID:int, suit: str, craft:str, needed_crafts:int, what_crafts:str):
         self.ID = ID
@@ -76,7 +92,7 @@ class Deck:
         if not empty:
             # Init game
             self.cards = []
-            for card_info in total_card_info:
+            for card_info in total_common_card_info:
                 self.cards.append(Card(*card_info))
         
         else:
@@ -87,8 +103,8 @@ class Deck:
 
     def get_the_card(self, ID):
         try:
-            self.cards.remove(Card(*total_card_info[ID]))
-            return Card(*total_card_info[ID])
+            self.cards.remove(Card(*total_common_card_info[ID]))
+            return Card(*total_common_card_info[ID])
         except:
             return("Card not in the deck")
     
@@ -98,6 +114,56 @@ class Deck:
         return self.cards.pop(0)
     
     def add_card(self, card: Card):
+        """
+        Add a card to the end, mainly used for discard deck
+        """
+        self.cards.append(card)
+    
+    def shuffle_deck(self):
+        shuffle(self.cards)
+
+class QuestCard:
+    def __init__(self, ID:int, item1: str, item2: str, suit: str):
+        self.ID = ID
+        self.suit = suit
+        self.item1 = item1
+        self.item2 = item2
+    
+    def get_options(self, points: int, crafts: list):
+        pass
+
+    def __eq__(self, other:int) -> bool:
+        if isinstance(other, QuestCard):
+            return self.ID == other.ID
+        return False
+    
+class QuestDeck:
+    def __init__(self, empty = False):
+        if not empty:
+            # Init game
+            self.cards = []
+            for card_info in vagabond_quest_card_info:
+                self.cards.append(QuestCard(*card_info))
+        
+        else:
+            # Init discard deck
+            self.cards = []
+
+        self.shuffle_deck()
+
+    def get_the_card(self, ID):
+        try:
+            self.cards.remove(QuestCard(*vagabond_quest_card_info[ID]))
+            return QuestCard(*vagabond_quest_card_info[ID])
+        except:
+            return("Card not in the deck")
+    
+    def draw_card(self):
+        if len(self.cards) == 0:
+            return "Deck Empty"
+        return self.cards.pop(0)
+    
+    def add_card(self, card: QuestCard):
         """
         Add a card to the end, mainly used for discard deck
         """
