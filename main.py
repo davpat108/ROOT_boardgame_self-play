@@ -2,6 +2,7 @@
 from deck import Deck, QuestDeck
 from map import build_regular_forest
 from actors import Margquise, Eerie, Alliance, Vagabond
+from utils import cat_birdsong_wood
 
 if __name__ == "__main__":
     map = build_regular_forest()
@@ -24,3 +25,10 @@ if __name__ == "__main__":
         alliance.supporter_deck.add_card(common_deck.draw_card())
         vagabond.deck.add_card(common_deck.draw_card())
         vagabond.quest_deck.add_card(quest_deck.draw_card())
+
+
+    winner = "No one"
+    while winner == "No one":
+        # Marquise
+        cat_birdsong_wood(map)
+        

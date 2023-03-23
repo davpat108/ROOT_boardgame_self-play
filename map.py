@@ -94,12 +94,6 @@ class Map:
 		for path in paths:
 			self.add_path(path[:1], path[1:])
 
-	def check_vagabond(self):
-		vagabond_num = 0
-		for key in sorted(list(self.places.keys())):
-			vagabond_num += self.places[key].vagabond_is_here
-		assert vagabond_num == 1
-
 	def add_object(self, object):
 		if isinstance(object, Map_object) and object.name not in self.places:
 			self.places[object.name] = object
@@ -118,6 +112,56 @@ class Map:
 			return True
 		else:
 			return False
+	
+	def count_on_map(self, what_to_look_for, per_suit = False):
+		"""
+		Args:
+			counts buildings/tokens on the map
+			what_to_look_for:(list[type,name])
+			per suit(bool): return count per suit in a dict or just integer
+		Returns:
+			count if per suit: dict of counts per suit, if not int
+		"""
+		if per_suit:
+			count = {
+				"rabbit" : 0,
+				"fox" : 0,
+				"mouse" : 0
+				}
+			
+			for key in sorted(list(self.places.keys())):
+				if what_to_look_for[0] == "building":
+					for building_slot in self.places[key].building_slots:
+						if building_slot[0] == what_to_look_for[1]:
+							count[self.places[key].suit] += 1
+
+				if what_to_look_for[0] == "token":
+					for token in self.places[key].tokens:
+						if token == what_to_look_for[1]:
+							count[self.places[key].suit] += 1
+		
+		else:
+			count = 0
+			for key in sorted(list(self.places.keys())):
+				if what_to_look_for[0] == "building":
+					for building_slot in self.places[key].building_slots:
+						if building_slot[0] == what_to_look_for[1]:
+							count += 1
+							
+				if what_to_look_for[0] == "token":
+					for token in self.places[key].tokens:
+						if token == what_to_look_for[1]:
+							count += 1
+		print(count)
+		return count
+
+
+
+	def check_vagabond(self):
+		vagabond_num = 0
+		for key in sorted(list(self.places.keys())):
+			vagabond_num += self.places[key].vagabond_is_here
+		assert vagabond_num == 1
 
 	def count_paths(self):
 		i = 0
@@ -144,9 +188,8 @@ def build_regular_forest():
 		  'HL', 'HI', 'IO', 'IS', 'IL', "JF", 'JK', 'JQ', 'JT', 'KL', 'KT',
 		    'KR', 'KQ', 'LT', 'LS', 'LR']
 	map = Map(20, clearing_num=clearing_num, building_slots=building_slots, suits=suits, vagabond_index=vagabond_index, ruin_indeces=ruin_indeces, paths=paths)
-	map.print_graph()
 
-	starting_pieces = [('A', {'soldiers' : {'cat': 1, 'bird' : 0, 'alliance' : 0}, 'buildings': [('sawmill', 'cat')], 'tokens' : [('keep', 'cat')]}),
+	starting_pieces = [('A', {'soldiers' : {'cat': 1, 'bird' : 0, 'alliance' : 0}, 'buildings': [('sawmill', 'cat')], 'tokens' : ['keep']}),
 		     ('D', {'soldiers' : {'cat': 1, 'bird' : 0, 'alliance' : 0}, 'buildings': [('workshop', 'cat'), ('ruin', 'No one')]}),
 			   ('E', {'soldiers' : {'cat': 1, 'bird' : 0, 'alliance' : 0}, 'buildings': [('recruiter', 'cat'), ('empty', 'No one')]}),
 			     ('L', {'soldiers' : {'cat': 0, 'bird' : 6, 'alliance' : 0}, 'buildings': [('roost', 'bird')]})]

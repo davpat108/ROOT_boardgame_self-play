@@ -15,14 +15,22 @@ class Margquise(Actor):
     def __init__(self) -> None:
         super().__init__()
     
-    def get_options(self):
-        return super().get_options() 
+    def get_options_craft(self, map):
+        super().get_options() 
+        # Birdsong
+        # Daylight craft
+        craft_suits = {"rabbit" : 0,
+                       "fox" : 0,
+                       "mouse": 0}
+        
+
+
 
 class Eerie(Actor):
     def __init__(self) -> None:
         super().__init__()
     
-    def get_options(self):
+    def get_options(self, map):
         return super().get_options()
     
 class Alliance(Actor):
