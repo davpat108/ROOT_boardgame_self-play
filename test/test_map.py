@@ -50,5 +50,7 @@ def test_count_stuff():
     cat_birdsong_wood(map)
     cat_birdsong_wood(map)
     assert map.count_on_map(('token', "wood")) == 2
-    assert map.count_on_map(('token', "wood"), per_suit=True)['rabbit'] == 2
+    assert map.count_on_map(('token', "wood"), per_suit=True)['fox'] == 2
+    assert map.count_on_map(('token', "wood"), per_suit=True)['rabbit'] == 0
+    assert map.count_on_map(("building", "roost"), per_suit=True)['rabbit'] == 1
 

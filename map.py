@@ -173,7 +173,7 @@ class Map:
 		for key in sorted(list(self.places.keys())):
 			
 			#print(key + str(self.places[key].neighbors))
-			print(key, self.places[key].soldiers, self.places[key].building_slots)
+			print(key, self.places[key].soldiers, self.places[key].building_slots, self.places[key].tokens, self.places[key].suit)
 
 
 def build_regular_forest():
@@ -202,7 +202,6 @@ def build_regular_forest():
 				i += 1
 			else:
 				map.places[key].update_pieces(**basic)
-
 
 	#map.check_vagabond()
 	#map.count_paths()

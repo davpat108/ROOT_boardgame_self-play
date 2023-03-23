@@ -6,6 +6,9 @@ class Actor(ABC):
     def __init__(self) -> None:
         self.deck = Deck(empty=True)
         self.points = 0
+        self.sappers = 0
+        self.cobbler = 0
+        self.tax_collector = 0
 
     @abstractmethod
     def get_options(self):
@@ -16,12 +19,10 @@ class Margquise(Actor):
         super().__init__()
     
     def get_options_craft(self, map):
-        super().get_options() 
-        # Birdsong
         # Daylight craft
-        craft_suits = {"rabbit" : 0,
-                       "fox" : 0,
-                       "mouse": 0}
+        craft_suits = map.count_on_map(("building", "workshop"), per_suit=True)
+                      
+                      
         
 
 
