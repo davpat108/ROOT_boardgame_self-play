@@ -76,7 +76,7 @@ class Map_object:
 
 
 class Map:
-	def __init__(self, object_num, clearing_num, suits, building_slots, vagabond_index, ruin_indeces, paths):
+	def __init__(self, object_num:int, clearing_num:int, suits:tuple[str, ...], building_slots:tuple[int, ...], vagabond_index:int, ruin_indeces:tuple[int, ...], paths:tuple[str, ...]):
 		self.places = {}
 		for i in range(object_num):
 			# Assuming vagabond can only start in the forest

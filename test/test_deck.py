@@ -25,10 +25,10 @@ def test_get_the_card():
     card = deck.get_the_card(ID=3)
     assert len(deck.cards) == 53
     assert card.ID == 3
-    assert card.suit == "rabbit"
+    assert card.card_suit == "rabbit"
     assert card.craft == "money"
-    assert card.needed_crafts == 2
-    assert card.what_crafts == "rabbit"
+    assert card.craft_cost == 2
+    assert card.craft_suit == "rabbit"
 
     card = deck.get_the_card(ID=88)
     assert len(deck.cards) == 53

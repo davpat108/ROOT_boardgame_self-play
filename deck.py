@@ -5,7 +5,7 @@ total_common_card_info = [[0, "rabbit", "command_warren", 2, "rabbit"],
                [2, "rabbit", "sack", 1, "mouse"],
                [3, "rabbit", "money", 2, "rabbit"],
                [4, "rabbit", "favor", 3, "rabbit"],
-               [5, "rabbit", "ambush", 0, "anything"],
+               [5, "rabbit", "ambush", 0, "ambush"],
                [6, "rabbit", "better_burrow_bank", 2, "rabbit"],
                [7, "rabbit", "better_burrow_bank", 2, "rabbit"],
                [8, "rabbit", "dominance", 10, "point"],
@@ -25,7 +25,7 @@ total_common_card_info = [[0, "rabbit", "command_warren", 2, "rabbit"],
                [22, "mouse", "favor", 3, "mouse"],
                [23, "mouse", "boot", 1, "rabbit"],
                [24, "mouse", "sack", 1, "mouse"],
-               [25, "mouse", "ambush", 0, "anything"],
+               [25, "mouse", "ambush", 0, "ambush"],
                [26, "fox", "hammer", 1, "fox"],
                [27, "fox", "stand_and_deliver", 3, "mouse"],
                [28, "fox", "stand_and_deliver", 3, "mouse"],
@@ -33,7 +33,7 @@ total_common_card_info = [[0, "rabbit", "command_warren", 2, "rabbit"],
                [30, "fox", "tax_collector", 3, "all"],
                [31, "fox", "tax_collector", 3, "all"],
                [32, "fox", "root_tea", 1, "mouse"],
-               [33, "fox", "ambush", 0, "anything"],
+               [33, "fox", "ambush", 0, "ambush"],
                [34, "fox", "sword", 2, "fox"],
                [35, "fox", "sack", 1, "mouse"],
                [36, "fox", "dominance", 10, "point"],
@@ -48,8 +48,8 @@ total_common_card_info = [[0, "rabbit", "command_warren", 2, "rabbit"],
                [45, "bird", "brutal_tactics", 2, "fox"],
                [46, "bird", "dominance", 10, "point"],
                [47, "bird", "sword", 2, "fox" ],
-               [48, "bird", "ambush", 0, "anything"],
-               [49, "bird", "ambush", 0, "anything"],
+               [48, "bird", "ambush", 0, "ambush"],
+               [49, "bird", "ambush", 0, "ambush"],
                [50, "bird", "armorers", 1, "fox"],
                [51, "bird", "armorers", 1, "fox"],
                [52, "bird", "crossbow", 1, "fox"],
@@ -72,12 +72,12 @@ vagabond_quest_card_info = [[0, "root_tea", "money", "fox"],
                             [14, "sword", "sword", "mouse"]]
 
 class Card:
-    def __init__(self, ID:int, suit: str, craft:str, needed_crafts:int, what_crafts:str):
+    def __init__(self, ID:int, card_suit: str, craft:str, craft_cost:int, craft_suit:str):
         self.ID = ID
-        self.suit = suit
+        self.card_suit = card_suit
         self.craft = craft
-        self.needed_crafts = needed_crafts
-        self.what_crafts = what_crafts
+        self.craft_cost = craft_cost
+        self.craft_suit = craft_suit
     
     def get_options(self, points: int, crafts: list):
         pass
