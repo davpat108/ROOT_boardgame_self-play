@@ -1,4 +1,4 @@
-class Map_object:
+class Place:
 	def __init__(self, name, suit, building_slot_num, vagabond_is_here=False, forest=False, ruin=False):
 		self.neighbors = list()
 		self.owner = "No one"
@@ -82,20 +82,20 @@ class Map:
 			# Assuming vagabond can only start in the forest
 			if i>=clearing_num:
 				if i == vagabond_index:
-					self.add_object(Map_object(name=chr(ord('A')+i), suit='Forest', building_slot_num=0, vagabond_is_here=True, forest=True))
+					self.add_object(Place(name=chr(ord('A')+i), suit='Forest', building_slot_num=0, vagabond_is_here=True, forest=True))
 				else:
-					self.add_object(Map_object(name=chr(ord('A')+i), suit='Forest', building_slot_num=0, forest=True))
+					self.add_object(Place(name=chr(ord('A')+i), suit='Forest', building_slot_num=0, forest=True))
 			else:
 				if i in ruin_indeces:
-					self.add_object(Map_object(name=chr(ord('A')+i), suit=suits[i], building_slot_num=building_slots[i], ruin=True))
+					self.add_object(Place(name=chr(ord('A')+i), suit=suits[i], building_slot_num=building_slots[i], ruin=True))
 				else:
-					self.add_object(Map_object(name=chr(ord('A')+i), suit=suits[i], building_slot_num=building_slots[i]))
+					self.add_object(Place(name=chr(ord('A')+i), suit=suits[i], building_slot_num=building_slots[i]))
 		
 		for path in paths:
 			self.add_path(path[:1], path[1:])
 
 	def add_object(self, object):
-		if isinstance(object, Map_object) and object.name not in self.places:
+		if isinstance(object, Place) and object.name not in self.places:
 			self.places[object.name] = object
 			return True
 		else:

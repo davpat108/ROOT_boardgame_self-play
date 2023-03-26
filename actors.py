@@ -1,5 +1,5 @@
 from deck import Deck, QuestDeck
-
+from actions import Battle_DTO, CraftDTO#, Move, Quest
 class Actor():
 
     def __init__(self) -> None:
@@ -29,19 +29,44 @@ class Marquise(Actor):
         self.items = []
     
     def get_options_craft(self, map):
-        # Daylight craft
         craft_suits = map.count_on_map(("building", "workshop"), per_suit=True)
         craft_options = []
         for card in self.deck.cards:
             if card.craft_suit == "ambush":
-                self.ambush[card.card_suit] += 1
+                pass
             elif craft_suits[card.craft_suit] >= card.craft_cost:
-                craft_options.append(card.craft)
+                craft_options.append(CraftDTO(card.craft))
             elif card.craft_suit == "anything":
                 if sum(craft_suits.values()) > card.craft_cost:
-                    craft_options.append(card.craft)
+                    craft_options.append(CraftDTO(card.craft))
         return craft_options
-                      
+    
+    def get_ambushes(self):
+        self.ambush ={
+            "rabbit": 0,
+            "mouse": 0,
+            "fox": 0,
+            "bird": 0,
+        }
+        for card in self.deck.cards:
+            if card.craft_suit == "ambush":
+                self.ambush[card.card_suit] += 1
+
+    def get_battles(self, map, vagabond):
+        battle_options = []
+        for key in sorted(list(map.places.keys())):
+            place = map.places[key]
+            if place.soldiers['cat'] > 0:
+                if place.soldiers['bird'] > 0 or True in [slot[0]=='roost' for slot in place.building_slots]:
+                    battle_options.append(Battle_DTO(place, "bird"))
+                if place.soldiers['alliance'] > 0 or True in [slot[0]=='base' for slot in place.building_slots] or "sympathy" in place.tokens:
+                    battle_options.append(Battle_DTO(place, "alliance"))
+                if place.vagabond_is_here and vagabond.relations['cat'] == 'hostile':
+                    battle_options.append(Battle_DTO(place, "vagabond"))
+        return battle_options
+    
+    def get_moves(self, map):
+        pass
                       
 class Eerie(Actor):
     def __init__(self) -> None:
@@ -72,6 +97,12 @@ class Vagabond(Actor):
             self.other_items_fresh = ["root_tea"]
             self.other_items_exhausted = []
             self.other_items_damaged = []
+            self.relations = {
+			"cat" : 'indifferent',
+			"bird" : 'indifferent',
+			"alliance" : 'indifferent'
+		}
+
         else:
             raise NotImplementedError("Only thief yet")
 
