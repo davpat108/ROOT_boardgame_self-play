@@ -22,9 +22,14 @@ class Place:
 		self.forest = forest
 
 	
-	def add_neighbor(self, clearing, to_forest):
-		if clearing not in self.neighbors:
-			self.neighbors.append((clearing, to_forest))
+	def add_neighbor(self, place, to_forest):
+		"""
+		Args:
+			place (Place): The clearing to add as a neighbor
+			to_forest (bool): Whether the neighbor is a forest
+		"""
+		if place not in self.neighbors:
+			self.neighbors.append((place, to_forest))
 			self.neighbors.sort()
 
 	def update_pieces(self, buildings = None, soldiers = None, tokens = None, vagabond_is_here=None):
@@ -169,6 +174,13 @@ class Map:
 			i+=len(self.places[key].neighbors)
 		print(i)
 
+	def update_owners(self):
+		"""
+		Updates owners of all places on the map
+		"""
+		for key in sorted(list(self.places.keys())):
+			self.places[key].update_owner()
+
 	def print_graph(self):
 		for key in sorted(list(self.places.keys())):
 			
@@ -202,7 +214,7 @@ def build_regular_forest():
 				i += 1
 			else:
 				map.places[key].update_pieces(**basic)
-
+	map.update_owners()
 	#map.check_vagabond()
 	#map.count_paths()
 	#map.print_graph()

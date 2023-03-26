@@ -28,3 +28,15 @@ class CraftDTO(ActionDTO):
         else:
             self.item = None
     
+class MoveDTO(ActionDTO):
+    def __init__(self, start, end, how_many) -> None:
+        super().__init__()
+        self.how_many = how_many
+        self.start = start
+        self.end = end
+
+    def __eq__(self, other) -> bool:
+        if self.start == other.start and self.end == other.end and self.how_many == other.how_many:
+            return True
+        else:
+            return False

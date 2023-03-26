@@ -1,5 +1,5 @@
 from deck import Deck, QuestDeck
-from actions import Battle_DTO, CraftDTO#, Move, Quest
+from actions import Battle_DTO, CraftDTO, MoveDTO
 class Actor():
 
     def __init__(self) -> None:
@@ -66,7 +66,20 @@ class Marquise(Actor):
         return battle_options
     
     def get_moves(self, map):
-        pass
+        "Returns a list of MoveDTO objects"
+        moves = []
+        for key in sorted(list(map.places.keys())): # sort places by key
+            place = map.places[key]
+            for i in range(place.soldiers['cat']):
+                for neighbor in place.neighbors:
+                    if place.owner == 'cat' or map.places[neighbor[0]].owner == 'cat':
+                        if place.forest == False and map.places[neighbor[0]].forest == False:
+                            moves.append(MoveDTO(place, map.places[neighbor[0]], how_many=i + 1))
+        return moves    
+    
+    def get_can_recruit():
+        return map.count_on_map(("building", "recruiter")) > 0
+            
                       
 class Eerie(Actor):
     def __init__(self) -> None:
