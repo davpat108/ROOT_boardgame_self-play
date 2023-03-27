@@ -1,5 +1,6 @@
 from deck import Deck, QuestDeck
 from actions import Battle_DTO, CraftDTO, MoveDTO
+from configs import buildings_list_marquise
 class Actor():
 
     def __init__(self) -> None:
@@ -97,6 +98,29 @@ class Marquise(Actor):
                     woods += 1
 
         return woods
+    
+    def get_build_options(self, map):
+        """
+        Returns a dict of building options for the Marquise.
+        """
+        bulding_costs = [0, 1, 2, 3, 3, 4]
+        building_options = {"sawmill": {"where" : [], "cost" : 9}, "workshop": {"where" : [], "cost" : 9}, "recruiter": {"where" : [], "cost" : 9}} # 9 is a placeholder for infinity
+
+        for building in ["sawmill", "workshop", "recruiter"]:
+            count = map.count_on_map(("building", building))
+            if count == 6:
+                continue
+            cost = bulding_costs[count]
+            for key in sorted(list(map.places.keys())):
+                place = map.places[key]
+                woods = self.get_wood_tokens_to_build(map, place)
+                if place.owner == 'cat' and True in [slot[0] == "empty" for slot in place.building_slots]:
+                    if not place.forest:
+                        if woods >= cost:
+                            building_options[building]["where"].append(place.name)
+                            building_options[building]["cost"] = cost
+
+        return building_options
            
 class Eerie(Actor):
     def __init__(self) -> None:

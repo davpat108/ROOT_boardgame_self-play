@@ -69,6 +69,6 @@ vagabond_quest_card_info = [[0, "root_tea", "money", "fox"],
                             [13, "boot", "boot", "mouse"],
                             [14, "sword", "sword", "mouse"]]
 
-buildings_list_marquise = {"sawmill": {"cost": [0, 1, 2, 3, 3, 4], "VictoryPoints": [0, 1, 2, 3, 4, 5], "BonusCard":[0, 0, 0, 0, 0, 0]},
-                            "workshop": {"cost": [0, 1, 2, 3, 3, 4], "VictoryPoints": [0, 2, 2, 3, 4, 5], "BonusCard":[0, 0, 0, 0, 0, 0]},
-                            "recruiter": {"cost": [0, 1, 2, 3, 3, 4], "VictoryPoints": [0, 1, 2, 3, 3, 4], "BonusCard":[0, 0, 1, 0, 1, 0]}}
+buildings_list_marquise = {"sawmill": {"VictoryPoints": [0, 1, 2, 3, 4, 5], "BonusCard":[0, 0, 0, 0, 0, 0]},
+                            "workshop": {"VictoryPoints": [0, 2, 2, 3, 4, 5], "BonusCard":[0, 0, 0, 0, 0, 0]},
+                            "recruiter": {"VictoryPoints": [0, 1, 2, 3, 3, 4], "BonusCard":[0, 0, 1, 0, 1, 0]}}

@@ -160,24 +160,6 @@ class Map:
 							count += 1
 		return count
 	
-	def is_connected(self, place1, place2):
-		"""
-		Returns True if place1 is connected to place2 on the game board, False otherwise.
-		"""
-		visited = set()
-		queue = [place1]
-
-		while queue:
-			current_place = queue.pop(0)
-			visited.add(current_place)
-
-			if current_place == place2:
-				return True		
-			for connection in current_place.neighbors:
-				if self.places[connection[0]] not in visited:
-					queue.append(self.places[connection[0]])
-		return False
-
 	def get_connected_places(self, start_place, player_name = 'cat', visited=None):
 		"""
 		Finds all places connected to the start_place through places that are all owned by player_name.

@@ -95,8 +95,6 @@ def test_marquise_get_connected_wood_tokens():
     cat_birdsong_wood(map)
     tokens = marquise.get_wood_tokens_to_build(map, map.places['A'])
     assert tokens == 3
-    for key in sorted(list(map.places.keys())):
-        print(map.places[key].name, map.places[key].owner, map.places[key].soldiers, map.places[key].building_slots, map.places[key].tokens)
 
     tokens = marquise.get_wood_tokens_to_build(map, map.places['K'])
     assert tokens == 1
@@ -105,3 +103,38 @@ def test_marquise_get_connected_wood_tokens():
     assert tokens == 1
 
 
+def test_marquise_get_build_options():
+    map = build_regular_forest()
+
+    marquise = Marquise()
+    build_options = marquise.get_build_options(map)
+    assert build_options == {'sawmill': {'where': [], 'cost': 9},
+                              'workshop': {'where': [], 'cost': 9},
+                                'recruiter': {'where': [], 'cost': 9}}
+    
+    cat_birdsong_wood(map)
+    build_options = marquise.get_build_options(map)
+    assert build_options == {'sawmill': {'where': ['B', 'C', 'E', 'G', 'H', 'I', 'J', 'K'], 'cost': 1},
+                              'workshop': {'where': ['B', 'C', 'E', 'G', 'H', 'I', 'J', 'K'], 'cost': 1},
+                                'recruiter': {'where': ['B', 'C', 'E', 'G', 'H', 'I', 'J', 'K'], 'cost': 1}}
+    
+    piece_setup =[('B', {'soldiers' : {'cat': 1, 'bird' : 0, 'alliance' : 0}, 'buildings': [('sawmill', 'cat'), ('empty', 'No one')], 'tokens' : []}),# Cats
+                ('C', {'soldiers' : {'cat': 1, 'bird' : 3, 'alliance' : 0}, 'buildings': [('sawmill', 'cat'),('recruiter', 'cat')], 'tokens' : []}), # Birds
+                ('D', {'soldiers' : {'cat': 2, 'bird' : 2, 'alliance' : 0}, 'buildings': [('empty', 'No one'), ('empty', 'No one')], 'tokens' : []}), # Birds
+                ('E', {'soldiers' : {'cat': 2, 'bird' : 2, 'alliance' : 0}, 'buildings': [('empty', 'No one'), ('empty', 'No one')], 'tokens' : []}), # Birds
+                ('F', {'soldiers' : {'cat': 2, 'bird' : 0, 'alliance' : 0}, 'buildings': [('sawmill', 'cat')], 'tokens' : []}), # Cats
+                ('G', {'soldiers' : {'cat': 2, 'bird' : 0, 'alliance' : 0}, 'buildings': [('empty', 'No one'), ('empty', 'No one')], 'tokens' : []})] # Cats
+
+    i=0
+    for key in sorted(list(map.places.keys())):
+        if i >= len(piece_setup):
+            break
+        if map.places[key].name == piece_setup[i][0]:
+            map.places[key].update_pieces(**piece_setup[i][1])
+            i += 1
+    map.update_owners()
+    cat_birdsong_wood(map)
+    build_options = marquise.get_build_options(map)
+    assert build_options == {'sawmill': {'where': ['B'], 'cost': 3},
+                            'workshop': {'where': ['B', 'G', 'H', 'I', 'J', 'K'], 'cost': 0},
+                            'recruiter': {'where': ['B', 'G', 'H', 'I', 'J', 'K'], 'cost': 1}}
