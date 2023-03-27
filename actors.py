@@ -79,6 +79,29 @@ class Marquise(Actor):
     
     def get_can_recruit():
         return map.count_on_map(("building", "recruiter")) > 0
+    
+    def get_wood_tokens_to_build(self, map, place):
+        """
+        Finds all 'wood' tokens that are connected to a Place object on the map through multiple cat-owned Places.
+        """
+        # Get all places owned by the cat
+        cat_places = [map.places[key] for key in sorted(list(map.places.keys())) if map.places[key].owner == 'cat']
+
+        # Find all connected places owned by the cat
+        connected_places = set()
+        for p in cat_places:
+            if map.is_connected(place, p):
+                connected_places.add(p)
+                connected_places.update(map.get_connected_places(p, connected_places))
+
+        # Find all wood tokens on the connected places
+        wood_tokens = 0
+        for p in connected_places:
+            for token in p.tokens:
+                if token == 'wood':
+                    wood_tokens += 1
+
+        return wood_tokens
             
                       
 class Eerie(Actor):

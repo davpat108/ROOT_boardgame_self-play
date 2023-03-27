@@ -80,6 +80,7 @@ class Place:
 			self.owner = sorted_points[-1][0]
 
 
+
 class Map:
 	def __init__(self, object_num:int, clearing_num:int, suits:tuple[str, ...], building_slots:tuple[int, ...], vagabond_index:int, ruin_indeces:tuple[int, ...], paths:tuple[str, ...]):
 		self.places = {}
@@ -157,10 +158,48 @@ class Map:
 					for token in self.places[key].tokens:
 						if token == what_to_look_for[1]:
 							count += 1
-		print(count)
 		return count
+	
+	def is_connected(self, place1, place2):
+		"""
+		Returns True if place1 is connected to place2 on the game board, False otherwise.
+		"""
+		visited = set()
+		queue = [place1]
 
+		while queue:
+			current_place = queue.pop(0)
+			visited.add(current_place)
 
+			if current_place == place2:
+				return True		
+			for connection in current_place.neighbors:
+				if self.places[connection[0]] not in visited:
+					queue.append(self.places[connection[0]])
+		return False
+
+	def get_connected_places(self, start_place, player_name = 'cat', visited=None):
+		"""
+		Finds all places connected to the start_place through places that are all owned by player_name.
+		
+		Args:
+		- start_place (Place): the starting place to search from
+		- player_name (str): the name of the player who owns all places in the path
+		- visited (set): set of places that have already been visited
+		
+		Returns:
+		- set of all places that are connected to the start_place through places owned by player_name
+		"""
+		if visited is None:
+			visited = set()
+		visited.add(start_place)
+		connected_places = set()
+		for path in start_place.neighbors:
+			next_place = self.places[path[0]]
+			if next_place not in visited and next_place.owner == player_name and start_place.owner == player_name:
+				connected_places.update(self.get_connected_places(next_place, player_name, visited))
+		connected_places.add(start_place)
+		return connected_places
 
 	def check_vagabond(self):
 		vagabond_num = 0

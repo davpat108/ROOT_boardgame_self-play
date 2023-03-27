@@ -2,6 +2,7 @@ from map import build_regular_forest, Map
 from actors import Marquise, Vagabond
 from deck import Card
 from actions import Battle_DTO, MoveDTO
+from utils import cat_birdsong_wood
 
 def test_marguise_get_options_craft():
     map = build_regular_forest()
@@ -45,14 +46,14 @@ def test_marquise_move():
     ruin_indeces = [3]
     paths = ['AB', 'AC', 'BD', 'CD']
     map = Map(4, clearing_num=clearing_num, building_slots=building_slots, suits=suits, vagabond_index=vagabond_index, ruin_indeces=ruin_indeces, paths=paths)
-    starting_pieces = [('A', {'soldiers' : {'cat': 1, 'bird' : 0, 'alliance' : 0}, 'buildings': [('sawmill', 'cat')], 'tokens' : ['keep']}), # Cats
+    piece_setup = [('A', {'soldiers' : {'cat': 1, 'bird' : 0, 'alliance' : 0}, 'buildings': [('sawmill', 'cat')], 'tokens' : ['keep']}), # Cats
                        ('B', {'soldiers' : {'cat': 1, 'bird' : 0, 'alliance' : 0}, 'buildings': [('sawmill', 'cat')], 'tokens' : []}), # Cats
                        ('C', {'soldiers' : {'cat': 1, 'bird' : 2, 'alliance' : 0}, 'buildings': [('empty', 'No one')], 'tokens' : []}), # Birds
                        ('D', {'soldiers' : {'cat': 2, 'bird' : 2, 'alliance' : 0}, 'buildings': [('empty', 'No one')], 'tokens' : []})] # Birds
     i = 0
     for key in sorted(list(map.places.keys())):
-        if map.places[key].name == starting_pieces[i][0]:
-            map.places[key].update_pieces(**starting_pieces[i][1])
+        if map.places[key].name == piece_setup[i][0]:
+            map.places[key].update_pieces(**piece_setup[i][1])
             i += 1
 
     map.update_owners()
@@ -65,3 +66,40 @@ def test_marquise_move():
                                  MoveDTO(map.places['C'], map.places['A'], 1),
                                      MoveDTO(map.places['D'], map.places['B'], 1), 
                                      MoveDTO(map.places['D'], map.places['B'], 2)]
+    
+def test_marquise_get_connected_wood_tokens():
+    map = build_regular_forest()
+    cat_birdsong_wood(map)
+
+    marquise = Marquise()
+    tokens = marquise.get_wood_tokens_to_build(map, map.places['A'])
+    
+    assert tokens == 1
+
+    piece_setup = [ ('B', {'soldiers' : {'cat': 1, 'bird' : 0, 'alliance' : 0}, 'buildings': [('sawmill', 'cat'), ('empty', 'No one')], 'tokens' : []}), # Cats
+                    ('C', {'soldiers' : {'cat': 1, 'bird' : 2, 'alliance' : 0}, 'buildings': [('empty', 'No one'),('empty', 'No one')], 'tokens' : []}), # Birds
+                    ('D', {'soldiers' : {'cat': 2, 'bird' : 2, 'alliance' : 0}, 'buildings': [('empty', 'No one'), ('empty', 'No one')], 'tokens' : []}), # Birds
+                    ('E', {'soldiers' : {'cat': 2, 'bird' : 2, 'alliance' : 0}, 'buildings': [('empty', 'No one'), ('empty', 'No one')], 'tokens' : []}), # Birds
+                    ('F', {'soldiers' : {'cat': 2, 'bird' : 0, 'alliance' : 0}, 'buildings': [('empty', 'No one')], 'tokens' : []}),
+                    ('G', {'soldiers' : {'cat': 2, 'bird' : 0, 'alliance' : 0}, 'buildings': [('sawmill', 'cat'), ('empty', 'No one')], 'tokens' : []})], # Cats
+    
+    i=0
+    for key in sorted(list(map.places.keys())):
+        if i >= len(piece_setup):
+            break
+        if map.places[key].name == piece_setup[i][0]:
+            map.places[key].update_pieces(**piece_setup[i][1])
+            i += 1
+
+    map.update_owners()
+    cat_birdsong_wood(map)
+    tokens = marquise.get_wood_tokens_to_build(map, map.places['A'])
+    assert tokens == 3
+    for key in sorted(list(map.places.keys())):
+        print(map.places[key].name, map.places[key].owner)
+
+
+    tokens = marquise.get_wood_tokens_to_build(map, map.places['K'])
+    assert tokens == 0
+    
+
