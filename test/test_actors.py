@@ -76,12 +76,12 @@ def test_marquise_get_connected_wood_tokens():
     
     assert tokens == 1
 
-    piece_setup = [ ('B', {'soldiers' : {'cat': 1, 'bird' : 0, 'alliance' : 0}, 'buildings': [('sawmill', 'cat'), ('empty', 'No one')], 'tokens' : []}), # Cats
-                    ('C', {'soldiers' : {'cat': 1, 'bird' : 2, 'alliance' : 0}, 'buildings': [('empty', 'No one'),('empty', 'No one')], 'tokens' : []}), # Birds
+    piece_setup =[('B', {'soldiers' : {'cat': 1, 'bird' : 0, 'alliance' : 0}, 'buildings': [('sawmill', 'cat'), ('empty', 'No one')], 'tokens' : []}),# Cats
+                    ('C', {'soldiers' : {'cat': 1, 'bird' : 2, 'alliance' : 0}, 'buildings': [('sawmill', 'cat'),('empty', 'No one')], 'tokens' : []}), # Birds
                     ('D', {'soldiers' : {'cat': 2, 'bird' : 2, 'alliance' : 0}, 'buildings': [('empty', 'No one'), ('empty', 'No one')], 'tokens' : []}), # Birds
                     ('E', {'soldiers' : {'cat': 2, 'bird' : 2, 'alliance' : 0}, 'buildings': [('empty', 'No one'), ('empty', 'No one')], 'tokens' : []}), # Birds
-                    ('F', {'soldiers' : {'cat': 2, 'bird' : 0, 'alliance' : 0}, 'buildings': [('empty', 'No one')], 'tokens' : []}),
-                    ('G', {'soldiers' : {'cat': 2, 'bird' : 0, 'alliance' : 0}, 'buildings': [('sawmill', 'cat'), ('empty', 'No one')], 'tokens' : []})], # Cats
+                    ('F', {'soldiers' : {'cat': 2, 'bird' : 0, 'alliance' : 0}, 'buildings': [('empty', 'No one')], 'tokens' : []}), # Cats
+                    ('G', {'soldiers' : {'cat': 2, 'bird' : 0, 'alliance' : 0}, 'buildings': [('sawmill', 'cat'), ('empty', 'No one')], 'tokens' : []})] # Cats
     
     i=0
     for key in sorted(list(map.places.keys())):
@@ -96,10 +96,12 @@ def test_marquise_get_connected_wood_tokens():
     tokens = marquise.get_wood_tokens_to_build(map, map.places['A'])
     assert tokens == 3
     for key in sorted(list(map.places.keys())):
-        print(map.places[key].name, map.places[key].owner)
-
+        print(map.places[key].name, map.places[key].owner, map.places[key].soldiers, map.places[key].building_slots, map.places[key].tokens)
 
     tokens = marquise.get_wood_tokens_to_build(map, map.places['K'])
-    assert tokens == 0
-    
+    assert tokens == 1
+
+    tokens = marquise.get_wood_tokens_to_build(map, map.places['G'])
+    assert tokens == 1
+
 

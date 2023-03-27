@@ -190,13 +190,16 @@ class Map:
 		Returns:
 		- set of all places that are connected to the start_place through places owned by player_name
 		"""
+		if start_place.owner != player_name:
+			return set()
+		
 		if visited is None:
 			visited = set()
 		visited.add(start_place)
 		connected_places = set()
 		for path in start_place.neighbors:
 			next_place = self.places[path[0]]
-			if next_place not in visited and next_place.owner == player_name and start_place.owner == player_name:
+			if next_place not in visited and next_place.owner == player_name:
 				connected_places.update(self.get_connected_places(next_place, player_name, visited))
 		connected_places.add(start_place)
 		return connected_places

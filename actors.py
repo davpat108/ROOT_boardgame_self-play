@@ -84,26 +84,20 @@ class Marquise(Actor):
         """
         Finds all 'wood' tokens that are connected to a Place object on the map through multiple cat-owned Places.
         """
-        # Get all places owned by the cat
-        cat_places = [map.places[key] for key in sorted(list(map.places.keys())) if map.places[key].owner == 'cat']
-
-        # Find all connected places owned by the cat
-        connected_places = set()
-        for p in cat_places:
-            if map.is_connected(place, p):
-                connected_places.add(p)
-                connected_places.update(map.get_connected_places(p, connected_places))
+        if place.owner != 'cat':
+            return 0
+        
+        connected_places = map.get_connected_places(place, 'cat')
 
         # Find all wood tokens on the connected places
-        wood_tokens = 0
+        woods = 0
         for p in connected_places:
             for token in p.tokens:
                 if token == 'wood':
-                    wood_tokens += 1
+                    woods += 1
 
-        return wood_tokens
-            
-                      
+        return woods
+           
 class Eerie(Actor):
     def __init__(self) -> None:
         super().__init__()
