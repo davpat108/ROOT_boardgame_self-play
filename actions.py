@@ -40,3 +40,19 @@ class MoveDTO(ActionDTO):
             return True
         else:
             return False
+        
+class OverworkDTO(ActionDTO):
+    def __init__(self, place, card_suit) -> None:
+        super().__init__()
+        self.place = place
+        self.card_suit = card_suit
+        self.check()
+
+    def __eq__(self, other) -> bool:
+        if self.place == other.place and self.card_suit == other.card_suit:
+            return True
+        else:
+            return False
+        
+    def check(self):
+        assert self.card_suit in ["rabbit", "mouse", "fox", "bird"]

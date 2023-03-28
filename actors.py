@@ -1,5 +1,5 @@
 from deck import Deck, QuestDeck
-from actions import Battle_DTO, CraftDTO, MoveDTO
+from actions import Battle_DTO, CraftDTO, MoveDTO, OverworkDTO
 from configs import buildings_list_marquise
 class Actor():
 
@@ -121,7 +121,23 @@ class Marquise(Actor):
                             building_options[building]["cost"] = cost
 
         return building_options
-           
+    
+    def get_overwork(self, map):
+        """
+        Returns a list of OverworkDTO objects.
+        """
+        overwork_clearings = []
+        for key in sorted(list(map.places.keys())):
+            place = map.places[key]
+            for card in self.deck.cards:
+                if place.owner == 'cat':
+                    for slot in place.building_slots:
+                        if slot[0] == 'sawmill' and (place.suit == card.card_suit or card.card_suit == 'bird'):
+                            overwork_clearings.append(OverworkDTO(place.name, card.card_suit))
+
+        return overwork_clearings
+    
+
 class Eerie(Actor):
     def __init__(self) -> None:
         super().__init__()

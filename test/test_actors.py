@@ -1,8 +1,9 @@
 from map import build_regular_forest, Map
 from actors import Marquise, Vagabond
-from deck import Card
-from actions import Battle_DTO, MoveDTO
+from deck import Card, Deck
+from actions import Battle_DTO, MoveDTO, OverworkDTO
 from utils import cat_birdsong_wood
+from configs import total_common_card_info
 
 def test_marguise_get_options_craft():
     map = build_regular_forest()
@@ -138,3 +139,38 @@ def test_marquise_get_build_options():
     assert build_options == {'sawmill': {'where': ['B'], 'cost': 3},
                             'workshop': {'where': ['B', 'G', 'H', 'I', 'J', 'K'], 'cost': 0},
                             'recruiter': {'where': ['B', 'G', 'H', 'I', 'J', 'K'], 'cost': 1}}
+
+def test_marquise_overwork():
+    map = build_regular_forest()
+    marquise = Marquise()
+
+    common_deck = Deck(empty=True)
+    common_deck.add_card(Card(*total_common_card_info[27]))
+    common_deck.add_card(Card(*total_common_card_info[28]))
+    common_deck.add_card(Card(*total_common_card_info[53]))
+
+    marquise.deck.add_card(common_deck.draw_card())
+    marquise.deck.add_card(common_deck.draw_card())
+    marquise.deck.add_card(common_deck.draw_card())
+
+    overworks = marquise.get_overwork(map)
+    assert overworks == [OverworkDTO('A', 'fox'), OverworkDTO('A', 'fox'), OverworkDTO('A', 'bird'),]
+
+    piece_setup =[('B', {'soldiers' : {'cat': 1, 'bird' : 0, 'alliance' : 0}, 'buildings': [('sawmill', 'cat'), ('empty', 'No one')], 'tokens' : []}),# Cats
+            ('C', {'soldiers' : {'cat': 1, 'bird' : 3, 'alliance' : 0}, 'buildings': [('sawmill', 'cat'),('recruiter', 'cat')], 'tokens' : []}), # Birds
+            ('D', {'soldiers' : {'cat': 2, 'bird' : 2, 'alliance' : 0}, 'buildings': [('empty', 'No one'), ('empty', 'No one')], 'tokens' : []}), # Birds
+            ('E', {'soldiers' : {'cat': 2, 'bird' : 2, 'alliance' : 0}, 'buildings': [('empty', 'No one'), ('empty', 'No one')], 'tokens' : []}), # Birds
+            ('F', {'soldiers' : {'cat': 2, 'bird' : 0, 'alliance' : 0}, 'buildings': [('sawmill', 'cat')], 'tokens' : []}), # Cats
+            ('G', {'soldiers' : {'cat': 2, 'bird' : 0, 'alliance' : 0}, 'buildings': [('empty', 'No one'), ('empty', 'No one')], 'tokens' : []})] # Cats
+    
+    i=0
+    for key in sorted(list(map.places.keys())):
+        if i >= len(piece_setup):
+            break
+        if map.places[key].name == piece_setup[i][0]:
+            map.places[key].update_pieces(**piece_setup[i][1])
+            i += 1
+
+    map.update_owners()
+    overworks = marquise.get_overwork(map)
+    assert overworks == [OverworkDTO('A', 'fox'), OverworkDTO('A', 'fox'), OverworkDTO('A', 'bird'), OverworkDTO('B', 'bird'), OverworkDTO('F', 'bird')]
