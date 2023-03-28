@@ -145,9 +145,9 @@ def test_marquise_overwork():
     marquise = Marquise()
 
     common_deck = Deck(empty=True)
-    common_deck.add_card(Card(*total_common_card_info[27]))
+    common_deck.add_card(Card(*total_common_card_info[27])) # 2x fox
     common_deck.add_card(Card(*total_common_card_info[28]))
-    common_deck.add_card(Card(*total_common_card_info[53]))
+    common_deck.add_card(Card(*total_common_card_info[53])) # 1x bird
 
     marquise.deck.add_card(common_deck.draw_card())
     marquise.deck.add_card(common_deck.draw_card())
