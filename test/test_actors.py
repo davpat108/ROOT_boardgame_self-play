@@ -154,7 +154,7 @@ def test_marquise_overwork():
     marquise.deck.add_card(common_deck.draw_card())
 
     overworks = marquise.get_overwork(map)
-    assert overworks == [OverworkDTO('A', 'fox'), OverworkDTO('A', 'fox'), OverworkDTO('A', 'bird'),]
+    assert overworks == [OverworkDTO('A', 27, 'fox'), OverworkDTO('A', 28, 'fox'), OverworkDTO('A', 53, 'bird'),]
 
     piece_setup =[('B', {'soldiers' : {'cat': 1, 'bird' : 0, 'alliance' : 0}, 'buildings': [('sawmill', 'cat'), ('empty', 'No one')], 'tokens' : []}),# Cats
             ('C', {'soldiers' : {'cat': 1, 'bird' : 3, 'alliance' : 0}, 'buildings': [('sawmill', 'cat'),('recruiter', 'cat')], 'tokens' : []}), # Birds
@@ -173,4 +173,4 @@ def test_marquise_overwork():
 
     map.update_owners()
     overworks = marquise.get_overwork(map)
-    assert overworks == [OverworkDTO('A', 'fox'), OverworkDTO('A', 'fox'), OverworkDTO('A', 'bird'), OverworkDTO('B', 'bird'), OverworkDTO('F', 'bird')]
+    assert overworks == [OverworkDTO('A', 27, 'fox'), OverworkDTO('A', 28, 'fox'), OverworkDTO('A', 53, 'bird'), OverworkDTO('B', 53, 'bird'), OverworkDTO('F', 53, 'bird'),]

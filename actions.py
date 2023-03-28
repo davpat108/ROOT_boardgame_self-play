@@ -42,14 +42,15 @@ class MoveDTO(ActionDTO):
             return False
         
 class OverworkDTO(ActionDTO):
-    def __init__(self, place, card_suit) -> None:
+    def __init__(self, place, cardID, card_suit) -> None:
         super().__init__()
         self.place = place
+        self.cardID = cardID
         self.card_suit = card_suit
         self.check()
 
     def __eq__(self, other) -> bool:
-        if self.place == other.place and self.card_suit == other.card_suit:
+        if self.place == other.place and self.card_suit == other.card_suit and self.cardID == other.cardID:
             return True
         else:
             return False

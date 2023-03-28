@@ -133,7 +133,7 @@ class Marquise(Actor):
                 if place.owner == 'cat':
                     for slot in place.building_slots:
                         if slot[0] == 'sawmill' and (place.suit == card.card_suit or card.card_suit == 'bird'):
-                            overwork_clearings.append(OverworkDTO(place.name, card.card_suit))
+                            overwork_clearings.append(OverworkDTO(place.name, card.ID, card.card_suit))
 
         return overwork_clearings
     
