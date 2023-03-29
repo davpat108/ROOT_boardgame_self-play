@@ -59,11 +59,11 @@ class Marquise(Actor):
             place = map.places[key]
             if place.soldiers['cat'] > 0:
                 if place.soldiers['bird'] > 0 or True in [slot[0]=='roost' for slot in place.building_slots]:
-                    battle_options.append(Battle_DTO(place, "bird"))
+                    battle_options.append(Battle_DTO(place.name, "bird"))
                 if place.soldiers['alliance'] > 0 or True in [slot[0]=='base' for slot in place.building_slots] or "sympathy" in place.tokens:
-                    battle_options.append(Battle_DTO(place, "alliance"))
+                    battle_options.append(Battle_DTO(place.name, "alliance"))
                 if place.vagabond_is_here and vagabond.relations['cat'] == 'hostile':
-                    battle_options.append(Battle_DTO(place, "vagabond"))
+                    battle_options.append(Battle_DTO(place.name, "vagabond"))
         return battle_options
     
     def get_moves(self, map):
@@ -75,7 +75,7 @@ class Marquise(Actor):
                 for neighbor in place.neighbors:
                     if place.owner == 'cat' or map.places[neighbor[0]].owner == 'cat':
                         if place.forest == False and map.places[neighbor[0]].forest == False:
-                            moves.append(MoveDTO(place, map.places[neighbor[0]], how_many=i + 1))
+                            moves.append(MoveDTO(place.name, map.places[neighbor[0]].name, how_many=i + 1))
         return moves    
     
     def get_can_recruit():
@@ -166,6 +166,34 @@ class Eyrie(Actor):
 
         return decree_options
     
+    def get_resolve_recruit(self, map):
+        recruit_options = []
+        for card_ID, card_suit in  self.decree["recruit"]:
+            matching_clearings = [place for place in map.places.values() if place.suit == card_suit or card_suit == "bird"]
+            total_bird_soldiers = sum([place.soldiers["bird"] for place in map.places.values()])
+
+            if total_bird_soldiers < 20:
+                for clearing in matching_clearings:
+                    recruit_options.append((clearing, card_ID))
+
+        return recruit_options
+
+    def get_resolve_move(self, map):
+
+        move_options = []
+        for card_ID, card_suit in  self.decree["move"]:
+            matching_clearings = [place for place in map.places.values() if place.suit == card_suit or card_suit == "bird"]
+
+            for source_clearing in matching_clearings:
+                if source_clearing.soldiers["bird"] > 0:
+                    for neighbor in source_clearing.neighbors:
+                        if not neighbor[1]:
+                            dest_clearing = map.places[neighbor[0]]
+                            for soldiers in range(1, source_clearing.soldiers["bird"] + 1):
+                                move_options.append(MoveDTO(source_clearing.name, dest_clearing.name, soldiers, card_ID))
+        return move_options
+
+
 class Alliance(Actor):
     def __init__(self) -> None:
         super().__init__()

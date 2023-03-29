@@ -4,10 +4,11 @@ class ActionDTO:
         pass
 
 class Battle_DTO(ActionDTO):
-    def __init__(self, place, against_whom:str) -> None:
+    def __init__(self, place, against_whom:str, card_ID = None) -> None:
         super().__init__()
         self.where = place
         self.against_whom = against_whom
+        self.card_ID = card_ID
     
     def __eq__(self, other) -> bool:
         if self.where == other.where and self.against_whom == other.against_whom:
@@ -29,11 +30,12 @@ class CraftDTO(ActionDTO):
             self.item = None
     
 class MoveDTO(ActionDTO):
-    def __init__(self, start, end, how_many) -> None:
+    def __init__(self, start, end, how_many, card_ID=None) -> None:
         super().__init__()
         self.how_many = how_many
         self.start = start
         self.end = end
+        self.card_ID = card_ID
 
     def __eq__(self, other) -> bool:
         if self.start == other.start and self.end == other.end and self.how_many == other.how_many:

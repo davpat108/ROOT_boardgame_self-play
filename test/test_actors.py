@@ -36,7 +36,7 @@ def test_marquise_battle():
     map.places['A'].update_pieces(soldiers = soldiers)
     map.places['A'].update_pieces(tokens = ["sympathy"])
     battle_options = marguise.get_battles(map, vagabond)
-    assert battle_options == [Battle_DTO(map.places['A'], "bird"), Battle_DTO(map.places['A'], "alliance")]
+    assert battle_options == [Battle_DTO('A', "bird"), Battle_DTO('A', "alliance")]
 
 
 def test_marquise_move():
@@ -60,13 +60,13 @@ def test_marquise_move():
     map.update_owners()
     marguise = Marquise()
     move_options = marguise.get_moves(map)
-    assert move_options == [MoveDTO(map.places['A'], map.places['B'], 1),
-                             MoveDTO(map.places['A'], map.places['C'], 1),
-                             MoveDTO(map.places['B'], map.places['A'], 1),  
-                              MoveDTO(map.places['B'], map.places['D'], 1),
-                                 MoveDTO(map.places['C'], map.places['A'], 1),
-                                     MoveDTO(map.places['D'], map.places['B'], 1), 
-                                     MoveDTO(map.places['D'], map.places['B'], 2)]
+    assert move_options == [MoveDTO('A', 'B', 1),
+                             MoveDTO('A', 'C', 1),
+                             MoveDTO('B', 'A', 1),
+                              MoveDTO('B', 'D', 1),
+                                 MoveDTO('C', 'A', 1),
+                                     MoveDTO('D', 'B', 1),
+                                     MoveDTO('D', 'B', 2)]
     
 def test_marquise_get_connected_wood_tokens():
     map = build_regular_forest()
@@ -200,3 +200,25 @@ def test_eyrie_get_decree_options():
             "battle": [(27, 'fox'), (28, 'fox'), (53, 'bird')],
             "build": [(27, 'fox'), (28, 'fox'), (53, 'bird')],
         }
+    
+    
+def test_resolves():
+    map = build_regular_forest()
+    eyrie = Eyrie()
+
+    # Give Eyrie some cards
+    common_deck = Deck(empty=True)
+    common_deck.add_card(Card(*total_common_card_info[0])) # rabbit
+    common_deck.add_card(Card(*total_common_card_info[27])) # 2x fox
+    common_deck.add_card(Card(*total_common_card_info[28]))
+    common_deck.add_card(Card(*total_common_card_info[53])) # 1x bird
+
+    eyrie.deck.add_card(common_deck.draw_card())
+    eyrie.deck.add_card(common_deck.draw_card())
+    eyrie.deck.add_card(common_deck.draw_card())
+
+    decree_options = eyrie.get_decree_options()
+    eyrie.decree = decree_options
+    move_options = eyrie.get_resolve_move(map)
+    assert move_options[0] == MoveDTO('L', 'H', 1, 0)
+    assert move_options[-1] == MoveDTO('L', 'K', 6, 53)
