@@ -11,7 +11,7 @@ class Battle_DTO(ActionDTO):
         self.card_ID = card_ID
     
     def __eq__(self, other) -> bool:
-        if self.where == other.where and self.against_whom == other.against_whom:
+        if self.where == other.where and self.against_whom == other.against_whom and self.card_ID == other.card_ID:
             return True
         else:
             return False
@@ -38,7 +38,7 @@ class MoveDTO(ActionDTO):
         self.card_ID = card_ID
 
     def __eq__(self, other) -> bool:
-        if self.start == other.start and self.end == other.end and self.how_many == other.how_many:
+        if self.start == other.start and self.end == other.end and self.how_many == other.how_many and self.card_ID == other.card_ID:
             return True
         else:
             return False

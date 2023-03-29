@@ -168,13 +168,15 @@ class Eyrie(Actor):
     
     def get_resolve_recruit(self, map):
         recruit_options = []
+
         for card_ID, card_suit in  self.decree["recruit"]:
             matching_clearings = [place for place in map.places.values() if place.suit == card_suit or card_suit == "bird"]
-            total_bird_soldiers = sum([place.soldiers["bird"] for place in map.places.values()])
 
+            total_bird_soldiers = sum([place.soldiers["bird"] for place in map.places.values()])
             if total_bird_soldiers < 20:
                 for clearing in matching_clearings:
-                    recruit_options.append((clearing, card_ID))
+                    if True in [building[0] == 'roost' for building in clearing.building_slots]:
+                        recruit_options.append((clearing.name, card_ID))
 
         return recruit_options
 
@@ -193,6 +195,36 @@ class Eyrie(Actor):
                                 move_options.append(MoveDTO(source_clearing.name, dest_clearing.name, soldiers, card_ID))
         return move_options
 
+    def get_resolve_battle(self, map, vagabond):
+        battle_options = []
+
+        for card_ID, card_suit in self.decree["battle"]:
+            matching_clearings = [place for place in map.places.values() if place.suit == card_suit or card_suit == "bird"]
+
+            for clearing in matching_clearings:
+                if clearing.soldiers["bird"] > 0:
+                    if clearing.soldiers["cat"] > 0:
+                        battle_options.append(Battle_DTO(clearing.name, "cat", card_ID))
+                    if clearing.soldiers["alliance"] > 0:
+                        battle_options.append(Battle_DTO(clearing.name, "alliance", card_ID))
+                    if clearing.vagabond_is_here and vagabond.relations['bird'] == 'hostile':
+                        battle_options.append(Battle_DTO(clearing.name, "vagabond", card_ID))
+
+        return battle_options
+    
+    def get_resolve_building(self, map):
+        building_option = []
+
+        for card_ID, card_suit in self.decree["battle"]:
+            matching_clearings = [place for place in map.places.values() if place.suit == card_suit or card_suit == "bird"]
+
+            for clearing in matching_clearings:
+                if clearing.owner == 'bird':
+                    if not True in [slot[0] == 'roost' for slot in clearing.building_slots] and True in [slot[0] == 'empty' for slot in clearing.building_slots] and not True in [token == 'keep' for token in clearing.tokens]:
+                        building_option.append((clearing.name, card_ID))
+                    
+
+        return building_option
 
 class Alliance(Actor):
     def __init__(self) -> None:

@@ -1,7 +1,7 @@
 from map import build_regular_forest, Map
 from actors import Marquise, Vagabond, Eyrie, Alliance
 from deck import Card, Deck
-from actions import Battle_DTO, MoveDTO, OverworkDTO
+from actions import Battle_DTO, MoveDTO, OverworkDTO, Battle_DTO
 from utils import cat_birdsong_wood
 from configs import total_common_card_info
 
@@ -205,7 +205,10 @@ def test_eyrie_get_decree_options():
 def test_resolves():
     map = build_regular_forest()
     eyrie = Eyrie()
-
+    vagabond = Vagabond()
+    vagabond.relations['bird'] = 'hostile'
+    map.places['L'].update_pieces(vagabond_is_here = True) # This creates 2 vagabonds but its ok for now
+    
     # Give Eyrie some cards
     common_deck = Deck(empty=True)
     common_deck.add_card(Card(*total_common_card_info[0])) # rabbit
@@ -216,9 +219,22 @@ def test_resolves():
     eyrie.deck.add_card(common_deck.draw_card())
     eyrie.deck.add_card(common_deck.draw_card())
     eyrie.deck.add_card(common_deck.draw_card())
+    eyrie.deck.add_card(common_deck.draw_card())
 
     decree_options = eyrie.get_decree_options()
-    eyrie.decree = decree_options
+    eyrie.decree = decree_options # Not how your supposed to do it, but it works for testing
     move_options = eyrie.get_resolve_move(map)
     assert move_options[0] == MoveDTO('L', 'H', 1, 0)
     assert move_options[-1] == MoveDTO('L', 'K', 6, 53)
+
+    recruit_options = eyrie.get_resolve_recruit(map)
+    assert recruit_options == [('L', 0), ('L', 53)]
+
+    battle_option = eyrie.get_resolve_battle(map, vagabond)
+    assert battle_option == [Battle_DTO('L', 'vagabond', 0), Battle_DTO('L', 'vagabond', 53)]
+
+    map.places['I'].update_pieces(soldiers = {'cat' : 0, 'bird' : 4, 'alliance' : 0})
+    map.places['A'].update_pieces(buildings = [('empty', 'No one')], soldiers = {'cat' : 0, 'bird' : 4, 'alliance' : 0})
+    map.update_owners()
+    build_option = eyrie.get_resolve_building(map)
+    assert build_option == [('I', 27),('I', 28),('I', 53)]
