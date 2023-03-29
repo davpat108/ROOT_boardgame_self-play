@@ -138,13 +138,33 @@ class Marquise(Actor):
         return overwork_clearings
     
 
-class Eerie(Actor):
+class Eyrie(Actor):
     def __init__(self) -> None:
         super().__init__()
         self.items = []
-    
+        self.decree = {
+            "recruit": [],
+            "move": [],
+            "battle": [],
+            "build": [],
+        }
+
     def get_options(self, map):
         return super().get_options()
+
+    def get_decree_options(self):
+        decree_options = {
+            "recruit": [],
+            "move": [],
+            "battle": [],
+            "build": [],
+        }
+
+        for card in self.deck.cards:
+            for action in decree_options.keys():
+                decree_options[action].append((card.ID, card.card_suit))
+
+        return decree_options
     
 class Alliance(Actor):
     def __init__(self) -> None:

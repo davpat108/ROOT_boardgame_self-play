@@ -1,5 +1,5 @@
 from map import build_regular_forest, Map
-from actors import Marquise, Vagabond
+from actors import Marquise, Vagabond, Eyrie, Alliance
 from deck import Card, Deck
 from actions import Battle_DTO, MoveDTO, OverworkDTO
 from utils import cat_birdsong_wood
@@ -174,3 +174,29 @@ def test_marquise_overwork():
     map.update_owners()
     overworks = marquise.get_overwork(map)
     assert overworks == [OverworkDTO('A', 27, 'fox'), OverworkDTO('A', 28, 'fox'), OverworkDTO('A', 53, 'bird'), OverworkDTO('B', 53, 'bird'), OverworkDTO('F', 53, 'bird'),]
+
+def test_eyrie_get_decree_options():
+    map = build_regular_forest()
+    eyrie = Eyrie()
+
+    # Give Eyrie some cards
+    common_deck = Deck(empty=True)
+    common_deck.add_card(Card(*total_common_card_info[27])) # 2x fox
+    common_deck.add_card(Card(*total_common_card_info[28]))
+    common_deck.add_card(Card(*total_common_card_info[53])) # 1x bird
+
+    eyrie.deck.add_card(common_deck.draw_card())
+    eyrie.deck.add_card(common_deck.draw_card())
+    eyrie.deck.add_card(common_deck.draw_card())
+
+    decree_options = eyrie.get_decree_options()
+
+    assert len(decree_options) == 4
+
+    # Check if the decree options include the correct cards with the right suits
+    assert decree_options ==  {
+            "recruit": [(27, 'fox'), (28, 'fox'), (53, 'bird')],
+            "move": [(27, 'fox'), (28, 'fox'), (53, 'bird')],
+            "battle": [(27, 'fox'), (28, 'fox'), (53, 'bird')],
+            "build": [(27, 'fox'), (28, 'fox'), (53, 'bird')],
+        }

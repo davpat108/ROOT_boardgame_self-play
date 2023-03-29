@@ -1,7 +1,7 @@
 
 from deck import Deck, QuestDeck
 from map import build_regular_forest
-from actors import Marquise, Eerie, Alliance, Vagabond
+from actors import Marquise, Eyrie, Alliance, Vagabond
 from utils import cat_birdsong_wood
 
 if __name__ == "__main__":
@@ -13,7 +13,7 @@ if __name__ == "__main__":
     discard_quest_deck = QuestDeck(empty=True)
 
     margquise = Marquise()
-    eerie = Eerie()
+    eerie = Eyrie()
     alliance = Alliance()
     vagabond = Vagabond(role = "Thief")
 
