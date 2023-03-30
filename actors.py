@@ -235,6 +235,8 @@ class Eyrie(Actor):
                     building_option.append((place.name, 0))
 
         return building_option
+    # TODO get craft, 
+
 
 class Alliance(Actor):
     def __init__(self) -> None:
@@ -244,6 +246,49 @@ class Alliance(Actor):
     
     def get_options(self):
         return super().get_options()
+    
+    def get_revolt_options(self, map):
+        revolt_options = []
+
+        # Iterate through the map to find suitable clearings for a revolt
+        for key in sorted(list(map.places.keys())):
+            place = map.places[key]
+
+            if "sympathy" in place.tokens and not "keep" in place.tokens:
+                suit = place.suit
+                has_base = self.base_search(map, place.suit)
+
+                if not has_base:
+                    matching_cards = [card for card in self.supporter_deck.cards if card.card_suit == suit or card.card_suit == "bird"]
+                    card_combinations = self.get_card_combinations(matching_cards, 2)
+
+                    for combination in card_combinations:
+                        revolt_options.append((place.name, combination[0].ID, combination[1].ID))
+
+        return revolt_options
+
+    def base_search(self, map, suit):
+        for place in map.places.values():
+            if place.suit == suit:
+                for slot in place.building_slots:
+                    if slot[0] == 'base':
+                        return True
+        return False
+
+    def get_card_combinations(self, cards, num_cards):
+        if num_cards == 0:
+            return [[]]
+
+        if not cards:
+            return []
+
+        card = cards[0]
+        remaining_cards = cards[1:]
+
+        with_card = [[card] + combination for combination in self.get_card_combinations(remaining_cards, num_cards - 1)]
+        without_card = self.get_card_combinations(remaining_cards, num_cards)
+
+        return with_card + without_card
     
 class Vagabond(Actor):
     # First lets just make him thief

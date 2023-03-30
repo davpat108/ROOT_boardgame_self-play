@@ -248,3 +248,30 @@ def test_eyrie_no_roosts_left():
 
     options = eyrie.get_no_roosts_left_options(map)
     assert options == [('B', 0), ('C', 0), ('E', 0), ('F', 0), ('G', 0), ('H', 0), ('I', 0), ('J', 0), ('K', 0), ('L', 0)]
+
+def test_alliance_revolt_options():
+    map = build_regular_forest()
+    alliance = Alliance()
+
+    # Give Alliance some cards
+    common_deck = Deck(empty=True)
+    common_deck.add_card(Card(*total_common_card_info[0])) # rabbit
+    common_deck.add_card(Card(*total_common_card_info[27])) # 2x fox
+    common_deck.add_card(Card(*total_common_card_info[28]))
+    common_deck.add_card(Card(*total_common_card_info[53])) # 1x bird
+
+    alliance.supporter_deck.add_card(common_deck.draw_card())
+    alliance.supporter_deck.add_card(common_deck.draw_card())
+    alliance.supporter_deck.add_card(common_deck.draw_card())
+    alliance.supporter_deck.add_card(common_deck.draw_card())
+
+    map.places['I'].update_pieces(tokens = ['sympathy'])
+    revolt_options = alliance.get_revolt_options(map)
+
+    assert revolt_options == [('I', 27, 28), ('I', 27, 53), ('I', 28, 53)]
+
+    map.places['G'].update_pieces(buildings = [('base', 'alliance'),('ruin', 'No one')], tokens = ['sympathy'])
+
+    revolt_options = alliance.get_revolt_options(map)
+    print(revolt_options)
+    assert revolt_options == []
