@@ -217,7 +217,7 @@ def build_regular_forest():
 	suits = ["fox", "rabbit", "mouse", "rabbit", "mouse", "rabbit", "fox", "mouse", "fox", "fox", "mouse", "rabbit"]
 	building_slots = [1, 2, 2, 2, 2, 1, 2, 3, 2, 2, 2, 1]
 	vagabond_index = 14
-	ruin_indeces = [3, 5, 6, 7]
+	ruin_indeces = [3, 6, 7, 8]
 	paths = ['AB', 'AM', 'AD', 'AN', 'AE', 'BC', 'BM', 'CM', 'CD', 'CI',
 	   'DM', 'DN', 'DG', 'DO', 'EN', 'EG', 'EF', 'EP', 'GP', 'GQ', 'GF',
 		'GH', 'GR', 'GO', 'GN', 'GK', 'FP', 'FQ', 'FJ', 'HO', 'HR', 'HS',

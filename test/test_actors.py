@@ -115,9 +115,9 @@ def test_marquise_get_build_options():
     
     cat_birdsong_wood(map)
     build_options = marquise.get_build_options(map)
-    assert build_options == {'sawmill': {'where': ['B', 'C', 'E', 'G', 'H', 'I', 'J', 'K'], 'cost': 1},
-                              'workshop': {'where': ['B', 'C', 'E', 'G', 'H', 'I', 'J', 'K'], 'cost': 1},
-                                'recruiter': {'where': ['B', 'C', 'E', 'G', 'H', 'I', 'J', 'K'], 'cost': 1}}
+    assert build_options == {'sawmill': {'where': ['B', 'C', 'E', 'F', 'G', 'H', 'I', 'J', 'K'], 'cost': 1},
+                              'workshop': {'where': ['B', 'C', 'E', 'F', 'G', 'H', 'I', 'J', 'K'], 'cost': 1},
+                                'recruiter': {'where': ['B', 'C', 'E', 'F', 'G', 'H', 'I', 'J', 'K'], 'cost': 1}}
     
     piece_setup =[('B', {'soldiers' : {'cat': 1, 'bird' : 0, 'alliance' : 0}, 'buildings': [('sawmill', 'cat'), ('empty', 'No one')], 'tokens' : []}),# Cats
                 ('C', {'soldiers' : {'cat': 1, 'bird' : 3, 'alliance' : 0}, 'buildings': [('sawmill', 'cat'),('recruiter', 'cat')], 'tokens' : []}), # Birds
@@ -238,3 +238,13 @@ def test_resolves():
     map.update_owners()
     build_option = eyrie.get_resolve_building(map)
     assert build_option == [('I', 27),('I', 28),('I', 53)]
+
+
+def test_eyrie_no_roosts_left():
+    map = build_regular_forest()
+    eyrie = Eyrie()
+    bird_base = {'soldiers' : {'cat': 1, 'bird' : 0, 'alliance' : 0}, 'buildings': [('empty', 'No one')], 'tokens' : []}
+    map.places['L'].update_pieces(**bird_base)
+
+    options = eyrie.get_no_roosts_left_options(map)
+    assert options == [('B', 0), ('C', 0), ('E', 0), ('F', 0), ('G', 0), ('H', 0), ('I', 0), ('J', 0), ('K', 0), ('L', 0)]

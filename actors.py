@@ -217,12 +217,22 @@ class Eyrie(Actor):
 
         for card_ID, card_suit in self.decree["battle"]:
             matching_clearings = [place for place in map.places.values() if place.suit == card_suit or card_suit == "bird"]
-
-            for clearing in matching_clearings:
-                if clearing.owner == 'bird':
-                    if not True in [slot[0] == 'roost' for slot in clearing.building_slots] and True in [slot[0] == 'empty' for slot in clearing.building_slots] and not True in [token == 'keep' for token in clearing.tokens]:
-                        building_option.append((clearing.name, card_ID))
+            total_roosts = sum([True in [slot[0] == 'roost' for slot in place.building_slots] for place in map.places.values()])
+            if total_roosts <7:
+                for clearing in matching_clearings:
+                    if clearing.owner == 'bird':
+                        if not True in [slot[0] == 'roost' for slot in clearing.building_slots] and True in [slot[0] == 'empty' for slot in clearing.building_slots] and not True in [token == 'keep' for token in clearing.tokens]:
+                            building_option.append((clearing.name, card_ID))
                     
+
+        return building_option
+    
+    def get_no_roosts_left_options(self, map):
+        building_option = []
+        for place in map.places.values():
+            if not True in [slot[0] == 'roost' for slot in place.building_slots]:
+                if not True in [slot[0] == 'roost' for slot in place.building_slots] and True in [slot[0] == 'empty' for slot in place.building_slots] and not True in [token == 'keep' for token in place.tokens]:
+                    building_option.append((place.name, 0))
 
         return building_option
 
