@@ -275,3 +275,39 @@ def test_alliance_revolt_options():
     revolt_options = alliance.get_revolt_options(map)
     print(revolt_options)
     assert revolt_options == []
+
+def test_alliance_spread_options():
+    map = build_regular_forest()
+    alliance = Alliance()
+
+    # Give Alliance some cards
+    common_deck = Deck(empty=True)
+    common_deck.add_card(Card(*total_common_card_info[0])) # rabbit
+    common_deck.add_card(Card(*total_common_card_info[27])) # 2x fox
+    common_deck.add_card(Card(*total_common_card_info[28]))
+    common_deck.add_card(Card(*total_common_card_info[53])) # 1x bird
+
+    alliance.supporter_deck.add_card(common_deck.draw_card())
+    alliance.supporter_deck.add_card(common_deck.draw_card())
+    alliance.supporter_deck.add_card(common_deck.draw_card())
+    alliance.supporter_deck.add_card(common_deck.draw_card())
+
+    options = alliance.get_spread_sympathy_options(map)
+    assert options == [('B', []), ('C', []), ('D', []), ('E', []), ('F', []), ('G', []), ('H', []), ('I', []), ('J', []), ('K', []), ('L', [0]), ('L', [53])]
+
+    map.places['I'].update_pieces(tokens = ['sympathy'])
+    options = alliance.get_spread_sympathy_options(map)
+    options.sort(key=lambda x: x[0])
+    res = [('C', [53]), ('H', [53]), ('L', [0, 53])]
+    res.sort(key=lambda x: x[0])
+    assert options == res
+
+
+    map.places['H'].update_pieces(tokens = ['sympathy'])
+    map.places['I'].update_pieces(tokens = ['sympathy'])
+    map.places['L'].update_pieces(tokens = ['sympathy'])
+    options = alliance.get_spread_sympathy_options(map)
+    options.sort(key=lambda x: x[1][0])
+    res = [('G', [27,28]), ('G', [27,53]), ('G', [28,53])]
+    res.sort(key=lambda x: x[1][0])
+    assert options == res

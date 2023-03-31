@@ -290,6 +290,59 @@ class Alliance(Actor):
 
         return with_card + without_card
     
+
+    def get_spread_sympathy_options(self, map):
+        spread_sympathy_options = []
+        sympathies_on_map = sum(place.tokens.count("sympathy") for place in map.places.values())
+        if sympathies_on_map > 9:
+            return spread_sympathy_options
+        
+        if sympathies_on_map == 0:
+            cost = 0
+            for key in sorted(list(map.places.keys())):
+                place = map.places[key]
+                if "keep" not in place.tokens and place.forest == False:
+                    matching_cards = [card for card in self.supporter_deck.cards if card.card_suit == place.suit or card.card_suit == "bird"]
+                    other_faction_soldiers = sum(soldiers for faction, soldiers in place.soldiers.items() if faction != "alliance")
+                    if other_faction_soldiers >= 3:
+                        cost += 1
+                    card_combinations = self.get_card_combinations(matching_cards, cost)
+                    for combination in card_combinations:
+                        card_ids = [card.ID for card in combination]
+                        spread_sympathy_options.append((place.name, card_ids))
+
+        else:
+            sympathy_clearings = [place for place in map.places.values() if "sympathy" in place.tokens]
+            adjacent_clearings = set()
+
+            for clearing in sympathy_clearings:
+                for neighbor in clearing.neighbors:
+                    adjacent_clearings.update(neighbor[0])
+
+            for clearing_name in adjacent_clearings:
+                target_clearing = map.places[clearing_name]
+                if "sympathy" not in target_clearing.tokens and "keep" not in target_clearing.tokens and target_clearing.forest == False:
+                    clearing_suit = target_clearing.suit
+                    matching_cards = [card for card in self.supporter_deck.cards if card.card_suit == clearing_suit or card.card_suit == "bird"]
+
+                    if sympathies_on_map <= 2:
+                        cost = 1
+                    elif sympathies_on_map <= 5:
+                        cost = 2
+                    else:
+                        cost = 3
+
+                    other_faction_soldiers = sum(soldiers for faction, soldiers in target_clearing.soldiers.items() if faction != "alliance")
+                    if other_faction_soldiers >= 3:
+                        cost += 1
+
+                    card_combinations = self.get_card_combinations(matching_cards, cost)
+                    for combination in card_combinations:
+                        card_ids = [card.ID for card in combination]
+                        spread_sympathy_options.append((target_clearing.name, card_ids))
+
+        return spread_sympathy_options
+    
 class Vagabond(Actor):
     # First lets just make him thief
     def __init__(self, role = "Thief") -> None:
