@@ -84,6 +84,7 @@ class Place:
 class Map:
 	def __init__(self, object_num:int, clearing_num:int, suits:tuple[str, ...], building_slots:tuple[int, ...], vagabond_index:int, ruin_indeces:tuple[int, ...], paths:tuple[str, ...]):
 		self.places = {}
+		self.vagabond_position = chr(ord('A')+vagabond_index)
 		for i in range(object_num):
 			# Assuming vagabond can only start in the forest
 			if i>=clearing_num:
@@ -106,6 +107,14 @@ class Map:
 			return True
 		else:
 			return False
+	
+	def move_vagabond(self, destination_name:str):
+		self.vagabond_position = destination_name
+		for place in self.places.values():
+			if place.vagabond_is_here:
+				place.vagabond_is_here = False
+			if place.name == destination_name:
+				place.vagabond_is_here = True
 	
 	def add_path(self, object1, object2):
 		if object1 in self.places and object2 in self.places:
@@ -239,8 +248,5 @@ def build_regular_forest():
 			else:
 				map.places[key].update_pieces(**basic)
 	map.update_owners()
-	#map.check_vagabond()
-	#map.count_paths()
-	#map.print_graph()
 
 	return map

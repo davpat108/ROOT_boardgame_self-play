@@ -4,7 +4,7 @@ class ActionDTO:
         pass
 
 class Battle_DTO(ActionDTO):
-    def __init__(self, place, against_whom:str, card_ID = None) -> None:
+    def __init__(self, place:str, against_whom:str, card_ID = None) -> None:
         super().__init__()
         self.where = place
         self.against_whom = against_whom

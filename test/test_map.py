@@ -54,3 +54,13 @@ def test_count_stuff():
     assert map.count_on_map(('token', "wood"), per_suit=True)['rabbit'] == 0
     assert map.count_on_map(("building", "roost"), per_suit=True)['rabbit'] == 1
 
+def test_vagabond():
+    map = build_regular_forest()
+    map.check_vagabond()
+    assert map.places['O'].vagabond_is_here == True
+
+    map.move_vagabond('P')
+    assert map.places['O'].vagabond_is_here == False
+    assert map.places['P'].vagabond_is_here == True
+
+    map.check_vagabond()

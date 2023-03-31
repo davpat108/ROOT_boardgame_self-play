@@ -214,9 +214,9 @@ class Eyrie(Actor):
 
             for clearing in matching_clearings:
                 if clearing.soldiers["bird"] > 0:
-                    if clearing.soldiers["cat"] > 0:
+                    if clearing.soldiers['cat'] > 0 or True in [slot[0]=='sawmill' for slot in clearing.building_slots] or True in [slot[0]=='workshop' for slot in clearing.building_slots] or True in [slot[0]=='recruiter' for slot in clearing.building_slots] or 'keep' in clearing.tokens:
                         battle_options.append(Battle_DTO(clearing.name, "cat", card_ID))
-                    if clearing.soldiers["alliance"] > 0:
+                    if clearing.soldiers['alliance'] > 0 or True in [slot[0]=='base' for slot in clearing.building_slots] or "sympathy" in clearing.tokens:
                         battle_options.append(Battle_DTO(clearing.name, "alliance", card_ID))
                     if clearing.vagabond_is_here and vagabond.relations['bird'] == 'hostile':
                         battle_options.append(Battle_DTO(clearing.name, "vagabond", card_ID))
@@ -266,8 +266,12 @@ class Alliance(Actor):
         super().__init__()
         self.supporter_deck = Deck(empty = True)
         self.items = []
-        self.officers = 0
+        self.current_officers = 0
+        self.total_officers = 0
     
+    def refresh_officers(self):
+        self.current_officers = self.total_officers
+
     def get_options(self):
         return super().get_options()
     
@@ -407,8 +411,56 @@ class Alliance(Actor):
                 train_options.append(card.ID)
 
         return list(set(train_options))
+    
+    def get_battles(self, map, vagabond):
+        battle_options = []
+        if self.current_officers == 0:
+            return battle_options
+        for key in sorted(list(map.places.keys())):
+            place = map.places[key]
+            if place.soldiers['alliance'] > 0:
+                if place.soldiers['cat'] > 0 or True in [slot[0]=='sawmill' for slot in place.building_slots] or True in [slot[0]=='workshop' for slot in place.building_slots] or True in [slot[0]=='recruiter' for slot in place.building_slots] or 'keep' in place.tokens:
+                    battle_options.append(Battle_DTO(place.name, "cat"))
+                if place.soldiers['bird'] > 0 or True in [slot[0]=='roost' for slot in place.building_slots]:
+                    battle_options.append(Battle_DTO(place.name, "bird"))
+                if place.vagabond_is_here and vagabond.relations['alliance'] == 'hostile':
+                    battle_options.append(Battle_DTO(place.name, "vagabond"))
+        return battle_options
+    
+    def get_moves(self, map):
+        "Returns a list of MoveDTO objects"
+        moves = []
+        if self.current_officers == 0:
+            return moves
+        for key in sorted(list(map.places.keys())): # sort places by key
+            place = map.places[key]
+            for i in range(place.soldiers['alliance']):
+                for neighbor in place.neighbors:
+                    if place.owner == 'alliance' or map.places[neighbor[0]].owner == 'alliance':
+                        if place.forest == False and map.places[neighbor[0]].forest == False:
+                            moves.append(MoveDTO(place.name, map.places[neighbor[0]].name, how_many=i + 1))
+        return moves
 
+    def get_recruits(self, map):
+        if self.current_officers == 0:
+            return []
+        recruit_options = []
+        for place in map.places.values():
+            if True in [slot[0]=='base' for slot in place.building_slots]:
+                recruit_options.append(place.name)
+        return recruit_options   
 
+    def get_organize_options(self, map):
+        organize_options = []
+        if self.current_officers == 0:
+            return organize_options
+        
+        for place in map.places.values():
+            if place.soldiers['alliance']>0 and not 'sympathy' in place.tokens:
+                organize_options.append(place.name)
+
+        return organize_options
+    
 class Vagabond(Actor):
     # First lets just make him thief
     def __init__(self, role = "Thief") -> None:
@@ -432,3 +484,4 @@ class Vagabond(Actor):
 
     def get_options(self):
         return super().get_options()
+    

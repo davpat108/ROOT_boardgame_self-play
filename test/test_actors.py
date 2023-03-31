@@ -269,7 +269,6 @@ def test_eyrie_get_options_craft():
         }
     
 
-
 def test_alliance_revolt_options():
     map = build_regular_forest()
     alliance = Alliance()
@@ -294,7 +293,6 @@ def test_alliance_revolt_options():
     map.places['G'].update_pieces(buildings = [('base', 'alliance'),('ruin', 'No one')], tokens = ['sympathy'])
 
     revolt_options = alliance.get_revolt_options(map)
-    print(revolt_options)
     assert revolt_options == []
 
 def test_alliance_spread_options():
@@ -374,4 +372,55 @@ def test_alliance_get_options_train():
     train_options = alliance.get_train_options(map)
     assert train_options== [0, 53]
 
-test_alliance_get_options_train()
+def test_alliance_get_options_battle_recruit_and_organize():
+    map = build_regular_forest()
+    alliance = Alliance()
+    vagabond = Vagabond()
+    alliance.total_officers = 1
+    alliance.refresh_officers()
+    map.places['D'].update_pieces(tokens = ['sympathy'], buildings = [('base', 'alliance'), ('ruin', 'No one')], soldiers = {'cat': 1, 'bird' : 1, 'alliance' : 1})
+    map.update_owners()
+    battles = alliance.get_battles(map, vagabond)
+
+    assert battles == [Battle_DTO('D', 'cat'), Battle_DTO('D', 'bird')]
+
+    organize = alliance.get_recruits(map)
+    assert organize == ['D']
+
+    map.places['K'].update_pieces(soldiers = {'cat': 1, 'bird' : 1, 'alliance' : 1})
+    map.update_owners()
+    organize = alliance.get_organize_options(map)
+    assert organize == ['K']
+
+
+def test_alliance_move():
+    clearing_num = 4
+    suits = ["fox", "rabbit", "mouse", "fox"]
+    building_slots = [1, 1, 1, 1]
+    vagabond_index = 1
+    ruin_indeces = [3]
+    paths = ['AB', 'AC', 'BD', 'CD']
+    map = Map(4, clearing_num=clearing_num, building_slots=building_slots, suits=suits, vagabond_index=vagabond_index, ruin_indeces=ruin_indeces, paths=paths)
+    piece_setup = [('A', {'soldiers' : {'cat': 1, 'bird' : 0, 'alliance' : 1}, 'buildings': [('base', 'alliance')], 'tokens' : ['keep']}), # Allanace
+                       ('B', {'soldiers' : {'cat': 1, 'bird' : 0, 'alliance' : 1}, 'buildings': [('base', 'alliance')], 'tokens' : []}), # Allanace
+                       ('C', {'soldiers' : {'cat': 0, 'bird' : 2, 'alliance' : 1}, 'buildings': [('empty', 'No one')], 'tokens' : []}), # Birds
+                       ('D', {'soldiers' : {'cat': 0, 'bird' : 2, 'alliance' : 2}, 'buildings': [('empty', 'No one')], 'tokens' : []})] # Birds
+    i = 0
+    for key in sorted(list(map.places.keys())):
+        if map.places[key].name == piece_setup[i][0]:
+            map.places[key].update_pieces(**piece_setup[i][1])
+            i += 1
+
+    map.update_owners()
+    alliance = Alliance()
+    alliance.total_officers = 1
+    alliance.refresh_officers()
+    move_options = alliance.get_moves(map)
+    assert move_options == [MoveDTO('A', 'B', 1),
+                             MoveDTO('A', 'C', 1),
+                             MoveDTO('B', 'A', 1),
+                              MoveDTO('B', 'D', 1),
+                                 MoveDTO('C', 'A', 1),
+                                     MoveDTO('D', 'B', 1),
+                                     MoveDTO('D', 'B', 2)]
+    
