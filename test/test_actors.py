@@ -249,6 +249,27 @@ def test_eyrie_no_roosts_left():
     options = eyrie.get_no_roosts_left_options(map)
     assert options == [('B', 0), ('C', 0), ('E', 0), ('F', 0), ('G', 0), ('H', 0), ('I', 0), ('J', 0), ('K', 0), ('L', 0)]
 
+def test_eyrie_get_options_craft():
+    map = build_regular_forest()
+    eyrie = Eyrie()
+    #give marquise a card that can be crafted
+    eyrie.deck.add_card(Card(*[11, "rabbit", "boot", 1, "rabbit"]))
+    #give marquise a card that can be crafted but not enough resources
+    eyrie.deck.add_card(Card(*[12, "rabbit", "root_tea", 1, "mouse"]))
+    eyrie.deck.add_card(Card(*[5, "rabbit", "ambush", 0, "ambush"]))
+    
+    craft_options = eyrie.get_options_craft(map)
+    assert [craft_option.item for craft_option in craft_options] == ["boot"]
+    eyrie.get_ambushes()
+    assert eyrie.ambush == {
+            "rabbit": 1,
+            "mouse": 0,
+            "fox": 0,
+            "bird": 0,
+        }
+    
+
+
 def test_alliance_revolt_options():
     map = build_regular_forest()
     alliance = Alliance()
@@ -311,3 +332,46 @@ def test_alliance_spread_options():
     res = [('G', [27,28]), ('G', [27,53]), ('G', [28,53])]
     res.sort(key=lambda x: x[1][0])
     assert options == res
+    
+
+def test_alliance_get_options_craft():
+    map = build_regular_forest()
+    alliance = Alliance()
+    #give allaince a card that can be crafted
+    alliance.deck.add_card(Card(*[11, "rabbit", "boot", 1, "rabbit"]))
+    #give allaince a card that can be crafted but not enough resources
+    alliance.deck.add_card(Card(*[12, "rabbit", "root_tea", 1, "mouse"]))
+    alliance.deck.add_card(Card(*[5, "rabbit", "ambush", 0, "ambush"]))
+    
+    map.places['D'].update_pieces(tokens = ['sympathy'])
+    craft_options = alliance.get_options_craft(map)
+    assert [craft_option.item for craft_option in craft_options] == ["boot"]
+    alliance.get_ambushes()
+    assert alliance.ambush == {
+            "rabbit": 1,
+            "mouse": 0,
+            "fox": 0,
+            "bird": 0,
+        }
+    
+def test_alliance_get_options_train():
+    map = build_regular_forest()
+    alliance = Alliance()
+
+    common_deck = Deck(empty=True)
+    common_deck.add_card(Card(*total_common_card_info[0])) # rabbit
+    common_deck.add_card(Card(*total_common_card_info[27])) # 2x fox
+    common_deck.add_card(Card(*total_common_card_info[28]))
+    common_deck.add_card(Card(*total_common_card_info[53])) # 1x bird
+
+    alliance.deck.add_card(common_deck.draw_card())
+    alliance.deck.add_card(common_deck.draw_card())
+    alliance.deck.add_card(common_deck.draw_card())
+    alliance.deck.add_card(common_deck.draw_card())
+
+    
+    map.places['D'].update_pieces(tokens = ['sympathy'], buildings = [('base', 'alliance'), ('ruin', 'No one')])
+    train_options = alliance.get_train_options(map)
+    assert train_options== [0, 53]
+
+test_alliance_get_options_train()

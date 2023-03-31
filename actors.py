@@ -152,6 +152,17 @@ class Eyrie(Actor):
     def get_options(self, map):
         return super().get_options()
 
+    def get_ambushes(self):
+        self.ambush ={
+            "rabbit": 0,
+            "mouse": 0,
+            "fox": 0,
+            "bird": 0,
+        }
+        for card in self.deck.cards:
+            if card.craft_suit == "ambush":
+                self.ambush[card.card_suit] += 1
+
     def get_decree_options(self):
         decree_options = {
             "recruit": [],
@@ -235,7 +246,19 @@ class Eyrie(Actor):
                     building_option.append((place.name, 0))
 
         return building_option
-    # TODO get craft, 
+
+    def get_options_craft(self, map):
+        roost_counts = map.count_on_map(("building", "roost"), per_suit=True)
+        craft_options = []
+        for card in self.deck.cards:
+            if card.craft_suit == "ambush":
+                pass
+            elif roost_counts[card.craft_suit] >= card.craft_cost:
+                craft_options.append(CraftDTO(card.craft))
+            elif card.craft_suit == "anything":
+                if sum(roost_counts.values()) > card.craft_cost:
+                    craft_options.append(CraftDTO(card.craft))
+        return craft_options 
 
 
 class Alliance(Actor):
@@ -243,10 +266,22 @@ class Alliance(Actor):
         super().__init__()
         self.supporter_deck = Deck(empty = True)
         self.items = []
+        self.officers = 0
     
     def get_options(self):
         return super().get_options()
     
+    def get_ambushes(self):
+        self.ambush ={
+            "rabbit": 0,
+            "mouse": 0,
+            "fox": 0,
+            "bird": 0,
+        }
+        for card in self.deck.cards:
+            if card.craft_suit == "ambush":
+                self.ambush[card.card_suit] += 1
+
     def get_revolt_options(self, map):
         revolt_options = []
 
@@ -343,6 +378,37 @@ class Alliance(Actor):
 
         return spread_sympathy_options
     
+    def get_options_craft(self, map):
+        sympathy_counts = map.count_on_map(("token", "sympathy"), per_suit=True)
+        craft_options = []
+        for card in self.deck.cards:
+            if card.craft_suit == "ambush":
+                pass
+            elif sympathy_counts[card.craft_suit] >= card.craft_cost:
+                craft_options.append(CraftDTO(card.craft))
+            elif card.craft_suit == "anything":
+                if sum(sympathy_counts.values()) > card.craft_cost:
+                    craft_options.append(CraftDTO(card.craft))
+        return craft_options
+    
+    def get_mobilize_options(self):
+        return [card.ID for card in self.deck.cards]
+    
+    def get_train_options(self, map):
+        base_suits = set()
+        train_options = []
+
+        for place in map.places.values():
+            if ("base", "alliance") in place.building_slots:
+                base_suits.add(place.suit)
+
+        for card in self.deck.cards:
+            if card.card_suit in base_suits or card.card_suit == "bird":
+                train_options.append(card.ID)
+
+        return list(set(train_options))
+
+
 class Vagabond(Actor):
     # First lets just make him thief
     def __init__(self, role = "Thief") -> None:
