@@ -1,5 +1,5 @@
 from map import build_regular_forest, Map
-from actors import Marquise, Vagabond, Eyrie, Alliance
+from actors import Marquise, Vagabond, Eyrie, Alliance, Item
 from deck import Card, Deck
 from actions import Battle_DTO, MoveDTO, OverworkDTO, Battle_DTO
 from utils import cat_birdsong_wood
@@ -424,3 +424,37 @@ def test_alliance_move():
                                      MoveDTO('D', 'B', 1),
                                      MoveDTO('D', 'B', 2)]
     
+
+def test_vagabond():
+    map = build_regular_forest()
+    alliance = Alliance()
+    vagabond = Vagabond()
+
+    slip_options = vagabond.get_slip_options(map)
+    slip_options = sorted(slip_options, key= lambda x: (x.start, x.end))
+    assert slip_options == sorted([MoveDTO('O', 'C', 0), MoveDTO('O', 'D', 0), MoveDTO('O', 'G', 0), MoveDTO('O', 'H', 0), MoveDTO('O', 'I', 0)], key= lambda x: (x.start, x.end))
+
+    move_options = vagabond.get_moves(map)
+    assert move_options == sorted([MoveDTO('O', 'C', 0), MoveDTO('O', 'D', 0), MoveDTO('O', 'G', 0), MoveDTO('O', 'H', 0), MoveDTO('O', 'I', 0)], key= lambda x: (x.start, x.end))
+
+    vagabond.damage_item('boot')
+    move_options = vagabond.get_moves(map)
+    move_options = sorted(move_options, key= lambda x: (x.start, x.end))
+    assert move_options == []
+
+    map.move_vagabond('C')
+    slip_options = vagabond.get_slip_options(map)
+    slip_options =sorted(slip_options, key= lambda x: (x.start, x.end))
+    assert slip_options == sorted([MoveDTO('C', 'B', 0), MoveDTO('C', 'D', 0), MoveDTO('C', 'I', 0), MoveDTO('C', 'M', 0), MoveDTO('C', 'O', 0)], key= lambda x: (x.start, x.end))
+
+    vagabond.repair_item('boot')
+    move_options = vagabond.get_moves(map)
+    move_options = sorted(move_options, key= lambda x: (x.start, x.end))
+    assert move_options == sorted([MoveDTO('C', 'B', 0), MoveDTO('C', 'D', 0), MoveDTO('C', 'I', 0)], key= lambda x: (x.start, x.end))
+
+    vagabond.exhaust_item('boot')
+    vagabond.exhaust_item('sword')
+    refresh_options = vagabond.get_refresh_options()
+    assert refresh_options == [(Item('sword'), Item('boot'))]
+
+    #UNTESTED : Vagabond.get_battle_options(map, alliance), Vagabond.get_repair_options(map, alliance)

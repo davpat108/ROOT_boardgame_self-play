@@ -1,6 +1,7 @@
 from deck import Deck, QuestDeck
 from actions import Battle_DTO, CraftDTO, MoveDTO, OverworkDTO
 from configs import buildings_list_marquise
+from itertools import combinations
 class Actor():
 
     def __init__(self) -> None:
@@ -461,18 +462,34 @@ class Alliance(Actor):
 
         return organize_options
     
+
+class Item():
+    def __init__(self, name, exhausted=False, damaged=False) -> None:
+        self.name = name
+        self.check_names()
+        self.exhausted = False
+        self.damaged = False
+
+    def __eq__(self, other) -> bool:
+        if self.name == other.name:
+            return True
+
+    def __repr__(self):
+        return self.name
+
+
+    def check_names(self):
+        if not self.name in ["sack", "money", "boot", "sword", "crossbow", "torch", "root_tea", "hammer"]:
+            raise ValueError("Item name not valid")
+
 class Vagabond(Actor):
     # First lets just make him thief
     def __init__(self, role = "Thief") -> None:
         super().__init__()
         self.quest_deck = QuestDeck(empty=True)
         if role == "Thief":
-            self.satchel_fresh = ["sword", "torch", "boot"]
-            self.satchel_exhausted = []
-            self.satchel_damaged = []
-            self.other_items_fresh = ["root_tea"]
-            self.other_items_exhausted = []
-            self.other_items_damaged = []
+            self.satchel = [Item("sword"), Item("torch"), Item("boot")]
+            self.other_items = [Item("root_tea")]
             self.relations = {
 			"cat" : 'indifferent',
 			"bird" : 'indifferent',
@@ -485,3 +502,85 @@ class Vagabond(Actor):
     def get_options(self):
         return super().get_options()
     
+    def get_slip_options(self, map):
+        slip_options = []
+        for neighbor in map.places[map.vagabond_position].neighbors:
+            slip_options.append(MoveDTO(map.vagabond_position, map.places[neighbor[0]].name, 0))
+        return slip_options
+    
+    def get_moves(self, map):
+        move_options = []
+        for neighbor in map.places[map.vagabond_position].neighbors:
+            if not neighbor[1]:
+                if self.relations[ map.places[neighbor[0]].owner ] == 'hostile':
+                    boot_cost = 2
+                else:
+                    boot_cost = 1
+                if [item for item in self.satchel if item.exhausted == False and item.damaged == False].count(Item("boot")) >= boot_cost:
+                    move_options.append(MoveDTO(map.vagabond_position, map.places[neighbor[0]].name, how_many=0))
+        return move_options
+    
+
+    def get_refresh_options(self):
+        item_num = self.other_items.count(Item("root_tea"))*2 + 3
+        all_items = self.satchel + self.other_items
+        exhausted_items = [item for item in all_items if item.exhausted]
+        return list(combinations(exhausted_items, min(item_num, len(exhausted_items))))
+
+    def get_repair_options(self):
+        item_num = self.satchel.count(Item("hammer").exhausted == False and Item("hammer").damaged == False)
+        all_items = self.satchel + self.other_items
+        damaged_items = [item for item in all_items if item.damaged]
+        return list(combinations(damaged_items, min(item_num, len(damaged_items))))
+    
+    def get_battle_options(self, map):
+        battle_options = []
+        if self.satchel.count(Item("sword").exhausted == False and Item("sword").damaged == False) > 0:
+            for army in map.place[map.vaganond_position].soldiers:
+                if map.place[map.vaganond_position].soldiers[army] > 0:
+                    battle_options.append(Battle_DTO(map.vagabond_position, army))
+        return battle_options
+
+    def damage_item(self, itemname):
+        for item in self.satchel:
+            if item.name == itemname:
+                item.damaged = True
+                return
+        for item in self.other_items:
+            if item.name == itemname:
+                item.damaged = True
+                return
+        raise ValueError("Item not found")
+
+    def exhaust_item(self, itemname):
+        for item in self.satchel:
+            if item.name == itemname:
+                item.exhausted = True
+                return
+        for item in self.other_items:
+            if item.name == itemname:
+                item.exhausted = True
+                return
+        raise ValueError("Item not found")
+
+    def repair_item(self, itemname):
+        for item in self.satchel:
+            if item.name == itemname:
+                item.damaged = False
+                return
+        for item in self.other_items:
+            if item.name == itemname:
+                item.damaged = False
+                return
+        raise ValueError("Item not found")
+    
+    def refresh_item(self, itemname):
+        for item in self.satchel:
+            if item.name == itemname:
+                item.exhausted = False
+                return
+        for item in self.other_items:
+            if item.name == itemname:
+                item.exhausted = False
+                return
+        raise ValueError("Item not found")

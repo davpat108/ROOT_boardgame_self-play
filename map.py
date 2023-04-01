@@ -118,9 +118,9 @@ class Map:
 	
 	def add_path(self, object1, object2):
 		if object1 in self.places and object2 in self.places:
-			if ord(object1)>ord('L') or ord(object2)>ord('L'):
+			if ord(object2)>ord('L'):
 				self.places[object1].add_neighbor(object2, to_forest = True)
-				self.places[object2].add_neighbor(object1, to_forest = True)
+				self.places[object2].add_neighbor(object1, to_forest = False)
 			else:
 				self.places[object1].add_neighbor(object2, to_forest = False)
 				self.places[object2].add_neighbor(object1, to_forest = False)
@@ -227,7 +227,7 @@ def build_regular_forest():
 	building_slots = [1, 2, 2, 2, 2, 1, 2, 3, 2, 2, 2, 1]
 	vagabond_index = 14
 	ruin_indeces = [3, 6, 7, 8]
-	paths = ['AB', 'AM', 'AD', 'AN', 'AE', 'BC', 'BM', 'CM', 'CD', 'CI',
+	paths = ['AB', 'AM', 'AD', 'AN', 'AE', 'BC', 'BM', 'CM', 'CD', 'CI','CO',
 	   'DM', 'DN', 'DG', 'DO', 'EN', 'EG', 'EF', 'EP', 'GP', 'GQ', 'GF',
 		'GH', 'GR', 'GO', 'GN', 'GK', 'FP', 'FQ', 'FJ', 'HO', 'HR', 'HS',
 		  'HL', 'HI', 'IO', 'IS', 'IL', "JF", 'JK', 'JQ', 'JT', 'KL', 'KT',

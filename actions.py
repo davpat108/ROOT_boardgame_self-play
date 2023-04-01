@@ -24,7 +24,7 @@ class CraftDTO(ActionDTO):
         self.get_item(craft)
 
     def get_item(self, craft):
-        if craft == "sack" or "money" or "boot" or "sword" or "crossbow" or "torch" or "root_tea" or "hammer":
+        if craft in ["sack", "money", "boot", "sword", "crossbow", "torch", "root_tea", "hammer"]:
             self.item = craft
         else:
             self.item = None
