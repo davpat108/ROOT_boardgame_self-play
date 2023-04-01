@@ -63,7 +63,7 @@ class Marquise(Actor):
                     battle_options.append(Battle_DTO(place.name, "bird"))
                 if place.soldiers['alliance'] > 0 or True in [slot[0]=='base' for slot in place.building_slots] or "sympathy" in place.tokens:
                     battle_options.append(Battle_DTO(place.name, "alliance"))
-                if place.vagabond_is_here and vagabond.relations['cat'] == 'hostile':
+                if place.vagabond_is_here:
                     battle_options.append(Battle_DTO(place.name, "vagabond"))
         return battle_options
     
@@ -219,7 +219,7 @@ class Eyrie(Actor):
                         battle_options.append(Battle_DTO(clearing.name, "cat", card_ID))
                     if clearing.soldiers['alliance'] > 0 or True in [slot[0]=='base' for slot in clearing.building_slots] or "sympathy" in clearing.tokens:
                         battle_options.append(Battle_DTO(clearing.name, "alliance", card_ID))
-                    if clearing.vagabond_is_here and vagabond.relations['bird'] == 'hostile':
+                    if clearing.vagabond_is_here:
                         battle_options.append(Battle_DTO(clearing.name, "vagabond", card_ID))
 
         return battle_options
@@ -424,7 +424,7 @@ class Alliance(Actor):
                     battle_options.append(Battle_DTO(place.name, "cat"))
                 if place.soldiers['bird'] > 0 or True in [slot[0]=='roost' for slot in place.building_slots]:
                     battle_options.append(Battle_DTO(place.name, "bird"))
-                if place.vagabond_is_here and vagabond.relations['alliance'] == 'hostile':
+                if place.vagabond_is_here:
                     battle_options.append(Battle_DTO(place.name, "vagabond"))
         return battle_options
     

@@ -206,7 +206,6 @@ def test_resolves():
     map = build_regular_forest()
     eyrie = Eyrie()
     vagabond = Vagabond()
-    vagabond.relations['bird'] = 'hostile'
     map.places['L'].update_pieces(vagabond_is_here = True) # This creates 2 vagabonds but its ok for now
     
     # Give Eyrie some cards
