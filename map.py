@@ -23,6 +23,7 @@ class Place:
 
 	def has_opponent_pieces(self, opponent):
 		has_building = any(slot[1] == opponent for slot in self.building_slots)
+		has_token = False
 		if opponent == "alliance":
 			has_token = any(token == "sympathy" for token in self.tokens)
 		if opponent == "cat":

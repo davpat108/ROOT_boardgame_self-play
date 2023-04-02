@@ -427,6 +427,8 @@ def test_alliance_move():
 def test_vagabond():
     map = build_regular_forest()
     alliance = Alliance()
+    eyrie = Eyrie()
+    marquise = Marquise()
     vagabond = Vagabond()
     # SLIP and MOVE
     slip_options = vagabond.get_slip_options(map)
@@ -499,5 +501,87 @@ def test_vagabond():
     quest_options = vagabond.get_quest_options(map)
     assert quest_options == []
 
+    #THIEVING
+    vagabond.repair_and_refresh_all()
+    thief_options = vagabond.get_thief_ability(map)
+    assert thief_options == ['cat', 'bird', 'alliance']
 
-#UNTESTED :  get thief ability, get_ruin_explore_options, get_strike_options, get_aid_options
+    vagabond.exhaust_item(Item('torch'))
+    thief_options = vagabond.get_thief_ability(map)
+    assert thief_options == []
+
+    # RUIN
+    vagabond.repair_and_refresh_all()
+    ruin_option = vagabond.get_ruin_explore_options(map)
+    assert ruin_option == False
+
+    map.move_vagabond('D')
+    ruin_option = vagabond.get_ruin_explore_options(map)
+    assert ruin_option == True
+
+    map.places['D'].building_slots[0] = ('empty', 'No one')
+    map.places['D'].building_slots[1] = ('empty', 'No one') # RUIN cleared
+    ruin_option = vagabond.get_ruin_explore_options(map)
+    assert ruin_option == False
+
+    # STRIKE
+    vagabond.repair_and_refresh_all()
+    strike_options = vagabond.get_strike_options(map)
+    assert strike_options == [('D', 'cat', 'soldier')]
+
+    map.move_vagabond('A')
+    strike_options = vagabond.get_strike_options(map)
+    assert strike_options == [('A', 'cat', 'soldier')]
+
+    map.places['A'].update_pieces(soldiers = {'cat': 0, 'bird' : 0, 'alliance' : 0})
+    strike_options = vagabond.get_strike_options(map)
+    strike_options = sorted(strike_options, key= lambda x: (x[0], x[1], x[2]))
+    assert strike_options == sorted([('A', 'cat', 'keep'), ('A', 'cat', 'sawmill')], key= lambda x: (x[0], x[1], x[2]))
+
+    map.places['A'].update_pieces(tokens = ['sympathy', 'keep'])
+    strike_options = vagabond.get_strike_options(map)
+    strike_options = sorted(strike_options, key= lambda x: (x[0], x[1], x[2]))
+    assert strike_options == sorted([('A', 'cat', 'keep'), ('A', 'cat', 'sawmill'), ('A', 'alliance', 'sympathy')], key= lambda x: (x[0], x[1], x[2]))
+
+    vagabond.exhaust_item(Item('crossbow'))
+    strike_options = vagabond.get_strike_options(map)
+    assert strike_options == []
+
+    # AID
+
+    common_deck = Deck(empty=True)
+    common_deck.add_card(Card(*total_common_card_info[0])) # rabbit
+    common_deck.add_card(Card(*total_common_card_info[27])) # 2x fox
+    common_deck.add_card(Card(*total_common_card_info[28]))
+    common_deck.add_card(Card(*total_common_card_info[53])) # 1x bird
+
+    vagabond.deck.add_card(common_deck.draw_card())
+    vagabond.deck.add_card(common_deck.draw_card())
+    vagabond.deck.add_card(common_deck.draw_card())
+    vagabond.deck.add_card(common_deck.draw_card())
+
+    vagabond.repair_and_refresh_all()
+    vagabond.relations['cat'] = 'very good'
+    aid_options = vagabond.get_aid_options(map, [marquise, eyrie, alliance]) # alliance, cat
+    aid_options = sorted(aid_options, key= lambda x: (x[0], x[1]))
+    assert aid_options == sorted([('alliance', [27], None), ('alliance', [28], None), ('alliance', [53], None), ('cat', [27, 28, 53],  None)], key= lambda x: (x[0], x[1]))
+
+    marquise.items = [Item('sword'), Item('sword'), Item('sword')]
+    aid_options = vagabond.get_aid_options(map, [marquise, eyrie, alliance]) # alliance, cat
+    aid_options = sorted(aid_options, key= lambda x: (x[0], x[1]))
+    assert aid_options == sorted([('alliance', [27], None), ('alliance', [28], None), ('alliance', [53], None), ( 'cat', [27, 28, 53],  'sword')], key= lambda x: (x[0], x[1]))
+
+    alliance.items = [Item('sword'), Item('crossbow')]
+    aid_options = vagabond.get_aid_options(map, [marquise, eyrie, alliance]) # alliance, cat
+    aid_options = sorted(aid_options, key= lambda x: (x[0], x[1], x[2]))
+    assert aid_options == sorted([('alliance', [27], 'sword'), ('alliance', [28], 'sword'), ('alliance', [53], 'sword'), ('alliance', [27], 'crossbow'), ('alliance', [28], 'crossbow'), ('alliance', [53], 'crossbow'), ('cat', [27, 28, 53],  'sword')], key= lambda x: (x[0], x[1], x[2]))
+
+    vagabond.deck.draw_card()
+    vagabond.deck.draw_card()
+    vagabond.deck.draw_card()
+    vagabond.deck.draw_card()
+
+    aid_options = vagabond.get_aid_options(map, [marquise, eyrie, alliance]) # alliance, cat
+    aid_options = sorted(aid_options, key= lambda x: (x[0], x[1], x[2]))
+    assert aid_options == []
+

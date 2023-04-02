@@ -478,6 +478,14 @@ class Item():
     def __repr__(self):
         return self.name
 
+    def __lt__(self, other):
+        return self.name < other.name
+    
+    def __key(self):
+        return (self.name, self.exhausted, self.damaged)
+
+    def __hash__(self):
+        return hash(self.__key())
 
     def check_names(self):
         if not self.name in ["sack", "money", "boot", "sword", "crossbow", "torch", "root_tea", "hammer"]:
@@ -594,12 +602,12 @@ class Vagabond(Actor):
         thief_ability_options = []
         current_clearing = map.places[map.vagabond_position]
 
-        if current_clearing.soldiers['bird'] > 0 or True in [slot[0] == 'roost' for slot in current_clearing.building_slots]:
-            thief_ability_options.append((current_clearing.name, 'bird'))
         if current_clearing.soldiers['cat'] > 0 or True in [slot[1]=='cat' for slot in current_clearing.building_slots]or 'keep' in current_clearing.tokens or 'wood' in current_clearing.tokens:
-            thief_ability_options.append((current_clearing.name, 'cat'))
+            thief_ability_options.append('cat')
+        if current_clearing.soldiers['bird'] > 0 or True in [slot[0] == 'roost' for slot in current_clearing.building_slots]:
+            thief_ability_options.append('bird')
         if current_clearing.soldiers['alliance'] > 0 or True in [slot[0] == 'base' for slot in current_clearing.building_slots] or "sympathy" in current_clearing.tokens:
-            thief_ability_options.append((current_clearing.name, 'alliance'))
+            thief_ability_options.append('alliance')
 
         return thief_ability_options
         
@@ -622,6 +630,7 @@ class Vagabond(Actor):
         for opponent in ['cat', 'bird', 'alliance']:
             if current_clearing.soldiers[opponent] > 0:
                 strike_options.append((current_clearing.name, opponent, 'soldier'))
+                continue
             if opponent=="alliance" and 'sympathy' in current_clearing.tokens:
                 strike_options.append((current_clearing.name, opponent, 'sympathy'))
             if opponent=="cat" and 'keep' in current_clearing.tokens:
@@ -634,13 +643,14 @@ class Vagabond(Actor):
             
         return strike_options
 
-    def get_aid_options(self, map, *opponents):
+    def get_aid_options(self, map, opponents):
         aid_options = []
         current_clearing = map.places[map.vagabond_position]
         # Iterates through name
-        for opponent in ['cat', 'bird', 'alliance']:
-            if current_clearing.has_opponent_pieces(opponent):
-                relation = self.relations[opponent]
+        i = 0
+        for opponent_name in ['cat', 'bird', 'alliance']:
+            if current_clearing.has_opponent_pieces(opponent_name):
+                relation = self.relations[opponent_name]
                 if relation == 'hostile':
                     continue
 
@@ -652,15 +662,18 @@ class Vagabond(Actor):
                     cost = 3
 
                 item_choices = []  # Get items from the opponent
-                for item in opponents.items: #Iterates through opponent objects from arquments
-                    if not item.exhausted and not item.damaged:
-                        item_choices.append(Item(item.name))
+                for item in opponents[i].items: #Iterates through opponent objects from arquments
+                    item_choices.append(Item(item.name))
+                item_choices = set(item_choices)
 
-                if item_choices:
-                    for item in item_choices:
-                        aid_options.append((current_clearing.name, opponent, cost, item))
-                else:
-                    aid_options.append((current_clearing.name, opponent, cost, None))
+                usable_card_combinations = list(combinations([card.ID for card in self.deck.cards if card.card_suit == current_clearing.suit or card.card_suit == 'bird'], cost))
+                for combination in usable_card_combinations:
+                    if item_choices:
+                        for item in item_choices:
+                            aid_options.append((opponent_name, list(combination), item.name))
+                    else:
+                        aid_options.append((opponent_name, list(combination), None))
+            i += 1
 
         return aid_options
 
