@@ -5,6 +5,34 @@ from actions import Battle_DTO, MoveDTO, OverworkDTO, Battle_DTO
 from utils import cat_birdsong_wood
 from configs import total_common_card_info, vagabond_quest_card_info
 
+def test_discard_down_to_five():
+    marquise = Marquise()
+    common_deck = Deck(empty=True)
+    common_deck.add_card(Card(*total_common_card_info[0])) # rabbit
+    common_deck.add_card(Card(*total_common_card_info[1]))
+    common_deck.add_card(Card(*total_common_card_info[2]))
+    common_deck.add_card(Card(*total_common_card_info[27])) # 2x fox
+    common_deck.add_card(Card(*total_common_card_info[28]))
+    common_deck.add_card(Card(*total_common_card_info[53])) # 1x bird
+
+    marquise.deck.add_card(common_deck.draw_card())
+    marquise.deck.add_card(common_deck.draw_card())
+    marquise.deck.add_card(common_deck.draw_card())
+    marquise.deck.add_card(common_deck.draw_card())
+    marquise.deck.add_card(common_deck.draw_card())
+    marquise.deck.add_card(common_deck.draw_card())
+
+    options = marquise.discard_down_to_five_options()
+    assert options == [[0], [1], [2], [27], [28], [53]]
+
+    common_deck.add_card(Card(*total_common_card_info[52]))
+    marquise.deck.add_card(common_deck.draw_card())
+    options = marquise.discard_down_to_five_options()
+    print(options)
+    assert len(options) == 21
+
+
+
 def test_marguise_get_options_craft():
     map = build_regular_forest()
     marguise = Marquise()
@@ -329,7 +357,20 @@ def test_alliance_spread_options():
     res = [('G', [27,28]), ('G', [27,53]), ('G', [28,53])]
     res.sort(key=lambda x: x[1][0])
     assert options == res
-    
+
+    # Quick check supporter discard
+    common_deck.add_card(Card(*total_common_card_info[21]))
+    common_deck.add_card(Card(*total_common_card_info[22]))
+    alliance.supporter_deck.add_card(common_deck.draw_card())
+    alliance.supporter_deck.add_card(common_deck.draw_card())
+
+    options = alliance.discard_down_to_five_supporters_options(map)
+    assert sorted(options) == sorted([[0], [21], [22], [27], [28], [53]])
+
+    map.places['B'].update_pieces(buildings = [('base', 'alliance'),('sawmill', 'cat')])
+    options = alliance.discard_down_to_five_supporters_options(map)
+    assert options == None
+
 
 def test_alliance_get_options_craft():
     map = build_regular_forest()
@@ -365,7 +406,6 @@ def test_alliance_get_options_train():
     alliance.deck.add_card(common_deck.draw_card())
     alliance.deck.add_card(common_deck.draw_card())
     alliance.deck.add_card(common_deck.draw_card())
-
     
     map.places['D'].update_pieces(tokens = ['sympathy'], buildings = [('base', 'alliance'), ('ruin', 'No one')])
     train_options = alliance.get_train_options(map)

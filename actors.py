@@ -24,6 +24,18 @@ class Actor():
         #retuns a list of options
         pass
         
+    def discard_down_to_five_options(self):
+        if len(self.deck.cards) <= 5:
+            return
+        card_IDs = []
+        retlist = []
+        for card in self.deck.cards:
+            card_IDs.append(card.ID)
+
+        for combination in list(combinations(card_IDs, len(card_IDs)-5)):
+            retlist.append(list(combination))
+        return retlist
+        
         
 class Marquise(Actor):
     def __init__(self) -> None:
@@ -276,6 +288,20 @@ class Alliance(Actor):
     def get_options(self):
         return super().get_options()
     
+    def discard_down_to_five_supporters_options(self, map):
+        if map.count_on_map(("building", "base")) == 0:
+            if len(self.supporter_deck.cards) <= 5:
+                return
+            card_IDs = []
+            retlist = []
+            for card in self.supporter_deck.cards:
+                card_IDs.append(card.ID)
+
+            for combination in list(combinations(card_IDs, len(card_IDs)-5)):
+                retlist.append(list(combination))
+            return retlist
+        return
+
     def get_ambushes(self):
         self.ambush ={
             "rabbit": 0,
