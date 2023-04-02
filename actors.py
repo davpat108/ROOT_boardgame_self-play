@@ -215,9 +215,9 @@ class Eyrie(Actor):
 
             for clearing in matching_clearings:
                 if clearing.soldiers["bird"] > 0:
-                    if clearing.soldiers['cat'] > 0 or True in [slot[0]=='sawmill' for slot in clearing.building_slots] or True in [slot[0]=='workshop' for slot in clearing.building_slots] or True in [slot[0]=='recruiter' for slot in clearing.building_slots] or 'keep' in clearing.tokens:
+                    if clearing.soldiers['cat'] > 0 or True in [slot[1]=='cat' for slot in clearing.building_slots] or 'keep' in clearing.tokens or 'wood' in clearing.tokens:
                         battle_options.append(Battle_DTO(clearing.name, "cat", card_ID))
-                    if clearing.soldiers['alliance'] > 0 or True in [slot[0]=='base' for slot in clearing.building_slots] or "sympathy" in clearing.tokens:
+                    if clearing.soldiers['alliance'] > 0 or True in [slot[1]=='alliance' for slot in clearing.building_slots] or "sympathy" in clearing.tokens:
                         battle_options.append(Battle_DTO(clearing.name, "alliance", card_ID))
                     if clearing.vagabond_is_here:
                         battle_options.append(Battle_DTO(clearing.name, "vagabond", card_ID))
@@ -420,7 +420,7 @@ class Alliance(Actor):
         for key in sorted(list(map.places.keys())):
             place = map.places[key]
             if place.soldiers['alliance'] > 0:
-                if place.soldiers['cat'] > 0 or True in [slot[0]=='sawmill' for slot in place.building_slots] or True in [slot[0]=='workshop' for slot in place.building_slots] or True in [slot[0]=='recruiter' for slot in place.building_slots] or 'keep' in place.tokens:
+                if place.soldiers['cat'] > 0 or True in [slot[1]=='cat' for slot in place.building_slots]or 'keep' in place.tokens or 'wood' in place.tokens:
                     battle_options.append(Battle_DTO(place.name, "cat"))
                 if place.soldiers['bird'] > 0 or True in [slot[0]=='roost' for slot in place.building_slots]:
                     battle_options.append(Battle_DTO(place.name, "bird"))
@@ -487,7 +487,8 @@ class Vagabond(Actor):
     def __init__(self, role = "Thief") -> None:
         super().__init__()
         self.quest_deck = QuestDeck(empty=True)
-        if role == "Thief":
+        self.role = role
+        if self.role == "Thief":
             self.satchel = [Item("sword"), Item("torch"), Item("boot")]
             self.other_items = [Item("root_tea")]
             self.relations = {
@@ -498,6 +499,11 @@ class Vagabond(Actor):
 
         else:
             raise NotImplementedError("Only thief yet")
+
+    def chack_relation_status(self):
+        for status in self.relations.values():
+            if not status in ['indifferent', 'hostile', 'good', 'very good', 'friendly']:
+                return True
 
     def get_options(self):
         return super().get_options()
@@ -540,6 +546,105 @@ class Vagabond(Actor):
                 if map.place[map.vaganond_position].soldiers[army] > 0:
                     battle_options.append(Battle_DTO(map.vagabond_position, army))
         return battle_options
+
+    def has_items(self, item1, item2):
+        all_items = self.satchel + self.other_items
+        items_set = set(all_items)
+        return item1 in items_set and item2 in items_set
+
+    def get_quest_options(self, map):
+        quest_options = []
+        current_clearing = map.places[map.vagabond_position]
+
+        for quest_card in self.quest_deck.cards:
+            if (quest_card.suit == current_clearing.suit and
+                    self.has_items(quest_card.item1, quest_card.item2)):
+                quest_options.append(quest_card.id)
+
+        return quest_options
+
+    def has_non_exhausted_item(self, searched_item):
+        for item in self.satchel + self.other_items:
+            if item.name == searched_item.name and not item.exhausted and not item.damaged:
+                return True
+        return False
+
+    def get_thief_ability(self, map):
+        if not self.has_non_exhausted_item(Item('torch')):
+            return []
+
+        thief_ability_options = []
+        current_clearing = map.places[map.vagabond_position]
+
+        if current_clearing.soldiers['bird'] > 0 or True in [slot[0] == 'roost' for slot in current_clearing.building_slots]:
+            thief_ability_options.append((current_clearing.name, 'bird'))
+        if current_clearing.soldiers['cat'] > 0 or True in [slot[1]=='cat' for slot in current_clearing.building_slots]or 'keep' in current_clearing.tokens or 'wood' in current_clearing.tokens:
+            thief_ability_options.append((current_clearing.name, 'cat'))
+        if current_clearing.soldiers['alliance'] > 0 or True in [slot[0] == 'base' for slot in current_clearing.building_slots] or "sympathy" in current_clearing.tokens:
+            thief_ability_options.append((current_clearing.name, 'alliance'))
+
+        return thief_ability_options
+        
+    def get_ruin_explore_options(self, map):
+        if not self.has_non_exhausted_item(Item('torch')):
+            return False
+
+        current_clearing = map.places[map.vagabond_position]
+        has_ruin = any(slot[0] == 'ruin' for slot in current_clearing.building_slots)
+
+        return has_ruin
+
+    def get_strike_options(self, map):
+        if not self.has_non_exhausted_item(Item("crossbow")):
+            return []
+
+        strike_options = []
+        current_clearing = map.places[map.vagabond_position]
+
+        for opponent in ['cat', 'bird', 'alliance']:
+            if current_clearing.soldiers[opponent] > 0:
+                strike_options.append((current_clearing.name, opponent, 'soldier'))
+            if opponent=="alliance" and 'sympathy' in current_clearing.tokens:
+                strike_options.append((current_clearing.name, opponent, 'sympathy'))
+            if opponent=="cat" and 'keep' in current_clearing.tokens:
+                strike_options.append((current_clearing.name, opponent, 'keep'))
+            if opponent=="cat" and 'wood' in current_clearing.tokens:
+                strike_options.append((current_clearing.name, opponent, 'wood'))
+            for slot in current_clearing.building_slots:
+                if slot[1]==opponent:
+                    strike_options.append((current_clearing.name, opponent, slot[0]))
+            
+        return strike_options
+
+    def get_aid_options(self, map, *opponents):
+        aid_options = []
+        current_clearing = map.places[map.vagabond_position]
+        # Iterates through name
+        for opponent in ['cat', 'bird', 'alliance']:
+            if current_clearing.has_opponent_pieces(opponent):
+                relation = self.relations[opponent]
+                if relation == 'hostile':
+                    continue
+
+                if relation == 'indifferent':
+                    cost = 1
+                elif relation == 'good':
+                    cost = 2
+                else:  # friendly or very good
+                    cost = 3
+
+                item_choices = []  # Get items from the opponent
+                for item in opponents.items: #Iterates through opponent objects from arquments
+                    if not item.exhausted and not item.damaged:
+                        item_choices.append(Item(item.name))
+
+                if item_choices:
+                    for item in item_choices:
+                        aid_options.append((current_clearing.name, opponent, cost, item))
+                else:
+                    aid_options.append((current_clearing.name, opponent, cost, None))
+
+        return aid_options
 
     def damage_item(self, itemname):
         for item in self.satchel:

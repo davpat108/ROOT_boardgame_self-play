@@ -456,4 +456,4 @@ def test_vagabond():
     refresh_options = vagabond.get_refresh_options()
     assert refresh_options == [(Item('sword'), Item('boot'))]
 
-    #UNTESTED : Vagabond.get_battle_options(map, alliance), Vagabond.get_repair_options(map, alliance)
+    #UNTESTED : Vagabond.get_battle_options(map, alliance), Vagabond.get_repair_options(map, alliance), Vagabond.get_quest_optins(map), get thief ability, get_ruin_explore_options, get_strike_options, get_aid_options

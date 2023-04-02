@@ -21,7 +21,14 @@ class Place:
 		self.vagabond_is_here = vagabond_is_here
 		self.forest = forest
 
-	
+	def has_opponent_pieces(self, opponent):
+		has_building = any(slot[1] == opponent for slot in self.building_slots)
+		if opponent == "alliance":
+			has_token = any(token == "sympathy" for token in self.tokens)
+		if opponent == "cat":
+			has_token = any(token == "keep" or token == "wood" for token in self.tokens)
+		return has_building or has_token
+
 	def add_neighbor(self, place_name, to_forest):
 		"""
 		Args:

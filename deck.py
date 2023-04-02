@@ -49,7 +49,10 @@ class Deck:
         """
         Add a card to the end, mainly used for discard deck
         """
-        self.cards.append(card)
+        if isinstance(card, Card):
+            self.cards.append(card)
+        else:
+            return "Deck Empty"
     
     def shuffle_deck(self):
         shuffle(self.cards)
