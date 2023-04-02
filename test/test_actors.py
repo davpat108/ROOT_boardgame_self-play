@@ -1,9 +1,9 @@
 from map import build_regular_forest, Map
 from actors import Marquise, Vagabond, Eyrie, Alliance, Item
-from deck import Card, Deck
+from deck import Card, Deck, QuestCard, QuestDeck
 from actions import Battle_DTO, MoveDTO, OverworkDTO, Battle_DTO
 from utils import cat_birdsong_wood
-from configs import total_common_card_info
+from configs import total_common_card_info, vagabond_quest_card_info
 
 def test_marguise_get_options_craft():
     map = build_regular_forest()
@@ -428,7 +428,7 @@ def test_vagabond():
     map = build_regular_forest()
     alliance = Alliance()
     vagabond = Vagabond()
-
+    # SLIP and MOVE
     slip_options = vagabond.get_slip_options(map)
     slip_options = sorted(slip_options, key= lambda x: (x.start, x.end))
     assert slip_options == sorted([MoveDTO('O', 'C', 0), MoveDTO('O', 'D', 0), MoveDTO('O', 'G', 0), MoveDTO('O', 'H', 0), MoveDTO('O', 'I', 0)], key= lambda x: (x.start, x.end))
@@ -436,24 +436,68 @@ def test_vagabond():
     move_options = vagabond.get_moves(map)
     assert move_options == sorted([MoveDTO('O', 'C', 0), MoveDTO('O', 'D', 0), MoveDTO('O', 'G', 0), MoveDTO('O', 'H', 0), MoveDTO('O', 'I', 0)], key= lambda x: (x.start, x.end))
 
-    vagabond.damage_item('boot')
+    vagabond.damage_item(Item('boot'))
     move_options = vagabond.get_moves(map)
     move_options = sorted(move_options, key= lambda x: (x.start, x.end))
     assert move_options == []
+
 
     map.move_vagabond('C')
     slip_options = vagabond.get_slip_options(map)
     slip_options =sorted(slip_options, key= lambda x: (x.start, x.end))
     assert slip_options == sorted([MoveDTO('C', 'B', 0), MoveDTO('C', 'D', 0), MoveDTO('C', 'I', 0), MoveDTO('C', 'M', 0), MoveDTO('C', 'O', 0)], key= lambda x: (x.start, x.end))
 
-    vagabond.repair_item('boot')
+    # REPAIR
+    vagabond.repair_item(Item('boot'))
     move_options = vagabond.get_moves(map)
     move_options = sorted(move_options, key= lambda x: (x.start, x.end))
     assert move_options == sorted([MoveDTO('C', 'B', 0), MoveDTO('C', 'D', 0), MoveDTO('C', 'I', 0)], key= lambda x: (x.start, x.end))
 
-    vagabond.exhaust_item('boot')
-    vagabond.exhaust_item('sword')
+    # REFRESH
+    vagabond.exhaust_item(Item('boot'))
+    vagabond.exhaust_item(Item('sword'))
     refresh_options = vagabond.get_refresh_options()
     assert refresh_options == [(Item('sword'), Item('boot'))]
 
-    #UNTESTED : Vagabond.get_battle_options(map, alliance), Vagabond.get_repair_options(map, alliance), Vagabond.get_quest_optins(map), get thief ability, get_ruin_explore_options, get_strike_options, get_aid_options
+    # BATTLE
+    vagabond.refresh_item(refresh_options[0][0])
+    vagabond.refresh_item(refresh_options[0][1])
+
+    map.places['C'].update_pieces(soldiers = {'cat': 1, 'bird' : 1, 'alliance' : 1})
+    battle_options = vagabond.get_battle_options(map)
+    assert battle_options == [Battle_DTO('C', 'cat'), Battle_DTO('C', 'bird'), Battle_DTO('C', 'alliance')]
+
+    vagabond.exhaust_item(Item('sword'))
+    battle_options = vagabond.get_battle_options(map)
+    assert battle_options == []
+    # REPAIR
+    vagabond.damage_item(Item('boot'))
+    vagabond.damage_item(Item('sword'))
+
+    repair_options = vagabond.get_repair_options()
+    assert repair_options == []
+
+    vagabond.add_item(Item('hammer'))
+    repair_options = sorted(vagabond.get_repair_options(), key= lambda x: x.name)
+    assert repair_options == sorted([Item('boot'), Item('sword')], key= lambda x: x.name)
+    
+    # QUEST
+    vagabond.add_item(Item('crossbow'))
+    vagabond.quest_deck.add_card(QuestCard(*vagabond_quest_card_info[10])) # 2 mouse 1 fox
+    vagabond.quest_deck.add_card(QuestCard(*vagabond_quest_card_info[11]))
+    vagabond.quest_deck.add_card(QuestCard(*vagabond_quest_card_info[0]))
+
+    quest_options = vagabond.get_quest_options(map)
+    assert quest_options == [10]
+    vagabond.repair_item(Item('sword'))
+    vagabond.refresh_item(Item('sword'))
+    quest_options = vagabond.get_quest_options(map)
+    assert quest_options == [10, 11]
+
+    vagabond.exhaust_item(Item('torch'))
+    vagabond.exhaust_item(Item('sword'))
+    quest_options = vagabond.get_quest_options(map)
+    assert quest_options == []
+
+
+#UNTESTED :  get thief ability, get_ruin_explore_options, get_strike_options, get_aid_options

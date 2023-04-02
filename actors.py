@@ -473,6 +473,7 @@ class Item():
     def __eq__(self, other) -> bool:
         if self.name == other.name:
             return True
+        return False
 
     def __repr__(self):
         return self.name
@@ -534,23 +535,40 @@ class Vagabond(Actor):
         return list(combinations(exhausted_items, min(item_num, len(exhausted_items))))
 
     def get_repair_options(self):
-        item_num = self.satchel.count(Item("hammer").exhausted == False and Item("hammer").damaged == False)
+        hammer_avaible = any(item for item in self.satchel if item.name == "hammer" and not item.damaged and not item.exhausted)
         all_items = self.satchel + self.other_items
         damaged_items = [item for item in all_items if item.damaged]
-        return list(combinations(damaged_items, min(item_num, len(damaged_items))))
+        if hammer_avaible:
+            return damaged_items
+        else:
+            return []
     
     def get_battle_options(self, map):
         battle_options = []
-        if self.satchel.count(Item("sword").exhausted == False and Item("sword").damaged == False) > 0:
-            for army in map.place[map.vaganond_position].soldiers:
-                if map.place[map.vaganond_position].soldiers[army] > 0:
+        if any(item for item in self.satchel if item.name == "sword" and not item.damaged and not item.exhausted):
+            for army in map.places[map.vagabond_position].soldiers:
+                if map.places[map.vagabond_position].soldiers[army] > 0:
                     battle_options.append(Battle_DTO(map.vagabond_position, army))
         return battle_options
 
     def has_items(self, item1, item2):
         all_items = self.satchel + self.other_items
-        items_set = set(all_items)
-        return item1 in items_set and item2 in items_set
+        if item1 == item2:
+            count = sum(1 for item in all_items if item.name == item1.name and not item.damaged and not item.exhausted)
+            return count >= 2
+        else:
+            found_item1 = False
+            found_item2 = False
+            for item in self.satchel:
+                if not item.damaged and not item.exhausted:
+                    if item.name == item1.name:
+                        found_item1 = True
+                    elif item.name == item2.name:
+                        found_item2 = True
+                if found_item1 and found_item2:
+                    return True
+        return False
+    
 
     def get_quest_options(self, map):
         quest_options = []
@@ -558,8 +576,8 @@ class Vagabond(Actor):
 
         for quest_card in self.quest_deck.cards:
             if (quest_card.suit == current_clearing.suit and
-                    self.has_items(quest_card.item1, quest_card.item2)):
-                quest_options.append(quest_card.id)
+                    self.has_items(Item(quest_card.item1), Item(quest_card.item2))):
+                quest_options.append(quest_card.ID)
 
         return quest_options
 
@@ -646,46 +664,60 @@ class Vagabond(Actor):
 
         return aid_options
 
-    def damage_item(self, itemname):
+    def damage_item(self, other_item):
         for item in self.satchel:
-            if item.name == itemname:
+            if item.name == other_item.name:
                 item.damaged = True
                 return
         for item in self.other_items:
-            if item.name == itemname:
+            if item.name == other_item.name:
                 item.damaged = True
                 return
         raise ValueError("Item not found")
 
-    def exhaust_item(self, itemname):
+    def add_item(self, item):
+        if item.name in ['sword', 'crossbow', 'hammer', 'boot', 'torch']:
+            self.satchel.append(item)
+        else:
+            self.other_items.append(item)
+
+    def exhaust_item(self, other_item):
         for item in self.satchel:
-            if item.name == itemname:
+            if item.name == other_item.name:
                 item.exhausted = True
                 return
         for item in self.other_items:
-            if item.name == itemname:
+            if item.name == other_item.name:
                 item.exhausted = True
                 return
         raise ValueError("Item not found")
 
-    def repair_item(self, itemname):
+    def repair_item(self, other_item):
         for item in self.satchel:
-            if item.name == itemname:
+            if item.name == other_item.name:
                 item.damaged = False
                 return
         for item in self.other_items:
-            if item.name == itemname:
+            if item.name == other_item:
                 item.damaged = False
                 return
         raise ValueError("Item not found")
     
-    def refresh_item(self, itemname):
+    def refresh_item(self, other_item):
         for item in self.satchel:
-            if item.name == itemname:
+            if item.name == other_item.name:
                 item.exhausted = False
                 return
         for item in self.other_items:
-            if item.name == itemname:
+            if item.name == other_item.name:
                 item.exhausted = False
                 return
         raise ValueError("Item not found")
+    
+    def repair_and_refresh_all(self):
+        for item in self.satchel:
+            item.damaged = False
+            item.exhausted = False
+        for item in self.other_items:
+            item.damaged = False
+            item.exhausted = False
