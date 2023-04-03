@@ -634,3 +634,4 @@ def test_vagabond():
     aid_options = sorted(aid_options, key= lambda x: (x[0], x[1], x[2]))
     assert aid_options == []
 
+    # DMG otpions

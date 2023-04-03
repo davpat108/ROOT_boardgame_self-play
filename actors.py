@@ -16,7 +16,7 @@ class Actor():
             "fox": 0,
             "bird": 0,
         }
-
+        self.victory_points = 0
     def get_options(self):
         pass
 
@@ -573,12 +573,16 @@ class Vagabond(Actor):
                     move_options.append(MoveDTO(map.vagabond_position, map.places[neighbor[0]].name, how_many=0))
         return move_options
     
-
     def get_refresh_options(self):
         item_num = self.other_items.count(Item("root_tea"))*2 + 3
         all_items = self.satchel + self.other_items
         exhausted_items = [item for item in all_items if item.exhausted]
         return list(combinations(exhausted_items, min(item_num, len(exhausted_items))))
+    
+    def get_damage_options(self, num_dmged):
+        all_items = self.satchel + self.other_items
+        non_damaged_items = [item for item in all_items if not item.damaged]
+        return list(combinations(non_damaged_items, min(num_dmged, len(non_damaged_items))))
 
     def get_repair_options(self):
         hammer_avaible = any(item for item in self.satchel if item.name == "hammer" and not item.damaged and not item.exhausted)

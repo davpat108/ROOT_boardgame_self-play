@@ -72,3 +72,5 @@ vagabond_quest_card_info = [[0, "root_tea", "money", "fox"],
 buildings_list_marquise = {"sawmill": {"VictoryPoints": [0, 1, 2, 3, 4, 5], "BonusCard":[0, 0, 0, 0, 0, 0]},
                             "workshop": {"VictoryPoints": [0, 2, 2, 3, 4, 5], "BonusCard":[0, 0, 0, 0, 0, 0]},
                             "recruiter": {"VictoryPoints": [0, 1, 2, 3, 3, 4], "BonusCard":[0, 0, 1, 0, 1, 0]}}
+
+sympathy_VPs = [0, 1, 1, 1, 2, 2, 3, 4, 4, 4]
