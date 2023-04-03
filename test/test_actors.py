@@ -1,8 +1,8 @@
 from map import build_regular_forest, Map
 from actors import Marquise, Vagabond, Eyrie, Alliance, Item
 from deck import Card, Deck, QuestCard, QuestDeck
-from actions import Battle_DTO, MoveDTO, OverworkDTO, Battle_DTO
-from utils import cat_birdsong_wood
+from dtos import Battle_DTO, MoveDTO, OverworkDTO, Battle_DTO
+from actions import cat_birdsong_wood
 from configs import total_common_card_info, vagabond_quest_card_info
 
 def test_discard_down_to_five():
@@ -270,11 +270,20 @@ def test_resolves():
 def test_eyrie_no_roosts_left():
     map = build_regular_forest()
     eyrie = Eyrie()
-    bird_base = {'soldiers' : {'cat': 1, 'bird' : 0, 'alliance' : 0}, 'buildings': [('empty', 'No one')], 'tokens' : []}
-    map.places['L'].update_pieces(**bird_base)
 
     options = eyrie.get_no_roosts_left_options(map)
-    assert options == [('B', 0), ('C', 0), ('E', 0), ('F', 0), ('G', 0), ('H', 0), ('I', 0), ('J', 0), ('K', 0), ('L', 0)]
+    assert options == []
+
+    bird_base = {'soldiers' : {'cat': 1, 'bird' : 0, 'alliance' : 0}, 'buildings': [('empty', 'No one')], 'tokens' : []}
+    map.places['L'].update_pieces(**bird_base)
+    options = eyrie.get_no_roosts_left_options(map)
+    assert sorted(options) == sorted(['B', 'C', 'E','F', 'G', 'H', 'I', 'J', 'K', 'L'])
+
+    empty_clearing = {'soldiers' : {'cat': 0, 'bird' : 0, 'alliance' : 0}, 'buildings': [('empty', 'No one'), ('empty', 'No one')], 'tokens' : []}
+    map.places['K'].update_pieces(**empty_clearing)
+    options = eyrie.get_no_roosts_left_options(map)
+    assert sorted(options) == sorted(['K'])
+
 
 def test_eyrie_get_options_craft():
     map = build_regular_forest()

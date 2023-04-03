@@ -1,5 +1,5 @@
 from map import build_regular_forest
-from utils import cat_birdsong_wood
+from actions import cat_birdsong_wood
 
 def test_clearing_owner():
     map = build_regular_forest()

@@ -2,7 +2,7 @@
 from deck import Deck, QuestDeck
 from map import build_regular_forest
 from actors import Marquise, Eyrie, Alliance, Vagabond
-from utils import cat_birdsong_wood
+from actions import cat_birdsong_wood
 
 if __name__ == "__main__":
     map = build_regular_forest()

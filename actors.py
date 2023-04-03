@@ -1,5 +1,5 @@
 from deck import Deck, QuestDeck
-from actions import Battle_DTO, CraftDTO, MoveDTO, OverworkDTO
+from dtos import Battle_DTO, CraftDTO, MoveDTO, OverworkDTO
 from configs import buildings_list_marquise
 from itertools import combinations
 class Actor():
@@ -155,12 +155,14 @@ class Eyrie(Actor):
     def __init__(self) -> None:
         super().__init__()
         self.items = []
+        self.leader = "Despot"
         self.decree = {
             "recruit": [],
             "move": [],
             "battle": [],
             "build": [],
         }
+        self.decree_deck = Deck(empty=True)
 
     def get_options(self, map):
         return super().get_options()
@@ -251,14 +253,24 @@ class Eyrie(Actor):
 
         return building_option
     
-    def get_no_roosts_left_options(self, map):
-        building_option = []
+    def get_no_roosts_left_options(self, map): 
         for place in map.places.values():
-            if not True in [slot[0] == 'roost' for slot in place.building_slots]:
-                if not True in [slot[0] == 'roost' for slot in place.building_slots] and True in [slot[0] == 'empty' for slot in place.building_slots] and not True in [token == 'keep' for token in place.tokens]:
-                    building_option.append((place.name, 0))
-
-        return building_option
+            if True in [slot[0] == 'roost' for slot in place.building_slots]:
+                return []
+        
+        min_soldiers_clearing = []
+        min_soldiers = 100
+        for place in map.places.values():
+            if sum(place.soldiers.values()) == min_soldiers and not 'keep' in place.tokens and not place.forest and ('empty', 'No one') in place.building_slots:
+                min_soldiers = sum(place.soldiers.values())
+                min_soldiers_clearing.append(place.name)
+            if sum(place.soldiers.values()) < min_soldiers and not 'keep' in place.tokens and not place.forest and ('empty', 'No one') in place.building_slots:
+                min_soldiers_clearing = []
+                min_soldiers = sum(place.soldiers.values())
+                min_soldiers_clearing.append(place.name)
+            
+                
+        return min_soldiers_clearing
 
     def get_options_craft(self, map):
         roost_counts = map.count_on_map(("building", "roost"), per_suit=True)
