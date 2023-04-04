@@ -109,6 +109,14 @@ class Map:
 		for path in paths:
 			self.add_path(path[:1], path[1:])
 
+	def remove_building(self, place_name, building_type):
+		place = self.places[place_name]
+		for i, (building, owner) in enumerate(place.building_slots):
+			if building == building_type:
+				place.building_slots[i] = ('empty', 'No one')
+				return
+		raise ValueError("No such building")
+
 	def add_object(self, object):
 		if isinstance(object, Place) and object.name not in self.places:
 			self.places[object.name] = object

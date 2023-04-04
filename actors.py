@@ -167,6 +167,12 @@ class Eyrie(Actor):
         }
         self.decree_deck = Deck(empty=True)
 
+    def check_role(self):
+        if self.role in["Despot", "Commander", "Builder", "Charismatic"]:
+            return
+        else:
+            raise ValueError("Invalid role for Eyrie")
+
     def get_options(self, map):
         return super().get_options()
 

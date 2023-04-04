@@ -74,7 +74,7 @@ def slip(map, where):
 
 # DAYLIGHT
 
-def get_battle_damages(attacker, defender, dice_rolls, map, place_name, eyrie, vagabond, marquise, alliance):
+def get_battle_damages(attacker, defender, dice_rolls, map, place_name, eyrie, vagabond, marquise, alliance, armorers = False):
     """
     :param attacker: str
     :param defender: str
@@ -124,10 +124,16 @@ def get_battle_damages(attacker, defender, dice_rolls, map, place_name, eyrie, v
         if actor.armoers != 0 and defender == actor.name:
             dmg_attacker = 0
 
-    return dmg_attacker, dmg_defender
+    if armorers:
+        dmg_attacker = 0
+
+    return dmg_attacker, dmg_defender, max(dmg_attacker-map.places[place_name].soldiers[defender], 0), max(dmg_defender-map.places[place_name].soldiers[attacker], 0)
     
 
-def battle(map, place_name, attacker, defender, dice_rolls : list, marquise, eyrie, alliance, vagabond, discard_deck, vagabond_items=None):
+def ambush():
+    pass
+
+def resolve_battle(map, place_name, attacker, defender, vagabond, dmg_attacker, dmg_defender, attacker_chosen_pieces=None, defender_chosen_pieces=None, vagabond_items=None):
     """
     :param map: Map
     :param place_name: str
@@ -140,12 +146,44 @@ def battle(map, place_name, attacker, defender, dice_rolls : list, marquise, eyr
     :param vagabond: Vagabond
     :param discard_deck: DiscardDeck
     :param vagabond_items: list, items to break
-    """
-    dmg_attacker, dmg_defender = get_battle_damages(attacker, defender, dice_rolls, map, place_name, eyrie, vagabond, marquise, alliance)
-    # IF no soldiers
-    ### Regular battle
-    if attacker == 'vagabond':
-        number_of_hits_attacker = min(dice_rolls[1], map.places[place_name].soldiers[attacker])
-        number_of_hits_attacker = min(dice_rolls[1], map.places[place_name].soldiers[defender])
+    """ 
 
-    ### Against vagabond
+    place = map.places[place_name]
+
+    # Process attacker's damage
+    if defender == "vagabond":
+        for item in vagabond_items[:dmg_attacker]:
+            vagabond.damage_item(item)
+    else:
+        dmg_defender = min(dmg_defender, place.soldiers[defender])  # Limit damage to the number of soldiers
+        place.soldiers[defender] -= dmg_defender
+
+        if defender_chosen_pieces is None:
+            defender_chosen_pieces = []
+
+        # If attacker dealt more damage than defender's soldiers, remove additional pieces
+        extra_dmg_defender = dmg_defender - place.soldiers[defender]
+        for piece in defender_chosen_pieces[:extra_dmg_defender]:
+            if piece == "building":
+                place.remove_building(defender)
+            elif piece == "token":
+                place.tokens.remove(defender)
+
+    # Process defender's damage
+    if attacker == "vagabond":
+        for item in vagabond_items[:dmg_defender]:
+            vagabond.damage_item(item)
+    else:
+        dmg_attacker = min(dmg_attacker, place.soldiers[attacker])  # Limit damage to the number of soldiers
+        place.soldiers[attacker] -= dmg_attacker
+
+        if attacker_chosen_pieces is None:
+            attacker_chosen_pieces = []
+
+        # If defender dealt more damage than attacker's soldiers, remove additional pieces
+        extra_dmg_attacker = dmg_attacker - place.soldiers[attacker]
+        for piece in attacker_chosen_pieces[:extra_dmg_attacker]:
+            if piece == "building":
+                place.remove_building(attacker)
+            elif piece == "token":
+                place.tokens.remove(attacker)

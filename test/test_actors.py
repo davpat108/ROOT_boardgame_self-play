@@ -205,7 +205,7 @@ def test_marquise_overwork():
 
 def test_eyrie_get_decree_options():
     map = build_regular_forest()
-    eyrie = Eyrie()
+    eyrie = Eyrie("Despot")
 
     # Give Eyrie some cards
     common_deck = Deck(empty=True)
@@ -232,7 +232,7 @@ def test_eyrie_get_decree_options():
     
 def test_resolves():
     map = build_regular_forest()
-    eyrie = Eyrie()
+    eyrie = Eyrie("Despot")
     vagabond = Vagabond()
     map.places['L'].update_pieces(vagabond_is_here = True) # This creates 2 vagabonds but its ok for now
     
@@ -269,7 +269,7 @@ def test_resolves():
 
 def test_eyrie_no_roosts_left():
     map = build_regular_forest()
-    eyrie = Eyrie()
+    eyrie = Eyrie("Despot")
 
     options = eyrie.get_no_roosts_left_options(map)
     assert options == []
@@ -287,7 +287,7 @@ def test_eyrie_no_roosts_left():
 
 def test_eyrie_get_options_craft():
     map = build_regular_forest()
-    eyrie = Eyrie()
+    eyrie = Eyrie("Despot")
     #give marquise a card that can be crafted
     eyrie.deck.add_card(Card(*[11, "rabbit", "boot", 1, "rabbit"]))
     #give marquise a card that can be crafted but not enough resources
@@ -476,7 +476,7 @@ def test_alliance_move():
 def test_vagabond():
     map = build_regular_forest()
     alliance = Alliance()
-    eyrie = Eyrie()
+    eyrie = Eyrie("Despot")
     marquise = Marquise()
     vagabond = Vagabond()
     # SLIP and MOVE
