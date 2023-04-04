@@ -10,6 +10,7 @@ class Actor():
         self.sappers = 0
         self.cobbler = 0
         self.tax_collector = 0
+        self.armorers = 0
         self.ambush ={
             "rabbit": 0,
             "mouse": 0,
@@ -41,6 +42,7 @@ class Marquise(Actor):
     def __init__(self) -> None:
         super().__init__()
         self.items = []
+        self.name = 'cat'
     
     def get_options_craft(self, map):
         craft_suits = map.count_on_map(("building", "workshop"), per_suit=True)
@@ -152,10 +154,11 @@ class Marquise(Actor):
     
 
 class Eyrie(Actor):
-    def __init__(self) -> None:
+    def __init__(self, role) -> None:
         super().__init__()
         self.items = []
-        self.leader = "Despot"
+        self.leader = role
+        self.name = 'bird'
         self.decree = {
             "recruit": [],
             "move": [],
@@ -293,6 +296,7 @@ class Alliance(Actor):
         self.items = []
         self.current_officers = 0
         self.total_officers = 0
+        self.name = "alliance"
     
     def refresh_officers(self):
         self.current_officers = self.total_officers
@@ -535,6 +539,7 @@ class Vagabond(Actor):
         super().__init__()
         self.quest_deck = QuestDeck(empty=True)
         self.role = role
+        self.name = "vagabond"
         if self.role == "Thief":
             self.satchel = [Item("sword"), Item("torch"), Item("boot")]
             self.other_items = [Item("root_tea")]
@@ -547,7 +552,7 @@ class Vagabond(Actor):
         else:
             raise NotImplementedError("Only thief yet")
 
-    def chack_relation_status(self):
+    def chack_relation_status_correct(self):
         for status in self.relations.values():
             if not status in ['indifferent', 'hostile', 'good', 'very good', 'friendly']:
                 return True

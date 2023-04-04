@@ -71,3 +71,81 @@ def spread_sympathy(map, alliance, discard_deck, place_name, card_ids):
 
 def slip(map, where):
     map.move_vagabond(where.end)
+
+# DAYLIGHT
+
+def get_battle_damages(attacker, defender, dice_rolls, map, place_name, eyrie, vagabond, marquise, alliance):
+    """
+    :param attacker: str
+    :param defender: str
+    :param dice_rolls: list, 2 0-3 nums descending order
+    """
+    dmg_attacker = 0
+    dmg_defender = 0
+
+    # Regular battle
+    if attacker != 'vagabond' and defender != 'vagabond':
+        if defender != 'alliance':
+            dmg_attacker += min(dice_rolls[0], map.places[place_name].soldiers[attacker])
+            dmg_defender += min(dice_rolls[1], map.places[place_name].soldiers[defender])
+
+        elif defender == 'alliance':
+            dmg_attacker += min(dice_rolls[1], map.places[place_name].soldiers[attacker])
+            dmg_defender += min(dice_rolls[0], map.places[place_name].soldiers[defender])
+    
+    elif defender == 'vagabond':
+            dmg_attacker += min(dice_rolls[0], map.places[place_name].soldiers[attacker])
+            dmg_defender += min(dice_rolls[1], len(item for item in vagabond.satchel if item.name == "sword" and not item.damaged))
+
+    elif attacker == 'vagabond': # Should cover all cases
+        if defender != 'alliance':
+            dmg_attacker += min(dice_rolls[0], len(item for item in vagabond.satchel if item.name == "sword" and not item.damaged))
+            dmg_defender += min(dice_rolls[1], map.places[place_name].soldiers[defender])
+
+        elif defender == 'alliance':
+            dmg_attacker += min(dice_rolls[1], len(item for item in vagabond.satchel if item.name == "sword" and not item.damaged))
+            dmg_defender += min(dice_rolls[0], map.places[place_name].soldiers[defender])
+
+    # No defender
+    if map.places[place_name].soldiers[defender] == 0:
+        dmg_attacker = min(dmg_attacker, 1)
+
+    # Sapper
+    for actor in [eyrie, vagabond, marquise, alliance]:
+        if actor.sapper != 0 and attacker == actor.name:
+            dmg_attacker += actor.sapper
+        if actor.sapper != 0 and defender == actor.name:
+            dmg_defender += actor.sapper
+        # OWL
+        if actor.name == 'eyrie' and actor.owl_bonus != 0 and attacker == 'eyrie':
+            dmg_attacker += actor.owl_bonus
+
+    for actor in [eyrie, vagabond, marquise, alliance]:
+        if actor.armoers != 0 and defender == actor.name:
+            dmg_attacker = 0
+
+    return dmg_attacker, dmg_defender
+    
+
+def battle(map, place_name, attacker, defender, dice_rolls : list, marquise, eyrie, alliance, vagabond, discard_deck, vagabond_items=None):
+    """
+    :param map: Map
+    :param place_name: str
+    :param attacker: str
+    :param defender: str
+    :param dice_rolls: list, 2 0-3 nums descending order
+    :param marquise: Marquise
+    :param eyrie: Eyrie
+    :param alliance: Alliance
+    :param vagabond: Vagabond
+    :param discard_deck: DiscardDeck
+    :param vagabond_items: list, items to break
+    """
+    dmg_attacker, dmg_defender = get_battle_damages(attacker, defender, dice_rolls, map, place_name, eyrie, vagabond, marquise, alliance)
+    # IF no soldiers
+    ### Regular battle
+    if attacker == 'vagabond':
+        number_of_hits_attacker = min(dice_rolls[1], map.places[place_name].soldiers[attacker])
+        number_of_hits_attacker = min(dice_rolls[1], map.places[place_name].soldiers[defender])
+
+    ### Against vagabond
