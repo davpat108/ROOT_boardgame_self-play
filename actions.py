@@ -112,23 +112,39 @@ def get_battle_damages(attacker, defender, dice_rolls, map, place_name, eyrie, v
 
     # Sapper
     for actor in [eyrie, vagabond, marquise, alliance]:
-        if actor.sapper != 0 and attacker == actor.name:
-            dmg_attacker += actor.sapper
-        if actor.sapper != 0 and defender == actor.name:
-            dmg_defender += actor.sapper
+        if actor.sappers != 0 and attacker == actor.name:
+            dmg_attacker += actor.sappers
+        if actor.sappers != 0 and defender == actor.name:
+            dmg_defender += actor.sappers
         # OWL
         if actor.name == 'eyrie' and actor.owl_bonus != 0 and attacker == 'eyrie':
             dmg_attacker += actor.owl_bonus
 
     for actor in [eyrie, vagabond, marquise, alliance]:
-        if actor.armoers != 0 and defender == actor.name:
+        if actor.armorers != 0 and defender == actor.name:
             dmg_attacker = 0
 
     if armorers:
         dmg_attacker = 0
 
-    return dmg_attacker, dmg_defender, max(dmg_attacker-map.places[place_name].soldiers[defender], 0), max(dmg_defender-map.places[place_name].soldiers[attacker], 0)
+    return dmg_attacker, dmg_defender
     
+
+def priority_to_list(priorities, place, owner):
+    """
+    :param priority: str
+    :return: list
+    """
+    chosen_pieces = []
+    for piece in priorities:
+        for token in place.tokens:
+            if token == piece:
+                chosen_pieces.append(token)
+        for building_slot in place.building_slots:
+            if building_slot[0] == piece and building_slot[1] == owner:
+                chosen_pieces.append(building_slot[0])
+
+    return chosen_pieces
 
 def ambush():
     pass
@@ -145,7 +161,7 @@ def resolve_battle(map, place_name, attacker, defender, vagabond, dmg_attacker, 
     :param alliance: Alliance
     :param vagabond: Vagabond
     :param discard_deck: DiscardDeck
-    :param vagabond_items: list, items to break
+    :param vagabond_items: list, items sorted by priority
     """ 
 
     place = map.places[place_name]

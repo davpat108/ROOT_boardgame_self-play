@@ -158,6 +158,7 @@ class Eyrie(Actor):
         super().__init__()
         self.items = []
         self.leader = role
+        self.check_role()
         self.name = 'bird'
         self.decree = {
             "recruit": [],
@@ -168,7 +169,7 @@ class Eyrie(Actor):
         self.decree_deck = Deck(empty=True)
 
     def check_role(self):
-        if self.role in["Despot", "Commander", "Builder", "Charismatic"]:
+        if self.leader in["Despot", "Commander", "Builder", "Charismatic"]:
             return
         else:
             raise ValueError("Invalid role for Eyrie")
