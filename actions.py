@@ -203,4 +203,4 @@ def resolve_battle(map, place_name, attacker, defender, vagabond, dmg_attacker, 
                     place.remove_building(piece[0])
                 elif piece[1] == "token":
                     place.tokens.remove(piece[0])
-    return
+    # TODO settle_sympathy(map, place_name, attacker, defender)
