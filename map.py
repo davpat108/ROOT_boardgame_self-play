@@ -21,6 +21,13 @@ class Place:
 		self.vagabond_is_here = vagabond_is_here
 		self.forest = forest
 
+	def remove_building(self, building_type):
+		for i, (building, owner) in enumerate(self.building_slots):
+			if building == building_type:
+				self.building_slots[i] = ('empty', 'No one')
+				return
+		raise ValueError("No such building")
+
 	def has_opponent_pieces(self, opponent):
 		has_building = any(slot[1] == opponent for slot in self.building_slots)
 		has_token = False
@@ -108,14 +115,6 @@ class Map:
 		
 		for path in paths:
 			self.add_path(path[:1], path[1:])
-
-	def remove_building(self, place_name, building_type):
-		place = self.places[place_name]
-		for i, (building, owner) in enumerate(place.building_slots):
-			if building == building_type:
-				place.building_slots[i] = ('empty', 'No one')
-				return
-		raise ValueError("No such building")
 
 	def add_object(self, object):
 		if isinstance(object, Place) and object.name not in self.places:

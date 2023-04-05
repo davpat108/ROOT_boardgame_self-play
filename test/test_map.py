@@ -54,7 +54,7 @@ def test_count_stuff():
     assert map.count_on_map(('token', "wood"), per_suit=True)['rabbit'] == 0
     assert map.count_on_map(("building", "roost"), per_suit=True)['rabbit'] == 1
 
-    map.remove_building('L', 'roost')
+    map.places['L'].remove_building('roost')
     assert map.count_on_map(("building", "roost"), per_suit=False) == 0
 
 def test_vagabond():

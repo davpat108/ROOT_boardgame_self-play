@@ -174,6 +174,10 @@ class Eyrie(Actor):
         else:
             raise ValueError("Invalid role for Eyrie")
 
+    def change_role(self, role):
+        self.leader = role
+        self.check_role()
+
     def get_options(self, map):
         return super().get_options()
 
@@ -735,12 +739,12 @@ class Vagabond(Actor):
         for item in self.satchel:
             if item.name == other_item.name:
                 item.damaged = True
-                return
+                return True
         for item in self.other_items:
             if item.name == other_item.name:
                 item.damaged = True
-                return
-        raise ValueError("Item not found")
+                return True
+        return False
 
     def add_item(self, item):
         if item.name in ['sword', 'crossbow', 'hammer', 'boot', 'torch']:
