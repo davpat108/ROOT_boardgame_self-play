@@ -170,8 +170,9 @@ def resolve_battle(map, place_name, attacker, defender, vagabond, dmg_attacker, 
     if defender == "vagabond":
         i = 0
         for item in vagabond_items:
-            while vagabond.damage_item(item) and i < dmg_attacker:
-                i += 1
+            if i < dmg_attacker:
+                while vagabond.damage_item(item) and i < dmg_attacker:
+                    i += 1
     else:
         # If attacker dealt more damage than defender's soldiers, remove additional pieces
         extra_dmg_attacker = dmg_attacker - place.soldiers[defender]
@@ -189,8 +190,9 @@ def resolve_battle(map, place_name, attacker, defender, vagabond, dmg_attacker, 
     if attacker == "vagabond":
         i = 0
         for item in vagabond_items:
-            while vagabond.damage_item(item) and i < dmg_defender:
-                i += 1
+            if i < dmg_defender:
+                while vagabond.damage_item(item) and i < dmg_defender:
+                    i += 1
     else:
         # If defender dealt more damage than attacker's soldiers, remove additional pieces
         extra_dmg_defender = dmg_defender - place.soldiers[attacker]

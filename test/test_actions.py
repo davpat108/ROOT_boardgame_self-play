@@ -146,7 +146,7 @@ def test_resolve_battle():
     vagabond.add_item(Item('sword'))
     vagabond.add_item(Item('sword'))
     vagabond.add_item(Item('money'))
-    vagabond_items_to_remove = [Item('money'), Item('sack'), Item('boot'), Item('root_tea'), Item('hammer'), Item('crossbow'), Item('torch'), Item('sword')]
+    vagabond_items_to_remove = [Item('sword'), Item('sack'), Item('boot'), Item('root_tea'), Item('hammer'), Item('crossbow'), Item('torch'), Item('money')]
 
     assert vagabond.other_items[vagabond.other_items.index(Item('money'))].damaged == False
     attacker_chosen_pieces = priority_to_list(attacker_pice_lose_priorities, map.places['H'], attacker)
@@ -157,9 +157,11 @@ def test_resolve_battle():
     assert map.places['H'].building_slots == [('base', 'alliance'), ('empty', 'No one'), ('Empty', 'No one')]
     assert 'sympathy' in map.places['H'].tokens
     assert sorted(vagabond.satchel) == sorted([Item('sword'), Item('sword'), Item('sword'),  Item('boot'), Item('torch')])
-    assert vagabond.other_items[vagabond.other_items.index(Item('money'))].damaged == True
-    assert vagabond.satchel[vagabond.satchel.index(Item('boot'))].damaged == True
-    assert vagabond.other_items[vagabond.other_items.index(Item('root_tea'))].damaged == True
+    assert vagabond.other_items[vagabond.other_items.index(Item('money'))].damaged == False
+    assert vagabond.satchel[vagabond.satchel.index(Item('sword'))].damaged == True
+    assert vagabond.satchel[vagabond.satchel.index(Item('sword'))+1].damaged == True
+    assert vagabond.satchel[vagabond.satchel.index(Item('sword'))+2].damaged == True
+    assert vagabond.other_items[vagabond.other_items.index(Item('root_tea'))].damaged == False
 
     # GET SYMPATHY penalty
 
