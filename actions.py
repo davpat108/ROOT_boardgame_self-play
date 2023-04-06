@@ -75,12 +75,19 @@ def slip(map, where):
 # DAYLIGHT
 
 
-def get_battle_damages(attacker, defender, dice_rolls, map, place_name, eyrie, vagabond, marquise, alliance, armorers = False):
+def get_battle_damages(attacker, defender, dice_rolls, map, place_name, eyrie, vagabond, marquise, alliance, armorers = False, vagabond_items= None):
     """
     :param attacker: str
     :param defender: str
     :param dice_rolls: list, 2 0-3 nums descending order
     """
+    # So vagabond cant attack its allies with its allies
+    if attacker == "vagabond":
+        if vagabond.relations[defender] == "friendly":
+            vagabond.allied_soldiers = remove_soldiers_from_vagabond_items(vagabond.allied_soldiers, defender)
+            vagabond_items = remove_soldiers_from_vagabond_items(vagabond_items, defender)
+
+    
     dmg_attacker = 0
     dmg_defender = 0
 
@@ -96,15 +103,15 @@ def get_battle_damages(attacker, defender, dice_rolls, map, place_name, eyrie, v
     
     elif defender == 'vagabond':
             dmg_attacker += min(dice_rolls[0], map.places[place_name].soldiers[attacker])
-            dmg_defender += min(dice_rolls[1], len(list(item for item in vagabond.satchel if item.name == "sword" and not item.damaged)))
+            dmg_defender += min(dice_rolls[1], len(list(item for item in vagabond.satchel if item.name == "sword" and not item.damaged)) +  len(vagabond.allied_soldiers))
 
     elif attacker == 'vagabond': # Should cover all cases
         if defender != 'alliance':
-            dmg_attacker += min(dice_rolls[0], len(list(item for item in vagabond.satchel if item.name == "sword" and not item.damaged)))
+            dmg_attacker += min(dice_rolls[0], len(list(item for item in vagabond.satchel if item.name == "sword" and not item.damaged)) +  len(vagabond.allied_soldiers))
             dmg_defender += min(dice_rolls[1], map.places[place_name].soldiers[defender])
 
         elif defender == 'alliance':
-            dmg_attacker += min(dice_rolls[1], len(list(item for item in vagabond.satchel if item.name == "sword" and not item.damaged)))
+            dmg_attacker += min(dice_rolls[1], len(list(item for item in vagabond.satchel if item.name == "sword" and not item.damaged)) +  len(vagabond.allied_soldiers))
             dmg_defender += min(dice_rolls[0], map.places[place_name].soldiers[defender])
 
     # No defender
@@ -150,6 +157,13 @@ def priority_to_list(priorities, place, owner):
 def ambush():
     pass
 
+def remove_soldiers_from_vagabond_items(items, defender):
+    new_items = []
+    for item in items:
+        if not item == defender:
+            new_items.append(item)
+    return new_items
+
 def resolve_battle(place, attacker, defender, eyrie, vagabond, marquise, alliance, dmg_attacker, dmg_defender, attacker_chosen_pieces=None, defender_chosen_pieces=None, vagabond_items=None, card_to_give_if_no_sympathy=None):
     """
     :param map: Map
@@ -164,7 +178,11 @@ def resolve_battle(place, attacker, defender, eyrie, vagabond, marquise, allianc
     :param discard_deck: DiscardDeck
     :param vagabond_items: list, items to damage
     """ 
-
+    # So vagabond cant attack its allies with its allies
+    if attacker == "vagabond":
+        if vagabond.relations[defender] == "friendly":
+            vagabond.allied_soldiers = remove_soldiers_from_vagabond_items(vagabond.allied_soldiers, defender)
+            vagabond_items = remove_soldiers_from_vagabond_items(vagabond_items, defender)
     victory_points_attacker = 0
     victory_points_defender = 0
     sympathy_killed = False
@@ -201,8 +219,17 @@ def resolve_battle(place, attacker, defender, eyrie, vagabond, marquise, allianc
 
     # Process defender's damage
     if attacker == "vagabond":
+        items = 0
+        soldiers = 0
         for item in vagabond_items[:dmg_defender]:
-            vagabond.damage_item(item)
+            vagabond.damage_item(item, place)
+            if isinstance(item, Item):
+                items += 1
+            else:
+                soldiers += 1
+        if soldiers > items:
+            vagabond.relations[item] = "hostile"
+
     else:
         # If defender dealt more damage than attacker's soldiers, remove additional pieces
         extra_dmg_defender = dmg_defender - place.soldiers[attacker]
@@ -233,15 +260,3 @@ def resolve_battle(place, attacker, defender, eyrie, vagabond, marquise, allianc
             actor.victory_points += victory_points_defender
             if sympathy_killed and card_to_give_if_no_sympathy:
                 alliance.deck.add_card(actor.deck.get_the_card(card_to_give_if_no_sympathy.ID))#CORRECT ASSUMING card_to_give_if_no_sympathy is correct
-
-
-def vagabond_battle_with_ally(place, vagabond, ally_actor, enemy_actor, vagabond_items, card_to_give_if_no_sympathy):
-    """
-    :param place: Place
-    :param vagabond: Vagabond
-    :param ally_actor: Actor
-    :param enemy_actor: Actor
-    :param vagabond_items: list, items to damage
-    :param card_to_give_if_no_sympathy: Card
-    """
-    pass # TODO

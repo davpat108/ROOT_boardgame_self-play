@@ -531,7 +531,7 @@ class Item():
         self.damaged = False
 
     def __eq__(self, other) -> bool:
-        if self.name == other.name:
+        if isinstance(other, Item) and self.name == other.name:
             return True
         return False
 
@@ -558,7 +558,7 @@ class Vagabond(Actor):
         self.quest_deck = QuestDeck(empty=True)
         self.role = role
         self.name = "vagabond"
-        self.allied_soldiers = []
+        self.allied_soldiers = [] # list of playernames
         if self.role == "Thief":
             self.satchel = [Item("sword"), Item("torch"), Item("boot")]
             self.other_items = [Item("root_tea")]
@@ -605,6 +605,7 @@ class Vagabond(Actor):
     def get_damage_options(self, num_dmged):
         all_items = self.satchel + self.other_items
         non_damaged_items = [item for item in all_items if not item.damaged]
+        non_damaged_items += self.allied_soldiers
         return list(combinations(non_damaged_items, min(num_dmged, len(non_damaged_items))))
 
     def get_repair_options(self):
@@ -750,15 +751,19 @@ class Vagabond(Actor):
                 item_dmg_options.append(item)
         return item_dmg_options
 
-    def damage_item(self, other_item):
-        for item in self.satchel:
-            if item.name == other_item.name:
-                item.damaged = True
-                return True
-        for item in self.other_items:
-            if item.name == other_item.name:
-                item.damaged = True
-                return True
+    def damage_item(self, other_item, place = None):
+        if isinstance(other_item, Item):
+            for item in self.satchel:
+                if item.name == other_item.name:
+                    item.damaged = True
+                    return True
+            for item in self.other_items:
+                if item.name == other_item.name:
+                    item.damaged = True
+                    return True
+        if place and not isinstance(other_item, Item):
+            place.soldiers[self.allied_soldiers[0]] -= 1
+            self.allied_soldiers.remove(self.allied_soldiers[0])
         return False
 
     def add_item(self, item):
