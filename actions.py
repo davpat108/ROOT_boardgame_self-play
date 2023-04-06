@@ -74,6 +74,7 @@ def slip(map, where):
 
 # DAYLIGHT
 
+
 def get_battle_damages(attacker, defender, dice_rolls, map, place_name, eyrie, vagabond, marquise, alliance, armorers = False):
     """
     :param attacker: str
@@ -149,7 +150,7 @@ def priority_to_list(priorities, place, owner):
 def ambush():
     pass
 
-def resolve_battle(map, place_name, attacker, defender, vagabond, dmg_attacker, dmg_defender, attacker_chosen_pieces=None, defender_chosen_pieces=None, vagabond_items=None):
+def resolve_battle(place, attacker, defender, eyrie, vagabond, marquise, alliance, dmg_attacker, dmg_defender, attacker_chosen_pieces=None, defender_chosen_pieces=None, vagabond_items=None, card_to_give_if_no_sympathy=None):
     """
     :param map: Map
     :param place_name: str
@@ -161,21 +162,24 @@ def resolve_battle(map, place_name, attacker, defender, vagabond, dmg_attacker, 
     :param alliance: Alliance
     :param vagabond: Vagabond
     :param discard_deck: DiscardDeck
-    :param vagabond_items: list, items sorted by priority
+    :param vagabond_items: list, items to damage
     """ 
 
-    place = map.places[place_name]
-
+    victory_points_attacker = 0
+    victory_points_defender = 0
+    sympathy_killed = False
     # Process attacker's damage
     if defender == "vagabond":
-        i = 0
-        for item in vagabond_items:
-            if i < dmg_attacker:
-                while vagabond.damage_item(item) and i < dmg_attacker:
-                    i += 1
+        for item in vagabond_items[:dmg_attacker]:
+            vagabond.damage_item(item)
     else:
         # If attacker dealt more damage than defender's soldiers, remove additional pieces
         extra_dmg_attacker = dmg_attacker - place.soldiers[defender]
+        if attacker == "vagabond":
+            victory_points_attacker += dmg_attacker-extra_dmg_attacker
+        if attacker == "vagabond" and dmg_attacker-extra_dmg_attacker > 0 and vagabond.relations[defender] != "hostile":
+            vagabond.relations[defender] = "hostile"
+            victory_points_attacker-=1 # THAT one soldier doesn't count as VP
         if extra_dmg_attacker <=0:
             place.soldiers[defender] -= dmg_attacker
         else:
@@ -183,19 +187,27 @@ def resolve_battle(map, place_name, attacker, defender, vagabond, dmg_attacker, 
             for piece in defender_chosen_pieces[:extra_dmg_attacker]:
                 if piece[1] == "building":
                     place.remove_building(piece[0])
+                    victory_points_attacker += 1
+                    if attacker == "vagabond" and vagabond.relations[defender] == "hostile":
+                        victory_points_attacker += 1
                 elif piece[1] == "token":
                     place.tokens.remove(piece[0])
+                    victory_points_attacker += 1
+                    if attacker == "vagabond" and vagabond.relations[defender] == "hostile":
+                        victory_points_attacker += 1
+                    if piece[0] == "sympathy":
+                        sympathy_killed = True
+
 
     # Process defender's damage
     if attacker == "vagabond":
-        i = 0
-        for item in vagabond_items:
-            if i < dmg_defender:
-                while vagabond.damage_item(item) and i < dmg_defender:
-                    i += 1
+        for item in vagabond_items[:dmg_defender]:
+            vagabond.damage_item(item)
     else:
         # If defender dealt more damage than attacker's soldiers, remove additional pieces
         extra_dmg_defender = dmg_defender - place.soldiers[attacker]
+        if defender == "vagabond" and dmg_defender-extra_dmg_defender > 0:
+            vagabond.relations[attacker] = "hostile"
         if extra_dmg_defender <=0:
             place.soldiers[attacker] -= dmg_defender
         else:
@@ -203,6 +215,33 @@ def resolve_battle(map, place_name, attacker, defender, vagabond, dmg_attacker, 
             for piece in attacker_chosen_pieces[:extra_dmg_defender]:
                 if piece[1] == "building":
                     place.remove_building(piece[0])
+                    victory_points_defender += 1
                 elif piece[1] == "token":
                     place.tokens.remove(piece[0])
-    # TODO settle_sympathy(map, place_name, attacker, defender)
+                    victory_points_defender += 1
+                    if piece[0] == "sympathy":
+                        sympathy_killed = True
+    
+    for actor in [eyrie, vagabond, marquise, alliance]:
+        if actor.name == attacker:
+            actor.victory_points += victory_points_attacker
+            if sympathy_killed and card_to_give_if_no_sympathy:
+                alliance.deck.add_card(actor.deck.get_the_card(card_to_give_if_no_sympathy.ID)) # CORRECT ASSUMING card_to_give_if_no_sympathy is correct
+
+                
+        elif actor.name == defender:
+            actor.victory_points += victory_points_defender
+            if sympathy_killed and card_to_give_if_no_sympathy:
+                alliance.deck.add_card(actor.deck.get_the_card(card_to_give_if_no_sympathy.ID))#CORRECT ASSUMING card_to_give_if_no_sympathy is correct
+
+
+def vagabond_battle_with_ally(place, vagabond, ally_actor, enemy_actor, vagabond_items, card_to_give_if_no_sympathy):
+    """
+    :param place: Place
+    :param vagabond: Vagabond
+    :param ally_actor: Actor
+    :param enemy_actor: Actor
+    :param vagabond_items: list, items to damage
+    :param card_to_give_if_no_sympathy: Card
+    """
+    pass # TODO

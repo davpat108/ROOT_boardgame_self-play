@@ -36,6 +36,13 @@ class Actor():
         for combination in list(combinations(card_IDs, len(card_IDs)-5)):
             retlist.append(list(combination))
         return retlist
+    
+    def get_cards_by_suit_options(self, suit):
+        matching_cards = []
+        for card in self.deck:
+            if card.suit == suit:
+                matching_cards.append(card)
+        return matching_cards
         
         
 class Marquise(Actor):
@@ -551,6 +558,7 @@ class Vagabond(Actor):
         self.quest_deck = QuestDeck(empty=True)
         self.role = role
         self.name = "vagabond"
+        self.allied_soldiers = []
         if self.role == "Thief":
             self.satchel = [Item("sword"), Item("torch"), Item("boot")]
             self.other_items = [Item("root_tea")]
@@ -559,7 +567,6 @@ class Vagabond(Actor):
 			"bird" : 'indifferent',
 			"alliance" : 'indifferent'
 		}
-
         else:
             raise NotImplementedError("Only thief yet")
 
@@ -734,6 +741,14 @@ class Vagabond(Actor):
             i += 1
 
         return aid_options
+
+    def get_item_dmg_options(self):
+        """Returns a list of items that can be damaged"""
+        item_dmg_options = []
+        for item in self.satchel + self.other_items:
+            if not item.damaged:
+                item_dmg_options.append(item)
+        return item_dmg_options
 
     def damage_item(self, other_item):
         for item in self.satchel:
