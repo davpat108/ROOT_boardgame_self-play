@@ -33,6 +33,10 @@ class Actor():
     def get_craft_activations(self):
         pass
 
+    def deactivate(self, cost):
+        for suit, amount in cost.items():
+            self.craft_activations[suit] -= amount
+
     def discard_down_to_five_options(self):
         if len(self.deck.cards) <= 5:
             return
@@ -72,6 +76,9 @@ class Marquise(Actor):
                     craft_options.append(CraftDTO(card.craft))
                 elif card.craft_suit == "anything":
                     if sum(self.craft_activations.values()) > card.craft_cost:
+                        craft_options.append(CraftDTO(card.craft))
+                elif card.craft_suit == "all":
+                    if self.craft_activations["fox"] >= 1 and self.craft_activations["rabbit"] >= 1 and self.craft_activations["mouse"] >= 1:
                         craft_options.append(CraftDTO(card.craft))
         return craft_options
     
@@ -310,13 +317,17 @@ class Eyrie(Actor):
     def get_options_craft(self, map):
         craft_options = []
         for card in self.deck.cards:
-            if card.craft_suit == "ambush":
-                pass
-            elif self.craft_activations[card.craft_suit] >= card.craft_cost:
-                craft_options.append(CraftDTO(card.craft))
-            elif card.craft_suit == "anything":
-                if sum(self.craft_activations.values()) > card.craft_cost:
+            if card.craft in Immediate_non_item_effects or card.craft in map.craftables or card.craft in persistent_effects:
+                if card.craft_suit == "ambush":
+                    pass
+                elif self.craft_activations[card.craft_suit] >= card.craft_cost:
                     craft_options.append(CraftDTO(card.craft))
+                elif card.craft_suit == "anything":
+                    if sum(self.craft_activations.values()) > card.craft_cost:
+                        craft_options.append(CraftDTO(card.craft))
+                elif card.craft_suit == "all":
+                    if self.craft_activations["fox"] >= 1 and self.craft_activations["rabbit"] >= 1 and self.craft_activations["mouse"] >= 1:
+                        craft_options.append(CraftDTO(card.craft))
         return craft_options 
 
 
@@ -462,13 +473,17 @@ class Alliance(Actor):
     def get_options_craft(self, map):
         craft_options = []
         for card in self.deck.cards:
-            if card.craft_suit == "ambush":
-                pass
-            elif self.craft_activations[card.craft_suit] >= card.craft_cost:
-                craft_options.append(CraftDTO(card.craft))
-            elif card.craft_suit == "anything":
-                if sum(self.craft_activations.values()) > card.craft_cost:
+            if card.craft in Immediate_non_item_effects or card.craft in map.craftables or card.craft in persistent_effects:
+                if card.craft_suit == "ambush":
+                    pass
+                elif self.craft_activations[card.craft_suit] >= card.craft_cost:
                     craft_options.append(CraftDTO(card.craft))
+                elif card.craft_suit == "anything":
+                    if sum(self.craft_activations.values()) > card.craft_cost:
+                        craft_options.append(CraftDTO(card.craft))
+                elif card.craft_suit == "all":
+                    if self.craft_activations["fox"] >= 1 and self.craft_activations["rabbit"] >= 1 and self.craft_activations["mouse"] >= 1:
+                        craft_options.append(CraftDTO(card.craft))
         return craft_options
     
     def get_mobilize_options(self):
@@ -564,7 +579,25 @@ class Vagabond(Actor):
 
     def get_options(self):
         return super().get_options()
-    
+
+    def get_options_craft(self):
+        craft_options = []
+        activations = 0
+        for item in self.satchel + self.other_items:
+            if item.name == "hammer" and not item.exhausted and not item.damaged:
+                activations += 1
+        for card in self.deck.cards:
+            if card.craft in Immediate_non_item_effects or card.craft in map.craftables or card.craft in persistent_effects: 
+                if card.craft_suit == "ambush":
+                    pass
+                elif activations >= card.craft_cost:
+                    craft_options.append(CraftDTO(card.craft))
+                elif card.craft_suit == "anything":
+                    pass
+                elif card.craft_suit == "all" and activations >= 3:
+                    craft_options.append(CraftDTO(card.craft))
+        return craft_options        
+
     def get_slip_options(self, map):
         slip_options = []
         for neighbor in map.places[map.vagabond_position].neighbors:

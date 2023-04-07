@@ -276,14 +276,15 @@ def move(map, starting_place, destination, quantity, actor, alliance, card_to_gi
         for _ in range(boot_cost):
             actor.exhaust_item(Item('boot'))
 
-def craft(actor, card, discard_deck, costs = []):
+def craft(actor, card, discard_deck, costs):
 
     actor.add_item(card.craft)
     discard_deck.add_card(actor.deck.get_the_card(card.ID))
 
     if actor == "vagabond":
-        for cost in costs:
+        for _ in range(sum(costs.values())):
             actor.exhaust_item("hammer")
     else:
-        for cost in costs:
-            actor.deactivate(card.craft_suit)
+        actor.deactivate(costs)
+
+    # TODO rewrite craft DTO to have cost
