@@ -1,3 +1,4 @@
+from item import Item
 class Place:
 	def __init__(self, name, suit, building_slot_num, vagabond_is_here=False, forest=False, ruin=False):
 		self.neighbors = list()
@@ -100,6 +101,7 @@ class Map:
 	def __init__(self, object_num:int, clearing_num:int, suits:tuple[str, ...], building_slots:tuple[int, ...], vagabond_index:int, ruin_indeces:tuple[int, ...], paths:tuple[str, ...]):
 		self.places = {}
 		self.vagabond_position = chr(ord('A')+vagabond_index)
+		self.craftables = [Item("sack"), Item("sack"), Item("boot"), Item("boot"), Item("crossbow"), Item("hammer"), Item("sword"), Item("sword"), Item("root_tea"), Item("root_tea"), Item("money"), Item("money")]
 		for i in range(object_num):
 			# Assuming vagabond can only start in the forest
 			if i>=clearing_num:

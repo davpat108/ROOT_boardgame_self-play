@@ -2,9 +2,8 @@ from random import shuffle
 from configs import total_common_card_info, vagabond_quest_card_info
 
 
-
 class Card:
-    def __init__(self, ID:int, card_suit: str, craft:str, craft_cost:int, craft_suit:str):
+    def __init__(self, ID:int, card_suit: str, craft, craft_cost:int, craft_suit:str):
         self.ID = ID
         self.card_suit = card_suit
         self.craft = craft
@@ -58,7 +57,7 @@ class Deck:
         shuffle(self.cards)
 
 class QuestCard:
-    def __init__(self, ID:int, item1: str, item2: str, suit: str):
+    def __init__(self, ID:int, item1, item2, suit: str):
         self.ID = ID
         self.suit = suit
         self.item1 = item1

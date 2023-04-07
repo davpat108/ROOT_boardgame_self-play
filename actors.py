@@ -1,7 +1,8 @@
 from deck import Deck, QuestDeck
 from dtos import Battle_DTO, CraftDTO, MoveDTO, OverworkDTO
-from configs import buildings_list_marquise
+from configs import buildings_list_marquise, Immediate_non_item_effects, persistent_effects
 from itertools import combinations
+from item import Item
 class Actor():
 
     def __init__(self) -> None:
@@ -18,13 +19,20 @@ class Actor():
             "bird": 0,
         }
         self.victory_points = 0
+        self.craft_activations = {
+            "rabbit": 0,
+            "mouse": 0,
+            "fox": 0
+        }
     def get_options(self):
         pass
-
-    def return_craft_options():
-        #retuns a list of options
-        pass
         
+    def add_item(self, item):
+        self.items.append(item)
+    
+    def get_craft_activations(self):
+        pass
+
     def discard_down_to_five_options(self):
         if len(self.deck.cards) <= 5:
             return
@@ -51,17 +59,20 @@ class Marquise(Actor):
         self.items = []
         self.name = 'cat'
     
+    def get_craft_activations(self, map):
+        self.craft_activations = map.count_on_map(("building", "workshop"), per_suit=True)
+
     def get_options_craft(self, map):
-        craft_suits = map.count_on_map(("building", "workshop"), per_suit=True)
         craft_options = []
         for card in self.deck.cards:
-            if card.craft_suit == "ambush":
-                pass
-            elif craft_suits[card.craft_suit] >= card.craft_cost:
-                craft_options.append(CraftDTO(card.craft))
-            elif card.craft_suit == "anything":
-                if sum(craft_suits.values()) > card.craft_cost:
+            if card.craft in Immediate_non_item_effects or card.craft in map.craftables or card.craft in persistent_effects:
+                if card.craft_suit == "ambush":
+                    pass
+                elif self.craft_activations[card.craft_suit] >= card.craft_cost:
                     craft_options.append(CraftDTO(card.craft))
+                elif card.craft_suit == "anything":
+                    if sum(self.craft_activations.values()) > card.craft_cost:
+                        craft_options.append(CraftDTO(card.craft))
         return craft_options
     
     def get_ambushes(self):
@@ -293,16 +304,18 @@ class Eyrie(Actor):
                 
         return min_soldiers_clearing
 
+    def get_craft_activations(self, map):
+        self.craft_activations = map.count_on_map(("building", "roost"), per_suit=True)
+
     def get_options_craft(self, map):
-        roost_counts = map.count_on_map(("building", "roost"), per_suit=True)
         craft_options = []
         for card in self.deck.cards:
             if card.craft_suit == "ambush":
                 pass
-            elif roost_counts[card.craft_suit] >= card.craft_cost:
+            elif self.craft_activations[card.craft_suit] >= card.craft_cost:
                 craft_options.append(CraftDTO(card.craft))
             elif card.craft_suit == "anything":
-                if sum(roost_counts.values()) > card.craft_cost:
+                if sum(self.craft_activations.values()) > card.craft_cost:
                     craft_options.append(CraftDTO(card.craft))
         return craft_options 
 
@@ -443,16 +456,18 @@ class Alliance(Actor):
 
         return spread_sympathy_options
     
+    def get_craft_activations(self, map):
+        self.craft_activations = map.count_on_map(("token", "sympathy"), per_suit=True)
+
     def get_options_craft(self, map):
-        sympathy_counts = map.count_on_map(("token", "sympathy"), per_suit=True)
         craft_options = []
         for card in self.deck.cards:
             if card.craft_suit == "ambush":
                 pass
-            elif sympathy_counts[card.craft_suit] >= card.craft_cost:
+            elif self.craft_activations[card.craft_suit] >= card.craft_cost:
                 craft_options.append(CraftDTO(card.craft))
             elif card.craft_suit == "anything":
-                if sum(sympathy_counts.values()) > card.craft_cost:
+                if sum(self.craft_activations.values()) > card.craft_cost:
                     craft_options.append(CraftDTO(card.craft))
         return craft_options
     
@@ -522,34 +537,6 @@ class Alliance(Actor):
 
         return organize_options
     
-
-class Item():
-    def __init__(self, name, exhausted=False, damaged=False) -> None:
-        self.name = name
-        self.check_names()
-        self.exhausted = False
-        self.damaged = False
-
-    def __eq__(self, other) -> bool:
-        if isinstance(other, Item) and self.name == other.name:
-            return True
-        return False
-
-    def __repr__(self):
-        return self.name
-
-    def __lt__(self, other):
-        return self.name < other.name
-    
-    def __key(self):
-        return (self.name, self.exhausted, self.damaged)
-
-    def __hash__(self):
-        return hash(self.__key())
-
-    def check_names(self):
-        if not self.name in ["sack", "money", "boot", "sword", "crossbow", "torch", "root_tea", "hammer"]:
-            raise ValueError("Item name not valid")
 
 class Vagabond(Actor):
     # First lets just make him thief
@@ -650,7 +637,7 @@ class Vagabond(Actor):
 
         for quest_card in self.quest_deck.cards:
             if (quest_card.suit == current_clearing.suit and
-                    self.has_items(Item(quest_card.item1), Item(quest_card.item2))):
+                    self.has_items(quest_card.item1, quest_card.item2)):
                 quest_options.append(quest_card.ID)
 
         return quest_options

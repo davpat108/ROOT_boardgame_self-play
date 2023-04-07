@@ -1,4 +1,4 @@
-
+from item import Item
 class ActionDTO:
     def __init__(self) -> None:
         pass
@@ -24,7 +24,7 @@ class CraftDTO(ActionDTO):
         self.get_item(craft)
 
     def get_item(self, craft):
-        if craft in ["sack", "money", "boot", "sword", "crossbow", "torch", "root_tea", "hammer"]:
+        if craft in [Item("sack"), Item("money"), Item("boot"), Item("sword"), Item("crossbow"), Item("torch"), Item("root_tea"), Item("hammer")]:
             self.item = craft
         else:
             self.item = None

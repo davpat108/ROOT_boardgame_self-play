@@ -2,7 +2,8 @@ import sys
 sys.path.append('.')
 from actions import get_battle_damages, resolve_battle, priority_to_list
 from map import build_regular_forest
-from actors import Marquise, Eyrie, Alliance, Vagabond, Item
+from actors import Marquise, Eyrie, Alliance, Vagabond
+from item import Item
 from configs import total_common_card_info
 from deck import Deck, Card
 def test_resolve_battle():
@@ -268,6 +269,12 @@ def test_resolve_battle():
     assert map.places['H'].soldiers['bird'] == 2
     assert vagabond.satchel[vagabond.satchel.index(Item('torch'))].damaged == True
     assert vagabond.relations['bird'] == "hostile"
+
+def test_slip():
+    pass
+
+def test_move():
+    pass
 
 
 

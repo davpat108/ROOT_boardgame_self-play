@@ -1,4 +1,5 @@
 from deck import Deck, Card, QuestCard, QuestDeck
+from item import Item
 
 def test_deck_init():
     deck = Deck()
@@ -26,7 +27,7 @@ def test_get_the_card():
     assert len(deck.cards) == 53
     assert card.ID == 3
     assert card.card_suit == "rabbit"
-    assert card.craft == "money"
+    assert card.craft == Item("money")
     assert card.craft_cost == 2
     assert card.craft_suit == "rabbit"
 

@@ -1,5 +1,6 @@
 from map import build_regular_forest, Map
-from actors import Marquise, Vagabond, Eyrie, Alliance, Item
+from actors import Marquise, Vagabond, Eyrie, Alliance
+from item import Item
 from deck import Card, Deck, QuestCard, QuestDeck
 from dtos import Battle_DTO, MoveDTO, OverworkDTO, Battle_DTO
 from actions import cat_birdsong_wood
@@ -37,13 +38,14 @@ def test_marguise_get_options_craft():
     map = build_regular_forest()
     marguise = Marquise()
     #give marquise a card that can be crafted
-    marguise.deck.add_card(Card(*[11, "rabbit", "boot", 1, "rabbit"]))
+    marguise.deck.add_card(Card(*[11, "rabbit", Item("boot"), 1, "rabbit"]))
     #give marquise a card that can be crafted but not enough resources
-    marguise.deck.add_card(Card(*[12, "rabbit", "root_tea", 1, "mouse"]))
+    marguise.deck.add_card(Card(*[12, "rabbit", Item("root_tea"), 1, "mouse"]))
     marguise.deck.add_card(Card(*[5, "rabbit", "ambush", 0, "ambush"]))
     
+    marguise.get_craft_activations(map)
     craft_options = marguise.get_options_craft(map)
-    assert [craft_option.item for craft_option in craft_options] == ["boot"]
+    assert [craft_option.item for craft_option in craft_options] == [Item("boot")]
     marguise.get_ambushes()
     assert marguise.ambush == {
             "rabbit": 1,
@@ -289,13 +291,14 @@ def test_eyrie_get_options_craft():
     map = build_regular_forest()
     eyrie = Eyrie("Despot")
     #give marquise a card that can be crafted
-    eyrie.deck.add_card(Card(*[11, "rabbit", "boot", 1, "rabbit"]))
+    eyrie.deck.add_card(Card(*[11, "rabbit", Item("boot"), 1, "rabbit"]))
     #give marquise a card that can be crafted but not enough resources
-    eyrie.deck.add_card(Card(*[12, "rabbit", "root_tea", 1, "mouse"]))
+    eyrie.deck.add_card(Card(*[12, "rabbit", Item("root_tea"), 1, "mouse"]))
     eyrie.deck.add_card(Card(*[5, "rabbit", "ambush", 0, "ambush"]))
     
+    eyrie.get_craft_activations(map)
     craft_options = eyrie.get_options_craft(map)
-    assert [craft_option.item for craft_option in craft_options] == ["boot"]
+    assert [craft_option.item for craft_option in craft_options] == [Item("boot")]
     eyrie.get_ambushes()
     assert eyrie.ambush == {
             "rabbit": 1,
@@ -385,14 +388,15 @@ def test_alliance_get_options_craft():
     map = build_regular_forest()
     alliance = Alliance()
     #give allaince a card that can be crafted
-    alliance.deck.add_card(Card(*[11, "rabbit", "boot", 1, "rabbit"]))
+    alliance.deck.add_card(Card(*[11, "rabbit", Item("boot"), 1, "rabbit"]))
     #give allaince a card that can be crafted but not enough resources
-    alliance.deck.add_card(Card(*[12, "rabbit", "root_tea", 1, "mouse"]))
+    alliance.deck.add_card(Card(*[12, "rabbit", Item("root_tea"), 1, "mouse"]))
     alliance.deck.add_card(Card(*[5, "rabbit", "ambush", 0, "ambush"]))
     
     map.places['D'].update_pieces(tokens = ['sympathy'])
+    alliance.get_craft_activations(map)
     craft_options = alliance.get_options_craft(map)
-    assert [craft_option.item for craft_option in craft_options] == ["boot"]
+    assert [craft_option.item for craft_option in craft_options] == [Item("boot")]
     alliance.get_ambushes()
     assert alliance.ambush == {
             "rabbit": 1,

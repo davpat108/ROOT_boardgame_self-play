@@ -1,4 +1,4 @@
-from actors import Eyrie, Marquise, Vagabond, Alliance, Item
+from item import Item
 from deck import Deck, Card
 from configs import sympathy_VPs
 # BIRDSONG
@@ -69,7 +69,9 @@ def spread_sympathy(map, alliance, discard_deck, place_name, card_ids):
 
 # Refresh items for vagabond already implemented in Vagabond class
 
-def slip(map, where):
+def slip(map, where, vagabond, alliance, card_to_give_if_sympathy):
+    if 'sympathy' in map.places[where.end].tokens:
+        vagabond.deck.add_card(alliance.deck.get_the_card(card_to_give_if_sympathy.ID))
     map.move_vagabond(where.end)
 
 # DAYLIGHT
@@ -164,7 +166,7 @@ def remove_soldiers_from_vagabond_items(items, defender):
             new_items.append(item)
     return new_items
 
-def resolve_battle(place, attacker, defender, eyrie, vagabond, marquise, alliance, dmg_attacker, dmg_defender, attacker_chosen_pieces=None, defender_chosen_pieces=None, vagabond_items=None, card_to_give_if_no_sympathy=None):
+def resolve_battle(place, attacker, defender, eyrie, vagabond, marquise, alliance, dmg_attacker, dmg_defender, attacker_chosen_pieces=None, defender_chosen_pieces=None, vagabond_items=None, card_to_give_if_sympathy=None):
     """
     :param map: Map
     :param place_name: str
@@ -252,11 +254,36 @@ def resolve_battle(place, attacker, defender, eyrie, vagabond, marquise, allianc
     for actor in [eyrie, vagabond, marquise, alliance]:
         if actor.name == attacker:
             actor.victory_points += victory_points_attacker
-            if sympathy_killed and card_to_give_if_no_sympathy:
-                alliance.deck.add_card(actor.deck.get_the_card(card_to_give_if_no_sympathy.ID)) # CORRECT ASSUMING card_to_give_if_no_sympathy is correct
+            if sympathy_killed and card_to_give_if_sympathy:
+                alliance.deck.add_card(actor.deck.get_the_card(card_to_give_if_sympathy.ID)) # CORRECT ASSUMING card_to_give_if_no_sympathy is correct
 
                 
         elif actor.name == defender:
             actor.victory_points += victory_points_defender
-            if sympathy_killed and card_to_give_if_no_sympathy:
-                alliance.deck.add_card(actor.deck.get_the_card(card_to_give_if_no_sympathy.ID))#CORRECT ASSUMING card_to_give_if_no_sympathy is correct
+            if sympathy_killed and card_to_give_if_sympathy:
+                alliance.deck.add_card(actor.deck.get_the_card(card_to_give_if_sympathy.ID))#CORRECT ASSUMING card_to_give_if_no_sympathy is correct
+
+def move(map, starting_place, destination, quantity, actor, alliance, card_to_give_if_sympathy, boot_cost = None):
+    if actor.name != 'vagabond':
+        starting_place.soldiers[actor.name] -= quantity
+        destination.soldiers[actor.name] += quantity
+
+    if actor.name != 'alliance' and destination.tokens.count("sympathy") > 0:
+        actor.deck.add_card(alliance.deck.get_the_card(card_to_give_if_sympathy.ID))
+    
+    if actor.name == 'vagabond':
+        map.move_vagabond(destination.name)
+        for _ in range(boot_cost):
+            actor.exhaust_item(Item('boot'))
+
+def craft(actor, card, discard_deck, costs = []):
+
+    actor.add_item(card.craft)
+    discard_deck.add_card(actor.deck.get_the_card(card.ID))
+
+    if actor == "vagabond":
+        for cost in costs:
+            actor.exhaust_item("hammer")
+    else:
+        for cost in costs:
+            actor.deactivate(card.craft_suit)
