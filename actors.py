@@ -73,13 +73,13 @@ class Marquise(Actor):
                 if card.craft_suit == "ambush":
                     pass
                 elif self.craft_activations[card.craft_suit] >= card.craft_cost:
-                    craft_options.append(CraftDTO(card.craft))
+                    craft_options.append(CraftDTO(card.craft, (card.craft_suit, card.craft_cost)))
                 elif card.craft_suit == "anything":
                     if sum(self.craft_activations.values()) > card.craft_cost:
-                        craft_options.append(CraftDTO(card.craft))
+                        craft_options.append(CraftDTO(card.craft, (card.craft_suit, card.craft_cost)))
                 elif card.craft_suit == "all":
                     if self.craft_activations["fox"] >= 1 and self.craft_activations["rabbit"] >= 1 and self.craft_activations["mouse"] >= 1:
-                        craft_options.append(CraftDTO(card.craft))
+                        craft_options.append(CraftDTO(card.craft, (card.craft_suit, card.craft_cost)))
         return craft_options
     
     def get_ambushes(self):
@@ -118,7 +118,9 @@ class Marquise(Actor):
                             moves.append(MoveDTO(place.name, map.places[neighbor[0]].name, how_many=i + 1))
         return moves    
     
-    def get_can_recruit():
+    def get_can_recruit(self, map):
+        if sum([place.soldiers["cat"] for place in map.places.values()]) >= 25:
+            return False
         return map.count_on_map(("building", "recruiter")) > 0
     
     def get_wood_tokens_to_build(self, map, place):
@@ -321,13 +323,13 @@ class Eyrie(Actor):
                 if card.craft_suit == "ambush":
                     pass
                 elif self.craft_activations[card.craft_suit] >= card.craft_cost:
-                    craft_options.append(CraftDTO(card.craft))
+                    craft_options.append(CraftDTO(card.craft, (card.craft_suit, card.craft_cost)))
                 elif card.craft_suit == "anything":
                     if sum(self.craft_activations.values()) > card.craft_cost:
-                        craft_options.append(CraftDTO(card.craft))
+                        craft_options.append(CraftDTO(card.craft, (card.craft_suit, card.craft_cost)))
                 elif card.craft_suit == "all":
                     if self.craft_activations["fox"] >= 1 and self.craft_activations["rabbit"] >= 1 and self.craft_activations["mouse"] >= 1:
-                        craft_options.append(CraftDTO(card.craft))
+                        craft_options.append(CraftDTO(card.craft, (card.craft_suit, card.craft_cost)))
         return craft_options 
 
 
@@ -477,13 +479,13 @@ class Alliance(Actor):
                 if card.craft_suit == "ambush":
                     pass
                 elif self.craft_activations[card.craft_suit] >= card.craft_cost:
-                    craft_options.append(CraftDTO(card.craft))
+                    craft_options.append(CraftDTO(card.craft, (card.craft_suit, card.craft_cost)))
                 elif card.craft_suit == "anything":
                     if sum(self.craft_activations.values()) > card.craft_cost:
-                        craft_options.append(CraftDTO(card.craft))
+                        craft_options.append(CraftDTO(card.craft, (card.craft_suit, card.craft_cost)))
                 elif card.craft_suit == "all":
                     if self.craft_activations["fox"] >= 1 and self.craft_activations["rabbit"] >= 1 and self.craft_activations["mouse"] >= 1:
-                        craft_options.append(CraftDTO(card.craft))
+                        craft_options.append(CraftDTO(card.craft, (card.craft_suit, card.craft_cost)))
         return craft_options
     
     def get_mobilize_options(self):
@@ -536,6 +538,8 @@ class Alliance(Actor):
         if self.current_officers == 0:
             return []
         recruit_options = []
+        if sum([place.soldiers["alliance"] for place in map.places.values()]) + self.total_officers >= 10:
+            return []
         for place in map.places.values():
             if True in [slot[0]=='base' for slot in place.building_slots]:
                 recruit_options.append(place.name)
@@ -591,11 +595,11 @@ class Vagabond(Actor):
                 if card.craft_suit == "ambush":
                     pass
                 elif activations >= card.craft_cost:
-                    craft_options.append(CraftDTO(card.craft))
+                    craft_options.append(CraftDTO(card.craft, (card.craft_suit, card.craft_cost)))
                 elif card.craft_suit == "anything":
                     pass
                 elif card.craft_suit == "all" and activations >= 3:
-                    craft_options.append(CraftDTO(card.craft))
+                    craft_options.append(CraftDTO(card.craft, (card.craft_suit, card.craft_cost)))
         return craft_options        
 
     def get_slip_options(self, map):
@@ -832,3 +836,9 @@ class Vagabond(Actor):
         for item in self.other_items:
             item.damaged = False
             item.exhausted = False
+    
+    def deactivate(self, cost):
+        raise NotImplementedError("Deactivate not implemented for vagabond")
+    
+    def get_discard_items_down_to_sack_options(self):
+        pass

@@ -21,3 +21,14 @@ I wrote pytests to ensure ther game and its elements work strictly according to 
 
 ## Configs
 The bigger constats are located here.
+
+## TODO
+Vagabond discard items down to sack
+crafting, move action, build,recruit, overwork tests
+in get options: all the immidiet and persistent effect cards
+dominance cards,
+favor cards,
+
+# TODO first gonna skip
+which woods to use to build, if you can build by the rule supply lines, you might be able to build unsupported wood
+which craft activations to use for royal claim

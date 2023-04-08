@@ -1,5 +1,6 @@
 from item import Item
 from deck import Deck, Card
+from dtos import CraftDTO, MoveDTO, Battle_DTO, ActionDTO
 from configs import sympathy_VPs
 # BIRDSONG
 def cat_birdsong_wood(map):
@@ -275,16 +276,63 @@ def move(map, starting_place, destination, quantity, actor, alliance, card_to_gi
         map.move_vagabond(destination.name)
         for _ in range(boot_cost):
             actor.exhaust_item(Item('boot'))
+    
+    if actor.name == 'alliance':
+        actor.current_officers -= 1
 
-def craft(actor, card, discard_deck, costs):
+def craft(map, actor, card, discard_deck, costs: CraftDTO):
 
     actor.add_item(card.craft)
+    map.craftables.remove(card.craft)
     discard_deck.add_card(actor.deck.get_the_card(card.ID))
 
     if actor == "vagabond":
-        for _ in range(sum(costs.values())):
+        for _ in range(sum(costs.cost.values())):
             actor.exhaust_item("hammer")
     else:
-        actor.deactivate(costs)
+        if costs.cost == "anything": # Royal claim card, Making the AI choose what to deactivate is too much work for now
+            i = 4
+            for _ in range(i):
+                for key in actor.craft_activations.keys():
+                    if not i:
+                        break
+                    if actor.craft_activations[key] > 0:
+                        actor.craft_activations[key] -= 1
+                        i -= 1
+                if not i:
+                    break
+        else:
+            actor.deactivate(costs)
+    
+def build(map, place, actor, building, cost = 0):
+    if actor.name == "cat": #Choosing which woods to remove is too much work for now
+        i = cost
+        for _ in range(i):
+            for place in map.places.values():
+                if not i:
+                    break
+                if "wood" in place.tokens and place.owner == 'cat':
+                    place.tokens.remove("wood")
+                    i -= 1
+            if not i:
+                break
+    for building_slot in place.building_slots:
+        if building_slot == ("empty", "No one"):
+            building_slot = (building, actor.name)
+            break
 
-    # TODO rewrite craft DTO to have cost
+def recruit_cat(map):
+    for place in map.place.values():
+        if ("recruiter", "cat") in place.building_slots and sum([place.soldiers["cat"] for place in map.places.values()]) < 25:
+            place.soldiers["cat"] += 1
+
+def recruit(place, actor):
+    place.soldiers[actor.name] += 1
+
+def overwork(place):
+    place.tokens.wood += 1
+
+def revolt():
+    pass
+def spread_symp():
+    pass
