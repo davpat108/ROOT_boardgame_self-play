@@ -23,11 +23,41 @@ class Place:
 		self.forest = forest
 
 	def remove_building(self, building_type):
+		# building type: (name, owner)
 		for i, (building, owner) in enumerate(self.building_slots):
 			if building == building_type:
 				self.building_slots[i] = ('empty', 'No one')
 				return
 		raise ValueError("No such building")
+
+	def clear_buildings(self):
+		removed_buildings = 0
+		for i in range(len(self.building_slots)):
+			if self.building_slots[i][0] != "ruin":
+				self.building_slots[i] = ('empty', 'No one')
+				removed_buildings += 1
+		return removed_buildings
+
+	def clear_tokens(self, exception_token=None):
+		removed_tokens = 0
+		for i in range(len(self.tokens)):
+			if self.tokens[i] != exception_token:
+				self.tokens.pop(i)
+				removed_tokens += 1
+		return removed_tokens
+	
+	def clear_soldiers(self, exception_faction=None):
+		for faction in self.soldiers:
+			if faction != exception_faction:
+				self.soldiers[faction] = 0
+
+	def add_building(self, building_type, owner):
+		# building type: (name, owner)
+		for i, (building, _) in enumerate(self.building_slots):
+			if building == 'empty':
+				self.building_slots[i] = (building_type, owner)
+				return
+		raise ValueError("No empty building slot")
 
 	def has_opponent_pieces(self, opponent):
 		has_building = any(slot[1] == opponent for slot in self.building_slots)

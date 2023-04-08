@@ -1,7 +1,7 @@
 from item import Item
 from deck import Deck, Card
 from dtos import CraftDTO, MoveDTO, Battle_DTO, ActionDTO
-from configs import sympathy_VPs
+from configs import sympathy_VPs, eyrie_roost_VPs
 # BIRDSONG
 def cat_birdsong_wood(map):
     for key in list(map.places.keys()):
@@ -72,7 +72,7 @@ def spread_sympathy(map, alliance, discard_deck, place_name, card_ids):
 
 def slip(map, where, vagabond, alliance, card_to_give_if_sympathy):
     if 'sympathy' in map.places[where.end].tokens:
-        vagabond.deck.add_card(alliance.deck.get_the_card(card_to_give_if_sympathy.ID))
+        alliance.supporter_deck.add_card(vagabond.deck.get_the_card(card_to_give_if_sympathy.ID))
     map.move_vagabond(where.end)
 
 # DAYLIGHT
@@ -256,13 +256,13 @@ def resolve_battle(place, attacker, defender, eyrie, vagabond, marquise, allianc
         if actor.name == attacker:
             actor.victory_points += victory_points_attacker
             if sympathy_killed and card_to_give_if_sympathy:
-                alliance.deck.add_card(actor.deck.get_the_card(card_to_give_if_sympathy.ID)) # CORRECT ASSUMING card_to_give_if_no_sympathy is correct
+                alliance.supporter_deck.add_card(actor.deck.get_the_card(card_to_give_if_sympathy.ID)) # CORRECT ASSUMING card_to_give_if_no_sympathy is correct
 
                 
         elif actor.name == defender:
             actor.victory_points += victory_points_defender
             if sympathy_killed and card_to_give_if_sympathy:
-                alliance.deck.add_card(actor.deck.get_the_card(card_to_give_if_sympathy.ID))#CORRECT ASSUMING card_to_give_if_no_sympathy is correct
+                alliance.supporter_deck.add_card(actor.deck.get_the_card(card_to_give_if_sympathy.ID))#CORRECT ASSUMING card_to_give_if_no_sympathy is correct
 
 def move(map, starting_place, destination, quantity, actor, alliance, card_to_give_if_sympathy, boot_cost = None):
     if actor.name != 'vagabond':
@@ -270,7 +270,7 @@ def move(map, starting_place, destination, quantity, actor, alliance, card_to_gi
         destination.soldiers[actor.name] += quantity
 
     if actor.name != 'alliance' and destination.tokens.count("sympathy") > 0:
-        actor.deck.add_card(alliance.deck.get_the_card(card_to_give_if_sympathy.ID))
+        alliance.supporter_deck.add_card(actor.deck.get_the_card(card_to_give_if_sympathy.ID))
     
     if actor.name == 'vagabond':
         map.move_vagabond(destination.name)
@@ -332,7 +332,77 @@ def recruit(place, actor):
 def overwork(place):
     place.tokens.wood += 1
 
-def revolt():
+def eyrie_get_points(map, eyrie):
+    roosts = map.count_on_map(("building", "roost"))
+    eyrie.victory_points += eyrie_roost_VPs[roosts]
+
+# Alliance
+def revolt(map, place, vagabond_items, vagabond, alliance, cost, soldiers_to_gain, discard_deck):
+    # Clear all buildings
+    victory_points = 0
+    victory_points += place.clear_buildings()
+    victory_points += place.clear_tokens(exception_token="sympathy")
+    place.clear_soldiers(exception_faction="alliance")
+
+    # Add a base for the alliance
+    place.add_building('base', 'alliance')
+
+    # If the vagabond is present, damage 3 vagabond items
+    if place.vagabond_is_here:
+        for item in vagabond_items[:3]:
+            vagabond.damage_item(item)
+
+    discard_deck.add_card(alliance.supporter_deck.get_the_card(cost[0]))
+    discard_deck.add_card(alliance.supporter_deck.get_the_card(cost[1]))
+
+    for _ in range(soldiers_to_gain):
+        if sum([place.soldiers["alliance"] for place in map.places.values()]) + alliance.total_officers >= 10:
+            break
+        place.soldiers["alliance"] += 1
+
+    if sum([place.soldiers["alliance"] for place in map.places.values()]) + alliance.total_officers <= 10:
+        alliance.total_officers += 1
+
+    alliance.victory_points += victory_points
+
+def spread_symp(map, place, cost, discard_deck, alliance):
+    symp_count = map.count_on_map(("token", "sympathy"), per_suit=False)
+    place.tokens.append("sympathy")
+    for i in range(len(cost)):
+        discard_deck.add_card(alliance.supporter_deck.get_the_card(cost[i]))
+    
+    alliance.victory_points += sympathy_VPs[symp_count]
+    
+
+def mobilize(card, alliance):
+    alliance.supporter_deck.add_card(alliance.deck.get_the_card(card.ID))
+
+def train(card, alliance, discard_deck):
+    discard_deck.add_card(alliance.deck.get_the_card(card.ID))
+    alliance.total_officers += 1
+    
+def organize(map, place, alliance):
+    symp_count = map.count_on_map(("token", "sympathy"), per_suit=False)
+    place.solderiers["alliance"] -= 1
+    place.tokens += ["sympathy"]
+    alliance.victory_points += sympathy_VPs[symp_count]
+
+# Vagabond
+def explore_ruin():
     pass
-def spread_symp():
+
+def aid():
     pass
+
+def steal():
+    pass
+
+def complete_quest():
+    pass
+
+def strike():
+    pass
+
+# Persistent_effects
+
+# Immidiate effects

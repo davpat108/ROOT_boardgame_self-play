@@ -28,6 +28,7 @@ crafting, move action, build,recruit, overwork tests
 in get options: all the immidiet and persistent effect cards
 dominance cards,
 favor cards,
+update owner, update victory points check gain-loss
 
 # TODO first gonna skip
 which woods to use to build, if you can build by the rule supply lines, you might be able to build unsupported wood

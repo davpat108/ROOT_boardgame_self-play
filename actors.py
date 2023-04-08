@@ -494,7 +494,8 @@ class Alliance(Actor):
     def get_train_options(self, map):
         base_suits = set()
         train_options = []
-
+        if sum([place.soldiers["alliance"] for place in map.places.values()]) + self.total_officers >= 10:
+            return train_options
         for place in map.places.values():
             if ("base", "alliance") in place.building_slots:
                 base_suits.add(place.suit)
@@ -776,6 +777,7 @@ class Vagabond(Actor):
         return item_dmg_options
 
     def damage_item(self, other_item, place = None):
+        # Place: when the vagabond is allied to a faction, the factions soldiers are considered items
         if isinstance(other_item, Item):
             for item in self.satchel:
                 if item.name == other_item.name:

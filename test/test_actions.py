@@ -199,7 +199,7 @@ def test_resolve_battle():
     assert sorted(vagabond.satchel) == sorted([Item('sword'), Item('sword'), Item('sword'),  Item('boot'), Item('torch')])
     assert vagabond.satchel[vagabond.satchel.index(Item('boot'))].damaged == True
     assert len(vagabond.deck.cards) == 0
-    assert alliance.deck.cards[0] == Card(*total_common_card_info[17])
+    assert alliance.supporter_deck.cards[0] == Card(*total_common_card_info[17])
 
     # VAGABOND attacker vs cat with bird allies turns hostile
     map.places['H'].update_pieces(soldiers ={'cat': 2, 'bird': 3, 'alliance': 0}, buildings = [('empty', 'No one'), ('empty', 'No one'), ('empty', 'No one')], tokens = [])
