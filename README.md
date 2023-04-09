@@ -24,11 +24,11 @@ The bigger constats are located here.
 
 ## TODO
 Vagabond discard items down to sack
-crafting, move action, build,recruit, overwork tests
-in get options: all the immidiet and persistent effect cards
-dominance cards,
-favor cards,
+crafting, move action, build,recruit, overwork, revolt, sympathy, mobilize, train, organize, ruin_explore, aid, steal, complete quest, strike  tests
+vagabond quest complete options draw or vp
 update owner, update victory points check gain-loss
+losing stuff in general
+favor dominance ambush
 
 # TODO first gonna skip
 which woods to use to build, if you can build by the rule supply lines, you might be able to build unsupported wood

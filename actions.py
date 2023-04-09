@@ -1,7 +1,7 @@
 from item import Item
 from deck import Deck, Card
 from dtos import CraftDTO, MoveDTO, Battle_DTO, ActionDTO
-from configs import sympathy_VPs, eyrie_roost_VPs
+from configs import sympathy_VPs, eyrie_roost_VPs, persistent_effects, Immediate_non_item_effects
 # BIRDSONG
 def cat_birdsong_wood(map):
     for key in list(map.places.keys()):
@@ -280,10 +280,11 @@ def move(map, starting_place, destination, quantity, actor, alliance, card_to_gi
     if actor.name == 'alliance':
         actor.current_officers -= 1
 
-def craft(map, actor, card, discard_deck, costs: CraftDTO):
+def craft(map, actor, card, discard_deck, vagabond, costs: CraftDTO):
 
-    actor.add_item(card.craft)
-    map.craftables.remove(card.craft)
+    if card.craft == "ambush":
+        raise ValueError("Ambush is not a craftable card")
+    
     discard_deck.add_card(actor.deck.get_the_card(card.ID))
 
     if actor == "vagabond":
@@ -303,7 +304,53 @@ def craft(map, actor, card, discard_deck, costs: CraftDTO):
                     break
         else:
             actor.deactivate(costs)
+
+    if isinstance(card.craft, Item):
+        actor.add_item(card.craft)
+        map.craftables.remove(card.craft)
+        actor.victory_points += card.craft.crafting_reward()
     
+    else:
+        # Persistent effects
+        if card.craft == "cobbler":
+            actor.cobbler = True
+        if card.craft == "tax_collector":
+            actor.tax_collector = True
+        if card.craft == "armorers":
+            actor.armorers = True
+        if card.craft == "sappers":
+            actor.sappers = True
+        if card.craft == "command_warren":
+            actor.command_warren = True
+        if card.craft == "scouting_party":
+            actor.scouting_party = True
+        if card.craft == "codebreakers":
+            actor.codebreakers = True
+        if card.craft == "stand_and_deliver":
+            actor.stand_and_deliver = True
+        if card.craft == "better_burrow_bank":
+            actor.better_burrow_bank = True
+        if card.craft == "royal_claim":
+            actor.royal_claim = True
+        if card.craft == "brutal_tactics":
+            actor.brutal_tactics = True
+        # Immidiate effects
+        if card.craft == "favor":
+            favor(map, actor, card.suit, vagabond)
+        if card.craft == "dominance":
+            dominance(map, actor.place, actor, card.building, card.cost)
+        
+        
+def favor(map, actor, suit, vagabond):
+    pass
+
+def dominance(actor):
+    pass
+
+def ambush(place, defender, attacker):
+    pass
+
+
 def build(map, place, actor, building, cost = 0):
     if actor.name == "cat": #Choosing which woods to remove is too much work for now
         i = cost
@@ -388,20 +435,57 @@ def organize(map, place, alliance):
     alliance.victory_points += sympathy_VPs[symp_count]
 
 # Vagabond
-def explore_ruin():
-    pass
+def explore_ruin(vagabond, place):
+    for building_slot in place.building_slots:
+        if building_slot[0] == "ruin":
+            vagabond.add_item(building_slot[1])
+            building_slot = ("empty", "No one")
+    # VPS
 
-def aid():
-    pass
+def aid(other_player, vagabond, choosen_item, choosen_card):
+    other_player.deck.add_card(vagabond.deck.get_the_card(choosen_card.ID))
+    other_player.item.remove(choosen_item)
+    vagabond.add_item(choosen_item)
+    # VPS
 
-def steal():
-    pass
+def steal(vagabond, other_player, choosen_card):
+    vagabond.deck.add_card(other_player.deck.get_the_card(choosen_card.ID))
+    vagabond.satchel[vagabond.satchel.index(Item('torch'))].exhausted = True
 
-def complete_quest():
-    pass
+def complete_quest(quest_discard_deck, quest_card, quest_deck, common_deck, vagabond, items, draw_or_VP):
+    quest_discard_deck.add_card(vagabond.quest_deck.get_the_card(quest_card.ID))
+    vagabond.quest_deck.add_card(quest_deck.draw_card())
 
-def strike():
-    pass
+    if draw_or_VP == "draw":
+        vagabond.deck.add_card(common_deck.draw_card())
+    if draw_or_VP == "VP":
+        vagabond.victory_points += sum([card.suit == quest_card.suit  for card in quest_discard_deck])
+
+    vagabond.exhaust_item(items[0])
+    vagabond.exhaust_item(items[1])
+
+
+def strike(place, opponent, target, vagabond):
+    if target == "wood" or target == "keep" or target == "sympathy":
+        place.tokens.remove(target)
+        if vagabond.relationships[opponent.name] == "hostile":
+            victory_points += 1
+        vagabond.victory_points += 1
+
+    elif target == "soldier":
+        place.soldiers[opponent.name] -= 1
+        if vagabond.relationships[opponent.name] == "hostile":
+            victory_points += 1
+        vagabond.relationships[opponent.name] = "hostile"
+
+    else:
+        for building_slot in place.building_slots:
+            if building_slot[0] == target:
+                building_slot = ("empty", "No one")
+                if vagabond.relationships[opponent.name] == "hostile":
+                    victory_points += 1
+                victory_points += 1
+                break
 
 # Persistent_effects
 

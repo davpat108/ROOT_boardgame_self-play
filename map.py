@@ -274,6 +274,7 @@ def build_regular_forest():
 	building_slots = [1, 2, 2, 2, 2, 1, 2, 3, 2, 2, 2, 1]
 	vagabond_index = 14
 	ruin_indeces = [3, 6, 7, 8]
+	ruin_items = [Item("sword"), Item("sack"), Item("boot"), Item("hammer")]
 	paths = ['AB', 'AM', 'AD', 'AN', 'AE', 'BC', 'BM', 'CM', 'CD', 'CI','CO',
 	   'DM', 'DN', 'DG', 'DO', 'EN', 'EG', 'EF', 'EP', 'GP', 'GQ', 'GF',
 		'GH', 'GR', 'GO', 'GN', 'GK', 'FP', 'FQ', 'FJ', 'HO', 'HR', 'HS',
@@ -282,8 +283,11 @@ def build_regular_forest():
 	map = Map(20, clearing_num=clearing_num, building_slots=building_slots, suits=suits, vagabond_index=vagabond_index, ruin_indeces=ruin_indeces, paths=paths)
 
 	starting_pieces = [('A', {'soldiers' : {'cat': 1, 'bird' : 0, 'alliance' : 0}, 'buildings': [('sawmill', 'cat')], 'tokens' : ['keep']}),
-		     ('D', {'soldiers' : {'cat': 1, 'bird' : 0, 'alliance' : 0}, 'buildings': [('workshop', 'cat'), ('ruin', 'No one')]}),
+		     ('D', {'soldiers' : {'cat': 1, 'bird' : 0, 'alliance' : 0}, 'buildings': [('workshop', 'cat'), ('ruin', ruin_items[0])]}),
 			   ('E', {'soldiers' : {'cat': 1, 'bird' : 0, 'alliance' : 0}, 'buildings': [('recruiter', 'cat'), ('empty', 'No one')]}),
+			   ('G', {'soldiers' : {'cat': 1, 'bird' : 0, 'alliance' : 0}, 'buildings': [('empty', 'No one'), ('ruin', ruin_items[1])]}),
+			   ('H', {'soldiers' : {'cat': 1, 'bird' : 0, 'alliance' : 0}, 'buildings': [('empty', 'No one'), ('empty', 'No one'), ('ruin', ruin_items[2])]}),
+			   ('I', {'soldiers' : {'cat': 1, 'bird' : 0, 'alliance' : 0}, 'buildings': [('empty', 'No one'), ('ruin', ruin_items[3])]}),
 			     ('L', {'soldiers' : {'cat': 0, 'bird' : 6, 'alliance' : 0}, 'buildings': [('roost', 'bird')]})]
 	basic = {'soldiers' : {'cat': 1, 'bird' : 0, 'alliance' : 0}}
 	i = 0

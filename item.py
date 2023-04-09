@@ -22,6 +22,24 @@ class Item():
     def __hash__(self):
         return hash(self.__key())
 
+    def crafting_reward(self):
+        if self.name == "sack":
+            return 1
+        elif self.name == "money":
+            return 3
+        elif self.name == "boot":
+            return 1
+        elif self.name == "sword":
+            return 2
+        elif self.name == "crossbow":
+            return 1
+        elif self.name == "torch":
+            raise ValueError("Someone tried to craft a torch")
+        elif self.name == "root_tea":
+            return 2
+        elif self.name == "hammer":
+            return 2
+
     def check_names(self):
         if not self.name in ["sack", "money", "boot", "sword", "crossbow", "torch", "root_tea", "hammer"]:
             raise ValueError("Item name not valid")
