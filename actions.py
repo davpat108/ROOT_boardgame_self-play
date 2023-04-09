@@ -21,42 +21,37 @@ def place_roost_if_zero_roost(map, place_name):
         map.places[place_name].soldiers['bird'] += 3
     except ValueError:
         raise ValueError("Error in get_no_roosts_left_options")
-    
-def revolt(map, alliance, discard_deck, place_name, cardID1, cardID2, vagabond, vagabond_item_breaks):
+
+# Alliance
+def revolt(map, place, vagabond_items, vagabond, alliance, cost, soldiers_to_gain, discard_deck):
+    # Clear all buildings
     victory_points = 0
-    if cardID1 == cardID2:
-        raise ValueError("Error in revolt: cardID1 == cardID2")
-    #Get soldiers
-    sympathies = map.count_on_map(what_to_look_for=('token', 'sympathy'), per_suit = True)
-    soldiers = sympathies[map.places[place_name].suit] + 1
+    victory_points += place.clear_buildings()
+    victory_points += place.clear_tokens(exception_token="sympathy")
+    place.clear_soldiers(exception_faction="alliance")
 
-    # VPs
-    for slot in map.places[place_name].building_slots:
-        if slot[1] != 'No one':
-            victory_points += 1
-    
-    for token in map.places[place_name].tokens:
-        if token != 'sympathy':
-            victory_points += 1
+    # Add a base for the alliance
+    place.add_building('base', 'alliance')
 
-    # place base and remove everything else
-    map.places[place_name].building_slots[0] = ('base', 'alliance')
-    for i in range(len(map.places[place_name].building_slots)-1):
-        map.places[place_name].building_slots[i+1] = ('empty', 'No one')
+    # If the vagabond is present, damage 3 vagabond items
+    if place.vagabond_is_here:
+        for item in vagabond_items[:3]:
+            vagabond.damage_item(item)
 
-    
-    map.places[place_name].update_pieces(soldiers = {'cat': soldiers, 'bird': 0, 'alliance': soldiers}, tokens=['sympathy'])
+    discard_deck.add_card(alliance.supporter_deck.get_the_card(cost[0]))
+    discard_deck.add_card(alliance.supporter_deck.get_the_card(cost[1]))
 
-    if discard_deck.add_card(alliance.supporter_deck.get_the_card(cardID1)) is not None \
-          or discard_deck.add_card(alliance.supporter_deck.get_the_card(cardID2)) is not None:
-        raise ValueError("Error in revolt: card not in supporter deck")
-    
+    for _ in range(soldiers_to_gain):
+        if sum([place.soldiers["alliance"] for place in map.places.values()]) + alliance.total_officers >= 10:
+            break
+        place.soldiers["alliance"] += 1
 
-    if map.places[place_name].vagabond_is_here:
-        for item in vagabond_item_breaks:
-            vagabond.damage(item)
-    
+    if sum([place.soldiers["alliance"] for place in map.places.values()]) + alliance.total_officers <= 10:
+        alliance.total_officers += 1
+
+    place.update_owner()
     alliance.victory_points += victory_points
+
 
 def spread_sympathy(map, alliance, discard_deck, place_name, card_ids):
     map.places[place_name].update_pieces(tokens = map.places[place_name].tokens + ['sympathy'])
@@ -70,10 +65,10 @@ def spread_sympathy(map, alliance, discard_deck, place_name, card_ids):
 
 # Refresh items for vagabond already implemented in Vagabond class
 
-def slip(map, where, vagabond, alliance, card_to_give_if_sympathy):
-    if 'sympathy' in map.places[where.end].tokens:
+def slip(map, place, vagabond, alliance, card_to_give_if_sympathy):
+    if 'sympathy' in map.places[place.name].tokens:
         alliance.supporter_deck.add_card(vagabond.deck.get_the_card(card_to_give_if_sympathy.ID))
-    map.move_vagabond(where.end)
+    map.move_vagabond(place.name)
 
 # DAYLIGHT
 
@@ -157,9 +152,6 @@ def priority_to_list(priorities, place, owner):
 
     return chosen_pieces
 
-def ambush():
-    pass
-
 def remove_soldiers_from_vagabond_items(items, defender):
     new_items = []
     for item in items:
@@ -181,6 +173,8 @@ def resolve_battle(place, attacker, defender, eyrie, vagabond, marquise, allianc
     :param discard_deck: DiscardDeck
     :param vagabond_items: list, items to damage
     """ 
+    if attacker != "vagabond" and place.soldiers[attacker] == 0:
+        return
     # So vagabond cant attack its allies with its allies
     if attacker == "vagabond":
         if vagabond.relations[defender] == "friendly":
@@ -263,8 +257,10 @@ def resolve_battle(place, attacker, defender, eyrie, vagabond, marquise, allianc
             actor.victory_points += victory_points_defender
             if sympathy_killed and card_to_give_if_sympathy:
                 alliance.supporter_deck.add_card(actor.deck.get_the_card(card_to_give_if_sympathy.ID))#CORRECT ASSUMING card_to_give_if_no_sympathy is correct
+    place.update_owner()
 
-def move(map, starting_place, destination, quantity, actor, alliance, card_to_give_if_sympathy, boot_cost = None):
+def move(map, starting_place, destination, quantity, actor, alliance, card_to_give_if_sympathy, boot_cost):
+    # TODO vagabond moveing with allied soldiers
     if actor.name != 'vagabond':
         starting_place.soldiers[actor.name] -= quantity
         destination.soldiers[actor.name] += quantity
@@ -279,13 +275,17 @@ def move(map, starting_place, destination, quantity, actor, alliance, card_to_gi
     
     if actor.name == 'alliance':
         actor.current_officers -= 1
+    map.update_owners()
 
-def craft(map, actor, card, discard_deck, vagabond, costs: CraftDTO):
+def craft(map, actor, discard_deck, vagabond, costs: CraftDTO):
 
-    if card.craft == "ambush":
+    if costs.card.craft == "ambush":
         raise ValueError("Ambush is not a craftable card")
     
-    discard_deck.add_card(actor.deck.get_the_card(card.ID))
+    if costs.card.craft == "dominance":
+        actor.deck.get_the_card(costs.card.ID)
+    else:
+        discard_deck.add_card(actor.deck.get_the_card(costs.card.ID))
 
     if actor == "vagabond":
         for _ in range(sum(costs.cost.values())):
@@ -303,52 +303,90 @@ def craft(map, actor, card, discard_deck, vagabond, costs: CraftDTO):
                 if not i:
                     break
         else:
-            actor.deactivate(costs)
+            actor.deactivate(costs.cost)
 
-    if isinstance(card.craft, Item):
-        actor.add_item(card.craft)
-        map.craftables.remove(card.craft)
-        actor.victory_points += card.craft.crafting_reward()
+    if isinstance(costs.card.craft, Item):
+        actor.add_item(costs.card.craft)
+        map.craftables.remove(costs.card.craft)
+        actor.victory_points += costs.card.craft.crafting_reward()
     
     else:
         # Persistent effects
-        if card.craft == "cobbler":
+        if costs.card.craft == "cobbler":
             actor.cobbler = True
-        if card.craft == "tax_collector":
+        if costs.card.craft == "tax_collector":
             actor.tax_collector = True
-        if card.craft == "armorers":
+        if costs.card.craft == "armorers":
             actor.armorers = True
-        if card.craft == "sappers":
+        if costs.card.craft == "sappers":
             actor.sappers = True
-        if card.craft == "command_warren":
+        if costs.card.craft == "command_warren":
             actor.command_warren = True
-        if card.craft == "scouting_party":
+        if costs.card.craft == "scouting_party":
             actor.scouting_party = True
-        if card.craft == "codebreakers":
+        if costs.card.craft == "codebreakers":
             actor.codebreakers = True
-        if card.craft == "stand_and_deliver":
+        if costs.card.craft == "stand_and_deliver":
             actor.stand_and_deliver = True
-        if card.craft == "better_burrow_bank":
+        if costs.card.craft == "better_burrow_bank":
             actor.better_burrow_bank = True
-        if card.craft == "royal_claim":
+        if costs.card.craft == "royal_claim":
             actor.royal_claim = True
-        if card.craft == "brutal_tactics":
+        if costs.card.craft == "brutal_tactics":
             actor.brutal_tactics = True
         # Immidiate effects
-        if card.craft == "favor":
-            favor(map, actor, card.suit, vagabond)
-        if card.craft == "dominance":
-            dominance(map, actor.place, actor, card.building, card.cost)
+        if costs.card.craft == "favor":
+            favor(map, actor, costs.card.suit, vagabond)
+        if costs.card.craft == "dominance":
+            dominance(map, actor.place, actor, costs.card.building, costs.card.cost)
         
         
-def favor(map, actor, suit, vagabond):
-    pass
+def favor(map, actor, suit, vagabond, vagabond_items):
+    victory_points = 0
+    for place in map.places.values():
+        if place.suit == suit:
+            for key in place.soldiers.key():
+                if key != actor.name and key != "vagabond":
+                    place.soldiers[key] = 0
+            if actor.name != "vagabond" and place.vagabond_is_here:
+                for item in vagabond_items[:3]:
+                    vagabond.damage_item(item)
+            victory_points += place.clear_buildings(exception_faction=actor.name)
+            victory_points += place.clear_tokens(exception_faction=actor.name)
+    actor.victory_points += victory_points
+    map.update_owners()
 
-def dominance(actor):
-    pass
+            
 
-def ambush(place, defender, attacker):
-    pass
+def dominance(user, actors, suit):
+    if user == "vagabond":
+        min_points = 100
+        min_point_actorname = None
+        for actor in actors:
+            if actor != "vagabond":
+                if actor.victory_points < min_points:
+                    min_points = actor.victory_points
+                    min_point_actorname = actor.name
+
+        for actor in actors:
+            if actor.name == min_point_actorname:
+                actor.win_condition = "coalition"
+        user.win_condition = "coalition"
+    else:
+        user.win_condition = suit
+        
+
+def ambush(place, attacker, counterambush, vagabond, vagabond_items):
+    if counterambush:
+        return
+    
+    if attacker.name == "vagabond":
+        for item in vagabond_items[:2]:
+            vagabond.damage_item(item)
+    
+    else:
+        place.soldiers[attacker.name] -= 2 
+        place.soldiers[attacker.name] = max(place.soldiers[attacker.name], 0)
 
 
 def build(map, place, actor, building, cost = 0):
@@ -367,14 +405,17 @@ def build(map, place, actor, building, cost = 0):
         if building_slot == ("empty", "No one"):
             building_slot = (building, actor.name)
             break
+    place.update_owner()
 
 def recruit_cat(map):
     for place in map.place.values():
         if ("recruiter", "cat") in place.building_slots and sum([place.soldiers["cat"] for place in map.places.values()]) < 25:
             place.soldiers["cat"] += 1
+    map.update_owners()
 
 def recruit(place, actor):
     place.soldiers[actor.name] += 1
+    place.update_owner()
 
 def overwork(place):
     place.tokens.wood += 1
@@ -383,34 +424,6 @@ def eyrie_get_points(map, eyrie):
     roosts = map.count_on_map(("building", "roost"))
     eyrie.victory_points += eyrie_roost_VPs[roosts]
 
-# Alliance
-def revolt(map, place, vagabond_items, vagabond, alliance, cost, soldiers_to_gain, discard_deck):
-    # Clear all buildings
-    victory_points = 0
-    victory_points += place.clear_buildings()
-    victory_points += place.clear_tokens(exception_token="sympathy")
-    place.clear_soldiers(exception_faction="alliance")
-
-    # Add a base for the alliance
-    place.add_building('base', 'alliance')
-
-    # If the vagabond is present, damage 3 vagabond items
-    if place.vagabond_is_here:
-        for item in vagabond_items[:3]:
-            vagabond.damage_item(item)
-
-    discard_deck.add_card(alliance.supporter_deck.get_the_card(cost[0]))
-    discard_deck.add_card(alliance.supporter_deck.get_the_card(cost[1]))
-
-    for _ in range(soldiers_to_gain):
-        if sum([place.soldiers["alliance"] for place in map.places.values()]) + alliance.total_officers >= 10:
-            break
-        place.soldiers["alliance"] += 1
-
-    if sum([place.soldiers["alliance"] for place in map.places.values()]) + alliance.total_officers <= 10:
-        alliance.total_officers += 1
-
-    alliance.victory_points += victory_points
 
 def spread_symp(map, place, cost, discard_deck, alliance):
     symp_count = map.count_on_map(("token", "sympathy"), per_suit=False)
@@ -419,6 +432,7 @@ def spread_symp(map, place, cost, discard_deck, alliance):
         discard_deck.add_card(alliance.supporter_deck.get_the_card(cost[i]))
     
     alliance.victory_points += sympathy_VPs[symp_count]
+    place.update_owner()
     
 
 def mobilize(card, alliance):
@@ -440,7 +454,10 @@ def explore_ruin(vagabond, place):
         if building_slot[0] == "ruin":
             vagabond.add_item(building_slot[1])
             building_slot = ("empty", "No one")
-    # VPS
+            vagabond.satchel[vagabond.satchel.index(Item('torch'))].exhausted = True
+            vagabond.victory_points += 1
+            return
+    raise ValueError("Try to explore but no ruin")
 
 def aid(other_player, vagabond, choosen_item, choosen_card):
     other_player.deck.add_card(vagabond.deck.get_the_card(choosen_card.ID))
@@ -486,7 +503,4 @@ def strike(place, opponent, target, vagabond):
                     victory_points += 1
                 victory_points += 1
                 break
-
-# Persistent_effects
-
-# Immidiate effects
+    place.update_owner()

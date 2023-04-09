@@ -18,13 +18,14 @@ class Battle_DTO(ActionDTO):
     
 class CraftDTO(ActionDTO):
     # Everything except ambush, ambush is a taken care of in Actor class
-    def __init__(self, craft, cost) -> None:
+    def __init__(self, craft, cost, card) -> None:
         super().__init__()
         self.what = craft
+        self.card = card
         self.get_cost(cost)
         self.get_item(craft)
 
-    def get_item(self, craft):
+    def get_item(self, craft): # Probably not necessary
         if craft in [Item("sack"), Item("money"), Item("boot"), Item("sword"), Item("crossbow"), Item("torch"), Item("root_tea"), Item("hammer")]:
             self.item = craft
         else:

@@ -30,18 +30,24 @@ class Place:
 				return
 		raise ValueError("No such building")
 
-	def clear_buildings(self):
+	def clear_buildings(self, exception_faction=None):
 		removed_buildings = 0
 		for i in range(len(self.building_slots)):
-			if self.building_slots[i][0] != "ruin":
+			if self.building_slots[i][0] != "ruin" and self.building_slots[i][1] != exception_faction:
 				self.building_slots[i] = ('empty', 'No one')
 				removed_buildings += 1
 		return removed_buildings
 
-	def clear_tokens(self, exception_token=None):
+	def clear_tokens(self, exception_faction=None):
+		if exception_faction == "alliance":
+			exception_tokens = ["sympathy"]
+		elif exception_faction == "cat":
+			exception_tokens = ["keep", "wood"]
+		else:
+			exception_tokens = []
 		removed_tokens = 0
 		for i in range(len(self.tokens)):
-			if self.tokens[i] != exception_token:
+			if self.tokens[i] not in exception_tokens:
 				self.tokens.pop(i)
 				removed_tokens += 1
 		return removed_tokens

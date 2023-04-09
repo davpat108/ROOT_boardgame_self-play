@@ -43,7 +43,7 @@ def test_marguise_get_options_craft():
     marguise.deck.add_card(Card(*[12, "rabbit", Item("root_tea"), 1, "mouse"]))
     marguise.deck.add_card(Card(*[5, "rabbit", "ambush", 0, "ambush"]))
     
-    marguise.get_craft_activations(map)
+    marguise.refresh_craft_activations(map)
     craft_options = marguise.get_options_craft(map)
     assert [craft_option.item for craft_option in craft_options] == [Item("boot")]
     marguise.get_ambushes()
@@ -296,7 +296,7 @@ def test_eyrie_get_options_craft():
     eyrie.deck.add_card(Card(*[12, "rabbit", Item("root_tea"), 1, "mouse"]))
     eyrie.deck.add_card(Card(*[5, "rabbit", "ambush", 0, "ambush"]))
     
-    eyrie.get_craft_activations(map)
+    eyrie.refresh_craft_activations(map)
     craft_options = eyrie.get_options_craft(map)
     assert [craft_option.item for craft_option in craft_options] == [Item("boot")]
     eyrie.get_ambushes()
@@ -394,7 +394,7 @@ def test_alliance_get_options_craft():
     alliance.deck.add_card(Card(*[5, "rabbit", "ambush", 0, "ambush"]))
     
     map.places['D'].update_pieces(tokens = ['sympathy'])
-    alliance.get_craft_activations(map)
+    alliance.refresh_craft_activations(map)
     craft_options = alliance.get_options_craft(map)
     assert [craft_option.item for craft_option in craft_options] == [Item("boot")]
     alliance.get_ambushes()

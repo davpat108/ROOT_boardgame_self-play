@@ -28,7 +28,6 @@ crafting, move action, build,recruit, overwork, revolt, sympathy, mobilize, trai
 vagabond quest complete options draw or vp
 update owner, update victory points check gain-loss
 losing stuff in general
-favor dominance ambush
 
 # TODO first gonna skip
 which woods to use to build, if you can build by the rule supply lines, you might be able to build unsupported wood

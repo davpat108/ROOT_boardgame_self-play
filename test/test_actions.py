@@ -1,6 +1,6 @@
 import sys
 sys.path.append('.')
-from actions import get_battle_damages, resolve_battle, priority_to_list
+from actions import *
 from map import build_regular_forest
 from actors import Marquise, Eyrie, Alliance, Vagabond
 from item import Item
@@ -270,12 +270,88 @@ def test_resolve_battle():
     assert vagabond.satchel[vagabond.satchel.index(Item('torch'))].damaged == True
     assert vagabond.relations['bird'] == "hostile"
 
-def test_slip():
-    pass
+def test_movement_slip():
+    map = build_regular_forest()
+    marquise = Marquise()
+    eyrie = Eyrie('Despot')
+    alliance = Alliance()
+    vagabond = Vagabond()
+    vagabond.deck.add_card(Card(*total_common_card_info[17]))
+    card_to_give_if_no_sympathy = Card(*total_common_card_info[17])
+
+
+    slip(map, map.places['D'], vagabond, alliance, card_to_give_if_no_sympathy)
+    map.check_vagabond()
+    assert map.places['D'].vagabond_is_here == True
+    assert len(vagabond.deck.cards) == 1
+
+    map.places['C'].update_pieces(tokens = ['sympathy'])
+    slip(map, map.places['C'], vagabond, alliance, card_to_give_if_no_sympathy)
+    map.check_vagabond()
+    assert map.places['C'].vagabond_is_here == True
+    assert len(vagabond.deck.cards) == 0
+    assert len(alliance.supporter_deck.cards) == 1
+
+    slip(map, map.places['M'], vagabond, alliance, card_to_give_if_no_sympathy)
+    assert map.places['M'].vagabond_is_here == True
+
+    vagabond = Vagabond()
+    vagabond.deck.add_card(Card(*total_common_card_info[17]))
+    card_to_give_if_no_sympathy = Card(*total_common_card_info[17])
+    map.move_vagabond('C')
+    move(map, map.places['C'], map.places['D'], 0, vagabond, alliance, card_to_give_if_no_sympathy, 1)
+    assert map.places['D'].vagabond_is_here == True
+    assert len(vagabond.deck.cards) == 1
+    assert vagabond.satchel[vagabond.satchel.index(Item('boot'))].exhausted == True
+
+    move(map, map.places['D'], map.places['C'], 0, vagabond, alliance, card_to_give_if_no_sympathy, 1)
+    assert map.places['C'].vagabond_is_here == True
+    assert len(vagabond.deck.cards) == 0
+    assert len(alliance.supporter_deck.cards) == 2
+
+
+    move(map, map.places['C'], map.places['H'], 1, marquise, alliance, card_to_give_if_no_sympathy, 1)
+    assert map.places['H'].soldiers['cat'] == 2
+    assert map.places['C'].soldiers['cat'] == 0 
+
+    move(map, map.places['L'], map.places['I'], 6, eyrie, alliance, card_to_give_if_no_sympathy, 1)    
+    assert map.places['I'].soldiers['bird'] == 6
+    assert map.places['L'].soldiers['bird'] == 0
+
+    # vagabond MOVE with allies
+
+
+
+def test_craft():
+    map = build_regular_forest()
+    marquise = Marquise()
+    eyrie = Eyrie('Despot')
+    alliance = Alliance()
+    vagabond = Vagabond()
+    vagabond.deck.add_card(Card(*total_common_card_info[17]))
+    card_to_give_if_no_sympathy = Card(*total_common_card_info[17])
+    discard_deck = Deck(empty=True)
+
+    eyrie.deck.add_card(Card(*total_common_card_info[11]))
+    eyrie.deck.add_card(Card(*total_common_card_info[13]))
+    
+    # regular item regular cat
+    marquise.deck.add_card(Card(*total_common_card_info[23]))
+    marquise.deck.add_card(Card(*total_common_card_info[3]))
+    marquise.refresh_craft_activations(map)
+    options = marquise.get_options_craft(map)
+    craft(map, marquise, discard_deck, vagabond, options[0])
+    assert len(marquise.deck.cards) == 1
+    assert len(discard_deck.cards) == 1
+    assert len(marquise.items) == 1
+
+    # persistent item regular cat
+    marquise.refresh_craft_activations(map)
+
 
 def test_move():
     pass
 
 
 
-test_resolve_battle()
+test_craft()
