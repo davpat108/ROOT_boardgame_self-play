@@ -1,25 +1,20 @@
-import sys
-sys.path.append('.')
-
-from game import Game
-from deck import Deck, Card
-from actors import Item
-from dtos import Battle_DTO, MoveDTO, OverworkDTO
-from map import Map
-from configs import total_common_card_info
+from map import build_regular_forest, Map
+from actors import Marquise, Vagabond, Eyrie, Alliance
+from item import Item
+from deck import Card, Deck, QuestCard, QuestDeck
+from dtos import Battle_DTO, MoveDTO, OverworkDTO, Battle_DTO
+from actions import cat_birdsong_wood
+from configs import total_common_card_info, vagabond_quest_card_info
 
 def test_discard_down_to_five():
-    game = Game(debug=True)
-    marquise = game.marquise
-    marquise.deck = Deck(empty=True)
+    marquise = Marquise()
     common_deck = Deck(empty=True)
-
-    common_deck.add_card(Card(*total_common_card_info[0]))
+    common_deck.add_card(Card(*total_common_card_info[0])) # rabbit
     common_deck.add_card(Card(*total_common_card_info[1]))
     common_deck.add_card(Card(*total_common_card_info[2]))
-    common_deck.add_card(Card(*total_common_card_info[27]))
+    common_deck.add_card(Card(*total_common_card_info[27])) # 2x fox
     common_deck.add_card(Card(*total_common_card_info[28]))
-    common_deck.add_card(Card(*total_common_card_info[53]))
+    common_deck.add_card(Card(*total_common_card_info[53])) # 1x bird
 
     marquise.deck.add_card(common_deck.draw_card())
     marquise.deck.add_card(common_deck.draw_card())
@@ -34,44 +29,47 @@ def test_discard_down_to_five():
     common_deck.add_card(Card(*total_common_card_info[52]))
     marquise.deck.add_card(common_deck.draw_card())
     options = marquise.discard_down_to_five_options()
+    print(options)
     assert len(options) == 21
 
 
+
 def test_marguise_get_options_craft():
-    game = Game(debug=True)
-    marquise = game.marquise
-    map = game.map
-
-    marquise.refresh_craft_activations(map)
-    craft_options = marquise.get_options_craft(map)
-    assert [craft_option.item for craft_option in craft_options] == [Item("boot")]
-    marquise.get_ambushes()
-    assert marquise.ambush == {
-        "rabbit": 1,
-        "mouse": 0,
-        "fox": 0,
-        "bird": 0,
-    }
-
-def test_marquise_battle():
-    game = Game(debug=True)
-    marquise = game.marquise
-    vagabond = game.vagabond
-    map = game.map
-
-    soldiers = {
-        "cat": 2,
-        "bird": 2,
-        "alliance": 0
-    }
-    map.places['A'].update_pieces(soldiers=soldiers)
-    map.places['A'].update_pieces(tokens=["sympathy"])
+    map = build_regular_forest()
+    marguise = Marquise()
+    #give marquise a card that can be crafted
+    marguise.deck.add_card(Card(*[11, "rabbit", Item("boot"), 1, "rabbit"]))
+    #give marquise a card that can be crafted but not enough resources
+    marguise.deck.add_card(Card(*[12, "rabbit", Item("root_tea"), 1, "mouse"]))
+    marguise.deck.add_card(Card(*[5, "rabbit", "ambush", 0, "ambush"]))
     
-    battle_options = marquise.get_battles(map, vagabond)
+    marguise.refresh_craft_activations(map)
+    craft_options = marguise.get_options_craft(map)
+    assert [craft_option.item for craft_option in craft_options] == [Item("boot")]
+    marguise.get_ambushes()
+    assert marguise.ambush == {
+            "rabbit": 1,
+            "mouse": 0,
+            "fox": 0,
+            "bird": 0,
+        }
+    
+def test_marquise_battle():
+    map = build_regular_forest()
+    marguise = Marquise()
+    vagabond = Vagabond()
+    soldiers = {
+			"cat" : 2,
+			"bird" : 2,
+			"alliance" : 0
+		}
+    map.places['A'].update_pieces(soldiers = soldiers)
+    map.places['A'].update_pieces(tokens = ["sympathy"])
+    battle_options = marguise.get_battles(map, vagabond)
     assert battle_options == [Battle_DTO('A', "bird"), Battle_DTO('A', "alliance")]
 
+
 def test_marquise_move():
-    game = Game(debug=True)
     clearing_num = 4
     suits = ["fox", "rabbit", "mouse", "fox"]
     building_slots = [1, 1, 1, 1]
@@ -90,7 +88,7 @@ def test_marquise_move():
             i += 1
 
     map.update_owners()
-    marguise = game.marquise
+    marguise = Marquise()
     move_options = marguise.get_moves(map)
     assert move_options == [MoveDTO('A', 'B', 1),
                              MoveDTO('A', 'C', 1),
@@ -101,22 +99,22 @@ def test_marquise_move():
                                      MoveDTO('D', 'B', 2)]
     
 def test_marquise_get_connected_wood_tokens():
-    game = Game(debug=True)
-    marquise = game.marquise
-    map = game.map
+    map = build_regular_forest()
+    cat_birdsong_wood(map)
 
-    game.cat_birdsong_wood()
+    marquise = Marquise()
     tokens = marquise.get_wood_tokens_to_build(map, map.places['A'])
+    
     assert tokens == 1
 
-    piece_setup = [('B', {'soldiers': {'cat': 1, 'bird': 0, 'alliance': 0}, 'buildings': [('sawmill', 'cat'), ('empty', 'No one')], 'tokens': []}),  # Cats
-                   ('C', {'soldiers': {'cat': 1, 'bird': 2, 'alliance': 0}, 'buildings': [('sawmill', 'cat'), ('empty', 'No one')], 'tokens': []}),  # Birds
-                   ('D', {'soldiers': {'cat': 2, 'bird': 2, 'alliance': 0}, 'buildings': [('empty', 'No one'), ('empty', 'No one')], 'tokens': []}),  # Birds
-                   ('E', {'soldiers': {'cat': 2, 'bird': 2, 'alliance': 0}, 'buildings': [('empty', 'No one'), ('empty', 'No one')], 'tokens': []}),  # Birds
-                   ('F', {'soldiers': {'cat': 2, 'bird': 0, 'alliance': 0}, 'buildings': [('empty', 'No one')], 'tokens': []}),  # Cats
-                   ('G', {'soldiers': {'cat': 2, 'bird': 0, 'alliance': 0}, 'buildings': [('sawmill', 'cat'), ('empty', 'No one')], 'tokens': []})]  # Cats
-
-    i = 0
+    piece_setup =[('B', {'soldiers' : {'cat': 1, 'bird' : 0, 'alliance' : 0}, 'buildings': [('sawmill', 'cat'), ('empty', 'No one')], 'tokens' : []}),# Cats
+                    ('C', {'soldiers' : {'cat': 1, 'bird' : 2, 'alliance' : 0}, 'buildings': [('sawmill', 'cat'),('empty', 'No one')], 'tokens' : []}), # Birds
+                    ('D', {'soldiers' : {'cat': 2, 'bird' : 2, 'alliance' : 0}, 'buildings': [('empty', 'No one'), ('empty', 'No one')], 'tokens' : []}), # Birds
+                    ('E', {'soldiers' : {'cat': 2, 'bird' : 2, 'alliance' : 0}, 'buildings': [('empty', 'No one'), ('empty', 'No one')], 'tokens' : []}), # Birds
+                    ('F', {'soldiers' : {'cat': 2, 'bird' : 0, 'alliance' : 0}, 'buildings': [('empty', 'No one')], 'tokens' : []}), # Cats
+                    ('G', {'soldiers' : {'cat': 2, 'bird' : 0, 'alliance' : 0}, 'buildings': [('sawmill', 'cat'), ('empty', 'No one')], 'tokens' : []})] # Cats
+    
+    i=0
     for key in sorted(list(map.places.keys())):
         if i >= len(piece_setup):
             break
@@ -125,7 +123,7 @@ def test_marquise_get_connected_wood_tokens():
             i += 1
 
     map.update_owners()
-    game.cat_birdsong_wood()
+    cat_birdsong_wood(map)
     tokens = marquise.get_wood_tokens_to_build(map, map.places['A'])
     assert tokens == 3
 
@@ -137,16 +135,15 @@ def test_marquise_get_connected_wood_tokens():
 
 
 def test_marquise_get_build_options():
-    game = Game(debug=True)
-    marquise = game.marquise
-    map = game.map
+    map = build_regular_forest()
 
+    marquise = Marquise()
     build_options = marquise.get_build_options(map)
     assert build_options == {'sawmill': {'where': [], 'cost': 9},
                               'workshop': {'where': [], 'cost': 9},
                                 'recruiter': {'where': [], 'cost': 9}}
     
-    game.cat_birdsong_wood()
+    cat_birdsong_wood(map)
     build_options = marquise.get_build_options(map)
     assert build_options == {'sawmill': {'where': ['B', 'C', 'E', 'F', 'G', 'H', 'I', 'J', 'K'], 'cost': 1},
                               'workshop': {'where': ['B', 'C', 'E', 'F', 'G', 'H', 'I', 'J', 'K'], 'cost': 1},
@@ -167,17 +164,15 @@ def test_marquise_get_build_options():
             map.places[key].update_pieces(**piece_setup[i][1])
             i += 1
     map.update_owners()
-    game.cat_birdsong_wood()
+    cat_birdsong_wood(map)
     build_options = marquise.get_build_options(map)
     assert build_options == {'sawmill': {'where': ['B'], 'cost': 3},
                             'workshop': {'where': ['B', 'G', 'H', 'I', 'J', 'K'], 'cost': 0},
                             'recruiter': {'where': ['B', 'G', 'H', 'I', 'J', 'K'], 'cost': 1}}
 
 def test_marquise_overwork():
-    game = Game(debug=True)
-    marquise = game.marquise
-    map = game.map
-    marquise.deck = Deck(empty=True)
+    map = build_regular_forest()
+    marquise = Marquise()
 
     common_deck = Deck(empty=True)
     common_deck.add_card(Card(*total_common_card_info[27])) # 2x fox
@@ -211,10 +206,8 @@ def test_marquise_overwork():
     assert overworks == [OverworkDTO('A', 27, 'fox'), OverworkDTO('A', 28, 'fox'), OverworkDTO('A', 53, 'bird'), OverworkDTO('B', 53, 'bird'), OverworkDTO('F', 53, 'bird'),]
 
 def test_eyrie_get_decree_options():
-    game = Game(debug=True)
-    eyrie = game.eyrie
-    map = game.map
-    eyrie.deck = Deck(empty=True)
+    map = build_regular_forest()
+    eyrie = Eyrie("Despot")
 
     # Give Eyrie some cards
     common_deck = Deck(empty=True)
@@ -240,10 +233,9 @@ def test_eyrie_get_decree_options():
     
     
 def test_resolves():
-    game = Game(debug=True)
-    eyrie = game.eyrie
-    map = game.map
-    eyrie.deck = Deck(empty=True)
+    map = build_regular_forest()
+    eyrie = Eyrie("Despot")
+    vagabond = Vagabond()
     map.places['L'].update_pieces(vagabond_is_here = True) # This creates 2 vagabonds but its ok for now
     
     # Give Eyrie some cards
@@ -267,7 +259,7 @@ def test_resolves():
     recruit_options = eyrie.get_resolve_recruit(map)
     assert recruit_options == [('L', 0), ('L', 53)]
 
-    battle_option = eyrie.get_resolve_battle(map, game.vagabond)
+    battle_option = eyrie.get_resolve_battle(map, vagabond)
     assert battle_option == [Battle_DTO('L', 'vagabond', 0), Battle_DTO('L', 'vagabond', 53)]
 
     map.places['I'].update_pieces(soldiers = {'cat' : 0, 'bird' : 4, 'alliance' : 0})
@@ -278,9 +270,8 @@ def test_resolves():
 
 
 def test_eyrie_no_roosts_left():
-    game = Game(debug=True)
-    eyrie = game.eyrie
-    map = game.map
+    map = build_regular_forest()
+    eyrie = Eyrie("Despot")
 
     options = eyrie.get_no_roosts_left_options(map)
     assert options == []
@@ -297,11 +288,8 @@ def test_eyrie_no_roosts_left():
 
 
 def test_eyrie_get_options_craft():
-    game = Game(debug=True)
-    eyrie = game.eyrie
-    map = game.map
-    eyrie.deck = Deck(empty=True)
-
+    map = build_regular_forest()
+    eyrie = Eyrie("Despot")
     #give marquise a card that can be crafted
     eyrie.deck.add_card(Card(*[11, "rabbit", Item("boot"), 1, "rabbit"]))
     #give marquise a card that can be crafted but not enough resources
@@ -321,14 +309,25 @@ def test_eyrie_get_options_craft():
     
 
 def test_alliance_revolt_options():
-    game = Game(debug=True)
-    alliance = game.alliance
-    map = game.map
+    map = build_regular_forest()
+    alliance = Alliance()
+
+    # Give Alliance some cards
+    common_deck = Deck(empty=True)
+    common_deck.add_card(Card(*total_common_card_info[0])) # rabbit
+    common_deck.add_card(Card(*total_common_card_info[27])) # 2x fox
+    common_deck.add_card(Card(*total_common_card_info[28]))
+    common_deck.add_card(Card(*total_common_card_info[53])) # 1x bird
+
+    alliance.supporter_deck.add_card(common_deck.draw_card())
+    alliance.supporter_deck.add_card(common_deck.draw_card())
+    alliance.supporter_deck.add_card(common_deck.draw_card())
+    alliance.supporter_deck.add_card(common_deck.draw_card())
 
     map.places['I'].update_pieces(tokens = ['sympathy'])
     revolt_options = alliance.get_revolt_options(map)
 
-    assert revolt_options == [('I', 31, 32), ('I', 31, 51), ('I', 32, 51)]
+    assert revolt_options == [('I', 27, 28), ('I', 27, 53), ('I', 28, 53)]
 
     map.places['G'].update_pieces(buildings = [('base', 'alliance'),('ruin', 'No one')], tokens = ['sympathy'])
 
@@ -336,17 +335,28 @@ def test_alliance_revolt_options():
     assert revolt_options == []
 
 def test_alliance_spread_options():
-    game = Game(debug=True)
-    alliance = game.alliance
-    map = game.map
+    map = build_regular_forest()
+    alliance = Alliance()
+
+    # Give Alliance some cards
+    common_deck = Deck(empty=True)
+    common_deck.add_card(Card(*total_common_card_info[0])) # rabbit
+    common_deck.add_card(Card(*total_common_card_info[27])) # 2x fox
+    common_deck.add_card(Card(*total_common_card_info[28]))
+    common_deck.add_card(Card(*total_common_card_info[53])) # 1x bird
+
+    alliance.supporter_deck.add_card(common_deck.draw_card())
+    alliance.supporter_deck.add_card(common_deck.draw_card())
+    alliance.supporter_deck.add_card(common_deck.draw_card())
+    alliance.supporter_deck.add_card(common_deck.draw_card())
 
     options = alliance.get_spread_sympathy_options(map)
-    assert options == [('B', []), ('C', []), ('D', []), ('E', []), ('F', []), ('G', []), ('H', []), ('I', []), ('J', []), ('K', []), ('L', [2]), ('L', [51])]
+    assert options == [('B', []), ('C', []), ('D', []), ('E', []), ('F', []), ('G', []), ('H', []), ('I', []), ('J', []), ('K', []), ('L', [0]), ('L', [53])]
 
     map.places['I'].update_pieces(tokens = ['sympathy'])
     options = alliance.get_spread_sympathy_options(map)
     options.sort(key=lambda x: x[0])
-    res = [('C', [51]), ('H', [51]), ('L', [2, 51])]
+    res = [('C', [53]), ('H', [53]), ('L', [0, 53])]
     res.sort(key=lambda x: x[0])
     assert options == res
 
@@ -356,19 +366,18 @@ def test_alliance_spread_options():
     map.places['L'].update_pieces(tokens = ['sympathy'])
     options = alliance.get_spread_sympathy_options(map)
     options.sort(key=lambda x: x[1][0])
-    res = [('G', [31,32]), ('G', [31,51]), ('G', [32,51])]
+    res = [('G', [27,28]), ('G', [27,53]), ('G', [28,53])]
     res.sort(key=lambda x: x[1][0])
     assert options == res
 
     # Quick check supporter discard
-    common_deck = Deck(empty=True)
     common_deck.add_card(Card(*total_common_card_info[21]))
     common_deck.add_card(Card(*total_common_card_info[22]))
     alliance.supporter_deck.add_card(common_deck.draw_card())
     alliance.supporter_deck.add_card(common_deck.draw_card())
 
     options = alliance.discard_down_to_five_supporters_options(map)
-    assert sorted(options) == sorted([[2], [21], [22], [31], [32], [51]])
+    assert sorted(options) == sorted([[0], [21], [22], [27], [28], [53]])
 
     map.places['B'].update_pieces(buildings = [('base', 'alliance'),('sawmill', 'cat')])
     options = alliance.discard_down_to_five_supporters_options(map)
@@ -376,10 +385,8 @@ def test_alliance_spread_options():
 
 
 def test_alliance_get_options_craft():
-    game = Game(debug=True)
-    alliance = game.alliance
-    map = game.map
-    alliance.deck = Deck(empty=True)
+    map = build_regular_forest()
+    alliance = Alliance()
     #give allaince a card that can be crafted
     alliance.deck.add_card(Card(*[11, "rabbit", Item("boot"), 1, "rabbit"]))
     #give allaince a card that can be crafted but not enough resources
@@ -399,19 +406,28 @@ def test_alliance_get_options_craft():
         }
     
 def test_alliance_get_options_train():
-    game = Game(debug=True)
-    alliance = game.alliance
-    map = game.map
+    map = build_regular_forest()
+    alliance = Alliance()
+
+    common_deck = Deck(empty=True)
+    common_deck.add_card(Card(*total_common_card_info[0])) # rabbit
+    common_deck.add_card(Card(*total_common_card_info[27])) # 2x fox
+    common_deck.add_card(Card(*total_common_card_info[28]))
+    common_deck.add_card(Card(*total_common_card_info[53])) # 1x bird
+
+    alliance.deck.add_card(common_deck.draw_card())
+    alliance.deck.add_card(common_deck.draw_card())
+    alliance.deck.add_card(common_deck.draw_card())
+    alliance.deck.add_card(common_deck.draw_card())
     
     map.places['D'].update_pieces(tokens = ['sympathy'], buildings = [('base', 'alliance'), ('ruin', 'No one')])
     train_options = alliance.get_train_options(map)
-    assert train_options== [1, 52]
+    assert train_options== [0, 53]
 
 def test_alliance_get_options_battle_recruit_and_organize():
-    game = Game(debug=True)
-    alliance = game.alliance
-    vagabond = game.vagabond
-    map = game.map
+    map = build_regular_forest()
+    alliance = Alliance()
+    vagabond = Vagabond()
     alliance.total_officers = 1
     alliance.refresh_officers()
     map.places['D'].update_pieces(tokens = ['sympathy'], buildings = [('base', 'alliance'), ('ruin', 'No one')], soldiers = {'cat': 1, 'bird' : 1, 'alliance' : 1})
@@ -448,8 +464,7 @@ def test_alliance_move():
             i += 1
 
     map.update_owners()
-    game = Game(debug=True)
-    alliance = game.alliance
+    alliance = Alliance()
     alliance.total_officers = 1
     alliance.refresh_officers()
     move_options = alliance.get_moves(map)
@@ -463,14 +478,11 @@ def test_alliance_move():
     
 
 def test_vagabond():
-
-    game = Game(debug=True)
-    vagabond = game.vagabond
-    map = game.map
-    eyrie = game.eyrie
-    alliance = game.alliance
-    marquise = game.marquise
-
+    map = build_regular_forest()
+    alliance = Alliance()
+    eyrie = Eyrie("Despot")
+    marquise = Marquise()
+    vagabond = Vagabond()
     # SLIP and MOVE
     slip_options = vagabond.get_slip_options(map)
     slip_options = sorted(slip_options, key= lambda x: (x.start, x.end))
@@ -526,6 +538,9 @@ def test_vagabond():
     
     # QUEST
     vagabond.add_item(Item('crossbow'))
+    vagabond.quest_deck.add_card(QuestCard(*vagabond_quest_card_info[10])) # 2 mouse 1 fox
+    vagabond.quest_deck.add_card(QuestCard(*vagabond_quest_card_info[11]))
+    vagabond.quest_deck.add_card(QuestCard(*vagabond_quest_card_info[0]))
 
     quest_options = vagabond.get_quest_options(map)
     assert quest_options == [10]
@@ -587,21 +602,32 @@ def test_vagabond():
 
     # AID
 
+    common_deck = Deck(empty=True)
+    common_deck.add_card(Card(*total_common_card_info[0])) # rabbit
+    common_deck.add_card(Card(*total_common_card_info[27])) # 2x fox
+    common_deck.add_card(Card(*total_common_card_info[28]))
+    common_deck.add_card(Card(*total_common_card_info[53])) # 1x bird
+
+    vagabond.deck.add_card(common_deck.draw_card())
+    vagabond.deck.add_card(common_deck.draw_card())
+    vagabond.deck.add_card(common_deck.draw_card())
+    vagabond.deck.add_card(common_deck.draw_card())
+
     vagabond.repair_and_refresh_all()
     vagabond.relations['cat'] = 'very good'
     aid_options = vagabond.get_aid_options(map, [marquise, eyrie, alliance]) # alliance, cat
     aid_options = sorted(aid_options, key= lambda x: (x[0], x[1]))
-    assert aid_options == sorted([('alliance', [33], None), ('alliance', [34], None), ('alliance', [50], None), ('cat', [33, 34, 50],  None)], key= lambda x: (x[0], x[1]))
+    assert aid_options == sorted([('alliance', [27], None), ('alliance', [28], None), ('alliance', [53], None), ('cat', [27, 28, 53],  None)], key= lambda x: (x[0], x[1]))
 
     marquise.items = [Item('sword'), Item('sword'), Item('sword')]
     aid_options = vagabond.get_aid_options(map, [marquise, eyrie, alliance]) # alliance, cat
     aid_options = sorted(aid_options, key= lambda x: (x[0], x[1]))
-    assert aid_options == sorted([('alliance', [33], None), ('alliance', [34], None), ('alliance', [50], None), ('cat', [33, 34, 50],  'sword')], key= lambda x: (x[0], x[1]))
+    assert aid_options == sorted([('alliance', [27], None), ('alliance', [28], None), ('alliance', [53], None), ( 'cat', [27, 28, 53],  'sword')], key= lambda x: (x[0], x[1]))
 
     alliance.items = [Item('sword'), Item('crossbow')]
     aid_options = vagabond.get_aid_options(map, [marquise, eyrie, alliance]) # alliance, cat
     aid_options = sorted(aid_options, key= lambda x: (x[0], x[1], x[2]))
-    assert aid_options == sorted([('alliance', [33], 'sword'), ('alliance', [34], 'sword'), ('alliance', [50], 'sword'), ('alliance', [33], 'crossbow'), ('alliance', [34], 'crossbow'), ('alliance', [50], 'crossbow'), ('cat', [33, 34, 50],  'sword')], key= lambda x: (x[0], x[1], x[2]))
+    assert aid_options == sorted([('alliance', [27], 'sword'), ('alliance', [28], 'sword'), ('alliance', [53], 'sword'), ('alliance', [27], 'crossbow'), ('alliance', [28], 'crossbow'), ('alliance', [53], 'crossbow'), ('cat', [27, 28, 53],  'sword')], key= lambda x: (x[0], x[1], x[2]))
 
     vagabond.deck.draw_card()
     vagabond.deck.draw_card()
@@ -612,4 +638,4 @@ def test_vagabond():
     aid_options = sorted(aid_options, key= lambda x: (x[0], x[1], x[2]))
     assert aid_options == []
 
-test_discard_down_to_five()
+    # DMG otpions

@@ -5,7 +5,7 @@ from itertools import combinations
 from item import Item
 class Actor():
 
-    def __init__(self) -> None:
+    def __init__(self, map) -> None:
         self.deck = Deck(empty=True)
         self.sappers = False
         self.cobbler = False
@@ -24,6 +24,8 @@ class Actor():
             "fox": 0
         }
         self.win_condition = "points" #None, rabbit, mouse, fox, bird, coalition
+        self.refresh_craft_activations(map)
+        self.refresh_ambush_options()
         
     def add_item(self, item):
         self.items.append(item)
@@ -57,14 +59,16 @@ class Actor():
                 self.ambush[card.card_suit] += 1
     
     def card_to_give_to_alliace_options(self, suit):
+        options = []
         for card in self.deck.cards:
             if card.card_suit == suit or card.card_suit == "bird":
-                return card.ID
-        return None
-        
+                options.append(card.ID)
+        return options
+    
+
 class Marquise(Actor):
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, map) -> None:
+        super().__init__(map)
         self.items = []
         self.name = 'cat'
     
@@ -188,8 +192,8 @@ class Marquise(Actor):
     
 
 class Eyrie(Actor):
-    def __init__(self, role) -> None:
-        super().__init__()
+    def __init__(self, map, role) -> None:
+        super().__init__(map)
         self.items = []
         self.leader = role
         self.check_role()
@@ -201,6 +205,7 @@ class Eyrie(Actor):
             "build": [],
         }
         self.decree_deck = Deck(empty=True)
+
 
     def check_role(self):
         if self.leader in["Despot", "Commander", "Builder", "Charismatic"]:
@@ -343,8 +348,8 @@ class Eyrie(Actor):
 
 
 class Alliance(Actor):
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, map) -> None:
+        super().__init__(map)
         self.supporter_deck = Deck(empty = True)
         self.items = []
         self.current_officers = 0
@@ -571,8 +576,8 @@ class Alliance(Actor):
 
 class Vagabond(Actor):
     # First lets just make him thief
-    def __init__(self, role = "Thief") -> None:
-        super().__init__()
+    def __init__(self, map, role = "Thief") -> None:
+        super().__init__(map)
         self.quest_deck = QuestDeck(empty=True)
         self.role = role
         self.name = "vagabond"
@@ -585,8 +590,15 @@ class Vagabond(Actor):
 			"bird" : 'indifferent',
 			"alliance" : 'indifferent'
 		}
+            self.refresh_items_to_damage()
         else:
             raise NotImplementedError("Only thief yet")
+
+    def refresh_craft_activations(self, map):
+        pass
+
+    def refresh_items_to_damage(self): # TODO NEEDS to be written properly after debug
+        self.items_to_damage = [Item('root_tea'), Item('torch'), Item('boot'), Item('sword')]
 
     def chack_relation_status_correct(self):
         for status in self.relations.values():
