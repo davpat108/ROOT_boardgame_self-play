@@ -277,7 +277,7 @@ def move(map, starting_place, destination, quantity, actor, alliance, card_to_gi
         actor.current_officers -= 1
     map.update_owners()
 
-def craft(map, actor, discard_deck, vagabond, costs: CraftDTO):
+def craft(map, actor, discard_deck, vagabond, vagabond_items, costs: CraftDTO):
 
     if costs.card.craft == "ambush":
         raise ValueError("Ambush is not a craftable card")
@@ -302,7 +302,7 @@ def craft(map, actor, discard_deck, vagabond, costs: CraftDTO):
                         i -= 1
                 if not i:
                     break
-        else:
+        elif costs.cost:
             actor.deactivate(costs.cost)
 
     if isinstance(costs.card.craft, Item):
@@ -336,16 +336,16 @@ def craft(map, actor, discard_deck, vagabond, costs: CraftDTO):
             actor.brutal_tactics = True
         # Immidiate effects
         if costs.card.craft == "favor":
-            favor(map, actor, costs.card.suit, vagabond)
+            favor(map, actor, costs.card.craft_suit, vagabond, vagabond_items)
         if costs.card.craft == "dominance":
-            dominance(map, actor.place, actor, costs.card.building, costs.card.cost)
+            dominance(actor, costs.card.building, costs.card.cost)
         
         
 def favor(map, actor, suit, vagabond, vagabond_items):
     victory_points = 0
     for place in map.places.values():
         if place.suit == suit:
-            for key in place.soldiers.key():
+            for key in place.soldiers.keys():
                 if key != actor.name and key != "vagabond":
                     place.soldiers[key] = 0
             if actor.name != "vagabond" and place.vagabond_is_here:

@@ -6,6 +6,7 @@ from actors import Marquise, Eyrie, Alliance, Vagabond
 from item import Item
 from configs import total_common_card_info
 from deck import Deck, Card
+from dtos import MoveDTO, CraftDTO, OverworkDTO
 def test_resolve_battle():
     # Setup
 
@@ -328,6 +329,7 @@ def test_craft():
     eyrie = Eyrie('Despot')
     alliance = Alliance()
     vagabond = Vagabond()
+    vagabond_items = [Item('boot'), Item('root_tea'), Item('torch'), Item('sword')]
     vagabond.deck.add_card(Card(*total_common_card_info[17]))
     card_to_give_if_no_sympathy = Card(*total_common_card_info[17])
     discard_deck = Deck(empty=True)
@@ -340,15 +342,31 @@ def test_craft():
     marquise.deck.add_card(Card(*total_common_card_info[3]))
     marquise.refresh_craft_activations(map)
     options = marquise.get_options_craft(map)
-    craft(map, marquise, discard_deck, vagabond, options[0])
+    craft(map, marquise, discard_deck, vagabond, vagabond_items, options[0])
     assert len(marquise.deck.cards) == 1
     assert len(discard_deck.cards) == 1
     assert len(marquise.items) == 1
 
-    # persistent item regular cat
+    # favor regular cat
+    map.places['D'].update_pieces(buildings = [("workshop", "cat"), ("workshop", "cat")])
+    map.places['F'].update_pieces(buildings = [("workshop", "cat")])
     marquise.refresh_craft_activations(map)
+    map.move_vagabond('D')
 
+    marquise.deck.add_card(Card(*total_common_card_info[4]))
+    options = marquise.get_options_craft(map)
+    craft(map, marquise, discard_deck, vagabond, vagabond_items, options[options.index(CraftDTO(Card(*total_common_card_info[4])))])
+    assert map.places['L'].soldiers['bird'] == 0
+    assert vagabond.satchel[vagabond.satchel.index(Item('torch'))].damaged == True
+    assert map.places['D'].soldiers['cat'] == 1
 
+    # dominance persistents
+    marquise.victory_points = 11
+    marquise.deck.add_card(Card(*total_common_card_info[8]))
+    options = marquise.get_options_craft(map)
+    craft(map, marquise, discard_deck, vagabond, vagabond_items, options[options.index(CraftDTO(Card(*total_common_card_info[8])))])
+    assert marquise.win_condition == "rabbit"
+    # TOO MANY LEVELS OF VARIANTS REFACTOR INTO CLASS
 def test_move():
     pass
 

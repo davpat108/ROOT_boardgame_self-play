@@ -18,18 +18,24 @@ class Battle_DTO(ActionDTO):
     
 class CraftDTO(ActionDTO):
     # Everything except ambush, ambush is a taken care of in Actor class
-    def __init__(self, craft, cost, card) -> None:
+    def __init__(self, card) -> None:
         super().__init__()
-        self.what = craft
+        self.what = card.craft
         self.card = card
-        self.get_cost(cost)
-        self.get_item(craft)
+        self.get_cost((card.craft_suit, card.craft_cost))
+        self.get_item(card.craft)
 
     def get_item(self, craft): # Probably not necessary
         if craft in [Item("sack"), Item("money"), Item("boot"), Item("sword"), Item("crossbow"), Item("torch"), Item("root_tea"), Item("hammer")]:
             self.item = craft
         else:
             self.item = None
+
+    def __eq__(self, other) -> bool:
+        if isinstance(other, CraftDTO):
+            if self.card.ID == other.card.ID:
+                return True
+        return False
 
     def get_cost(self, cost):
         if cost[0] == "all":
@@ -46,7 +52,8 @@ class CraftDTO(ActionDTO):
                 "mouse": 0,
                 "fox": 0
             }
-            self.cost[cost[0]] = cost[1]
+            if cost[0] in ["rabbit", "mouse", "fox"]:
+                self.cost[cost[0]] = cost[1]
 class MoveDTO(ActionDTO):
     def __init__(self, start, end, how_many, card_ID=None) -> None:
         super().__init__()
