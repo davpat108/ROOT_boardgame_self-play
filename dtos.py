@@ -4,11 +4,13 @@ class ActionDTO:
         pass
 
 class Battle_DTO(ActionDTO):
-    def __init__(self, place:str, against_whom:str, card_ID = None) -> None:
+    def __init__(self, place:str, against_whom:str, armorer_usage: bool = False, brutal_tactics_usage: bool = False, card_ID = None) -> None:
         super().__init__()
         self.where = place
         self.against_whom = against_whom
         self.card_ID = card_ID
+        self.armorer_usage = armorer_usage
+        self.brutal_tactics_usage = brutal_tactics_usage
     
     def __eq__(self, other) -> bool:
         if self.where == other.where and self.against_whom == other.against_whom and self.card_ID == other.card_ID:

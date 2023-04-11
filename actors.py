@@ -11,6 +11,20 @@ class Actor():
         self.cobbler = False
         self.tax_collector = False
         self.armorers = False
+        self.sappers = False
+        self.command_warren = False
+        self.scouting_party = False
+        self.codebreakers = False
+        self.stand_and_deliver = False
+        self.better_burrow_bank = False
+        self.royal_claim = False
+        self.brutal_tactics = False
+        self.known_hands = {
+            'cat': False,
+            'bird': False,
+            'alliance': False,
+            'vagabond': False
+        }
         self.ambush ={
             "rabbit": 0,
             "mouse": 0,
@@ -30,9 +44,36 @@ class Actor():
     def add_item(self, item):
         self.items.append(item)
 
+    def codebreakers_options(self, actors):
+        if not self.codebreakers:
+            return
+        options = []
+        for actor in actors:
+            if actor != self:
+                options.append(actor.name)
+        return options
+
     def deactivate(self, cost):
         for suit, amount in cost.items():
             self.craft_activations[suit] -= amount
+
+    def stand_and_deliver_options(self, actors):
+        if not self.stand_and_deliver:
+            return
+        options = ['No one'] # Maybe you can take from supporter deck but its not implemented
+        for actor in actors:
+            if actor != self and len(actor.deck.cards) > 0:
+                options.append(actor.name)
+        return options
+
+    def bbb_options(self, actors):
+        if not self.better_burrow_bank:
+            return
+        options = []
+        for actor in actors:
+            if actor != self:
+                options.append(actor.name)
+        return options
 
     def discard_down_to_five_options(self):
         if len(self.deck.cards) <= 5:
@@ -64,7 +105,32 @@ class Actor():
             if card.card_suit == suit or card.card_suit == "bird":
                 options.append(card.ID)
         return options
+
+    def get_sappers_options(self):
+        if not self.sappers:
+            return
+        return [True, False]
     
+    def get_ambush_options(self, place):
+        if self.ambush[place.suit] == 0:
+            return
+        return [True, False]
+    
+    def get_royal_claim_options(self):
+        if not self.royal_claim:
+            return
+        return [True, False]
+
+    def get_tax_collector_options(self, map):
+        # Gets all places with soldiers on the map
+        if not self.tax_collector:
+            return
+        options = []
+        for place in map.places.values():
+            if place.soldiers[self.name] > 0:
+                options.append(place.name)
+    
+
 
 class Marquise(Actor):
     def __init__(self, map) -> None:
@@ -93,17 +159,6 @@ class Marquise(Actor):
                     craft_options.append(CraftDTO(card))
         return craft_options
     
-    def get_ambushes(self):
-        self.ambush ={
-            "rabbit": 0,
-            "mouse": 0,
-            "fox": 0,
-            "bird": 0,
-        }
-        for card in self.deck.cards:
-            if card.craft_suit == "ambush":
-                self.ambush[card.card_suit] += 1
-
     def get_battles(self, map, vagabond):
         battle_options = []
         for key in sorted(list(map.places.keys())):
@@ -115,6 +170,27 @@ class Marquise(Actor):
                     battle_options.append(Battle_DTO(place.name, "alliance"))
                 if place.vagabond_is_here:
                     battle_options.append(Battle_DTO(place.name, "vagabond"))
+                if self.armorers:
+                    if place.soldiers['bird'] > 0 or True in [slot[0]=='roost' for slot in place.building_slots]:
+                        battle_options.append(Battle_DTO(place.name, "bird", armorer_usage=True))
+                    if place.soldiers['alliance'] > 0 or True in [slot[0]=='base' for slot in place.building_slots] or "sympathy" in place.tokens:
+                        battle_options.append(Battle_DTO(place.name, "alliance", armorer_usage=True))
+                    if place.vagabond_is_here:
+                        battle_options.append(Battle_DTO(place.name, "vagabond", armorer_usage=True))
+                if self.brutal_tactics:
+                    if place.soldiers['bird'] > 0 or True in [slot[0]=='roost' for slot in place.building_slots]:
+                        battle_options.append(Battle_DTO(place.name, "bird", brutal_tactics_usage=True))
+                    if place.soldiers['alliance'] > 0 or True in [slot[0]=='base' for slot in place.building_slots] or "sympathy" in place.tokens:
+                        battle_options.append(Battle_DTO(place.name, "alliance", brutal_tactics_usage=True))
+                    if place.vagabond_is_here:
+                        battle_options.append(Battle_DTO(place.name, "vagabond", brutal_tactics_usage=True))
+                if self.brutal_tactics and self.armorers:
+                    if place.soldiers['bird'] > 0 or True in [slot[0]=='roost' for slot in place.building_slots]:
+                        battle_options.append(Battle_DTO(place.name, "bird", brutal_tactics_usage=True, armorer_usage=True))
+                    if place.soldiers['alliance'] > 0 or True in [slot[0]=='base' for slot in place.building_slots] or "sympathy" in place.tokens:
+                        battle_options.append(Battle_DTO(place.name, "alliance", brutal_tactics_usage=True, armorer_usage=True))
+                    if place.vagabond_is_here:
+                        battle_options.append(Battle_DTO(place.name, "vagabond", brutal_tactics_usage=True, armorer_usage=True))
         return battle_options
     
     def get_moves(self, map):
@@ -220,16 +296,6 @@ class Eyrie(Actor):
     def get_options(self, map):
         return super().get_options()
 
-    def get_ambushes(self):
-        self.ambush ={
-            "rabbit": 0,
-            "mouse": 0,
-            "fox": 0,
-            "bird": 0,
-        }
-        for card in self.deck.cards:
-            if card.craft_suit == "ambush":
-                self.ambush[card.card_suit] += 1
 
     def get_decree_options(self):
         decree_options = {
@@ -288,6 +354,27 @@ class Eyrie(Actor):
                         battle_options.append(Battle_DTO(clearing.name, "alliance", card_ID))
                     if clearing.vagabond_is_here:
                         battle_options.append(Battle_DTO(clearing.name, "vagabond", card_ID))
+                    if self.armorers:
+                        if clearing.soldiers['cat'] > 0 or True in [slot[1]=='cat' for slot in clearing.building_slots] or 'keep' in clearing.tokens or 'wood' in clearing.tokens:
+                            battle_options.append(Battle_DTO(clearing.name, "cat", card_ID, armorer_usage=True))
+                        if clearing.soldiers['alliance'] > 0 or True in [slot[1]=='alliance' for slot in clearing.building_slots] or "sympathy" in clearing.tokens:
+                            battle_options.append(Battle_DTO(clearing.name, "alliance", card_ID, armorer_usage=True))
+                        if clearing.vagabond_is_here:
+                            battle_options.append(Battle_DTO(clearing.name, "vagabond", card_ID, armorer_usage=True))
+                    if self.brutal_tactics:
+                        if clearing.soldiers['cat'] > 0 or True in [slot[1]=='cat' for slot in clearing.building_slots] or 'keep' in clearing.tokens or 'wood' in clearing.tokens:
+                            battle_options.append(Battle_DTO(clearing.name, "cat", card_ID, brutal_tactics_usage=True))
+                        if clearing.soldiers['alliance'] > 0 or True in [slot[1]=='alliance' for slot in clearing.building_slots] or "sympathy" in clearing.tokens:
+                            battle_options.append(Battle_DTO(clearing.name, "alliance", card_ID, brutal_tactics_usage=True))
+                        if clearing.vagabond_is_here:
+                            battle_options.append(Battle_DTO(clearing.name, "vagabond", card_ID, brutal_tactics_usage=True))
+                    if self.brutal_tactics and self.armorers:
+                        if clearing.soldiers['cat'] > 0 or True in [slot[1]=='cat' for slot in clearing.building_slots] or 'keep' in clearing.tokens or 'wood' in clearing.tokens:
+                            battle_options.append(Battle_DTO(clearing.name, "cat", card_ID, brutal_tactics_usage=True, armorer_usage=True))
+                        if clearing.soldiers['alliance'] > 0 or True in [slot[1]=='alliance' for slot in clearing.building_slots] or "sympathy" in clearing.tokens:
+                            battle_options.append(Battle_DTO(clearing.name, "alliance", card_ID, brutal_tactics_usage=True, armorer_usage=True))
+                        if clearing.vagabond_is_here:
+                            battle_options.append(Battle_DTO(clearing.name, "vagabond", card_ID, brutal_tactics_usage=True, armorer_usage=True))
 
         return battle_options
     
@@ -376,16 +463,6 @@ class Alliance(Actor):
             return retlist
         return
 
-    def get_ambushes(self):
-        self.ambush ={
-            "rabbit": 0,
-            "mouse": 0,
-            "fox": 0,
-            "bird": 0,
-        }
-        for card in self.deck.cards:
-            if card.craft_suit == "ambush":
-                self.ambush[card.card_suit] += 1
 
     def get_revolt_options(self, map):
         revolt_options = []
@@ -535,6 +612,27 @@ class Alliance(Actor):
                     battle_options.append(Battle_DTO(place.name, "bird"))
                 if place.vagabond_is_here:
                     battle_options.append(Battle_DTO(place.name, "vagabond"))
+                if self.armorers:
+                    if place.soldiers['cat'] > 0 or True in [slot[1]=='cat' for slot in place.building_slots]or 'keep' in place.tokens or 'wood' in place.tokens:
+                        battle_options.append(Battle_DTO(place.name, "cat", armorer_usage=True))
+                    if place.soldiers['bird'] > 0 or True in [slot[0]=='roost' for slot in place.building_slots]:
+                        battle_options.append(Battle_DTO(place.name, "bird", armorer_usage=True))
+                    if place.vagabond_is_here:
+                        battle_options.append(Battle_DTO(place.name, "vagabond", armorer_usage=True))
+                if self.brutal_tactics:
+                    if place.soldiers['cat'] > 0 or True in [slot[1]=='cat' for slot in place.building_slots]or 'keep' in place.tokens or 'wood' in place.tokens:
+                        battle_options.append(Battle_DTO(place.name, "cat", brutal_tactics_usage=True))
+                    if place.soldiers['bird'] > 0 or True in [slot[0]=='roost' for slot in place.building_slots]:
+                        battle_options.append(Battle_DTO(place.name, "bird", brutal_tactics_usage=True))
+                    if place.vagabond_is_here:
+                        battle_options.append(Battle_DTO(place.name, "vagabond", brutal_tactics_usage=True))
+                if self.armorers and self.brutal_tactics:
+                    if place.soldiers['cat'] > 0 or True in [slot[1]=='cat' for slot in place.building_slots]or 'keep' in place.tokens or 'wood' in place.tokens:
+                        battle_options.append(Battle_DTO(place.name, "cat", armorer_usage=True, brutal_tactics_usage=True))
+                    if place.soldiers['bird'] > 0 or True in [slot[0]=='roost' for slot in place.building_slots]:
+                        battle_options.append(Battle_DTO(place.name, "bird", armorer_usage=True, brutal_tactics_usage=True))
+                    if place.vagabond_is_here:
+                        battle_options.append(Battle_DTO(place.name, "vagabond", armorer_usage=True, brutal_tactics_usage=True))
         return battle_options
     
     def get_moves(self, map):
@@ -673,6 +771,40 @@ class Vagabond(Actor):
             for army in map.places[map.vagabond_position].soldiers:
                 if map.places[map.vagabond_position].soldiers[army] > 0:
                     battle_options.append(Battle_DTO(map.vagabond_position, army))
+                    if self.brutal_tactics:
+                        battle_options.append(Battle_DTO(map.vagabond_position, army, brutal_tactics_usage=True))
+                    if self.armorers:
+                        battle_options.append(Battle_DTO(map.vagabond_position, army, armorer_usage=True))
+                    if self.armorers and self.brutal_tactics:
+                        battle_options.append(Battle_DTO(map.vagabond_position, army, brutal_tactics_usage=True, armorer_usage=True))
+
+            for building_slots in map.places[map.vagabond_position].building_slots:
+                if building_slots[1] != "No one":
+                    battle_options.append(Battle_DTO(map.vagabond_position, building_slots[1]))
+                    if self.brutal_tactics:
+                        battle_options.append(Battle_DTO(map.vagabond_position, building_slots[1], brutal_tactics_usage=True))
+                    if self.armorers:
+                        battle_options.append(Battle_DTO(map.vagabond_position, building_slots[1], armorer_usage=True))
+                    if self.armorers and self.brutal_tactics:
+                        battle_options.append(Battle_DTO(map.vagabond_position, building_slots[1], brutal_tactics_usage=True, armorer_usage=True))
+            
+            if "sympathy" in map.places[map.vagabond_position].tokens:
+                    battle_options.append(Battle_DTO(map.vagabond_position, 'alliance'))
+                    if self.brutal_tactics:
+                        battle_options.append(Battle_DTO(map.vagabond_position, 'alliance', brutal_tactics_usage=True))
+                    if self.armorers:
+                        battle_options.append(Battle_DTO(map.vagabond_position, 'alliance', armorer_usage=True))
+                    if self.armorers and self.brutal_tactics:
+                        battle_options.append(Battle_DTO(map.vagabond_position, 'alliance', brutal_tactics_usage=True, armorer_usage=True))
+
+            if "wood" in map.places[map.vagabond_position].tokens or "keep" in map.places[map.vagabond_position].tokens:
+                battle_options.append(Battle_DTO(map.vagabond_position, 'cat'))
+                if self.brutal_tactics:
+                    battle_options.append(Battle_DTO(map.vagabond_position, 'cat', brutal_tactics_usage=True))
+                if self.armorers:
+                    battle_options.append(Battle_DTO(map.vagabond_position, 'cat', armorer_usage=True))
+                if self.armorers and self.brutal_tactics:
+                    battle_options.append(Battle_DTO(map.vagabond_position, 'cat', brutal_tactics_usage=True, armorer_usage=True))
         return battle_options
 
     def has_items(self, item1, item2):

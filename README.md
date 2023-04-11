@@ -28,6 +28,18 @@ crafting, move action, build,recruit, overwork, revolt, sympathy, mobilize, trai
 vagabond quest complete options draw or vp
 update owner, update victory points check gain-loss
 losing stuff in general
+Cards: X means done XX means tested
+Codebreaker X
+cobbler X should be accounted for during the game
+better burrow bank X  
+tax collctor X
+armorers X
+sappers X
+brutal tactics X
+stand and deliver X
+command warren X should be accounted for during the game
+scouting party X
+royal claim X
 
 # TODO first gonna skip
 which woods to use to build, if you can build by the rule supply lines, you might be able to build unsupported wood

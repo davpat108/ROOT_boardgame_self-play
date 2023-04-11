@@ -54,6 +54,37 @@ class Game():
         else:
             raise ValueError("Not implemented yet")
 
+    def stand_and_deliver(self, taker, victim):
+        victim.deck.shuffle_deck()
+        taker.deck.add_card(victim.deck.draw_card())
+        taker.victory_points += 1
+
+    def better_burrow_bank(self, actor, other):
+        actor.deck.add_card(self.deck.draw_card())
+        if len(self.deck.cards) == 0: # DECK ONE LINER
+            self.deck = self.discard_deck
+            self.deck.shuffle_deck()
+            self.discard_deck = Deck(empty=True)
+        other.deck.add_card(self.deck.draw_card())
+
+    def codebreakers(self, actor, other):
+        actor.known_hands[other.name] = True
+
+    def tax_collection(self, actor, placename):
+        self.map.places[placename].soldiers[actor.name] -= 1
+        actor.deck.add_card(self.deck.draw_card())
+        self.map.places[placename].update_owner()
+        if len(self.deck.cards) == 0: # DECK ONE LINER
+            self.deck = self.discard_deck
+            self.deck.shuffle_deck()
+            self.discard_deck = Deck(empty=True)
+
+
+    def activate_royal_claim(self, actor):
+        for place in self.map.places.values():
+            if place.owner == actor.name:
+                actor.victory_points += 1
+
     def cat_birdsong_wood(self):
         for key in list(self.map.places.keys()):
             for building_slot in self.map.places[key].building_slots:
@@ -70,6 +101,7 @@ class Game():
         try:
             self.map.places[place_name].building_slots[self.map.places[place_name].building_slots.index(('empty', 'No one'))] = ('roost', 'bird')
             self.map.places[place_name].soldiers['bird'] += 3
+            self.map.places[place_name].update_owner()
         except ValueError:
             raise ValueError("Error in get_no_roosts_left_options")
 
@@ -128,13 +160,13 @@ class Game():
         return new_items
 
 
-    def get_battle_damages(self, attacker, defender, dice_rolls, place_name, armorers = False):
+    def get_battle_damages(self, attacker, defender, dice_rolls, place_name, armorers: list[bool, bool] = False, sappers:bool = False, brutal_tactics:bool=False):
         """
         :param attacker: str
         :param defender: str
         :param dice_rolls: list, 2 0-3 nums descending order
         """
-        # So vagabond cant attack its allies with its allies
+        # So vagabond cant attack its own soldiers with its own soldiers
         if attacker == "vagabond":
             if self.vagabond.relations[defender] == "friendly":
                 self.vagabond.allied_soldiers = self.remove_soldiers_from_vagabond_items(self.vagabond.allied_soldiers, defender)
@@ -167,26 +199,32 @@ class Game():
                 dmg_attacker += min(dice_rolls[1], len(list(item for item in self.vagabond.satchel if item.name == "sword" and not item.damaged)) +  len(self.vagabond.allied_soldiers))
                 dmg_defender += min(dice_rolls[0], self.map.places[place_name].soldiers[defender])
 
+        if armorers[0]:
+            dmg_defender = 0
+
+        if armorers[1]:
+            dmg_attacker = 0        
+
         # No defender
         if  defender != 'vagabond' and self.map.places[place_name].soldiers[defender] == 0:
             dmg_attacker = min(dmg_attacker, 1)
 
-        # Sapper
+        if sappers:
+            dmg_defender += 1
+
+        if brutal_tactics:
+            dmg_attacker += 1
+
+
         for actor in [self.eyrie, self.vagabond, self.marquise, self.alliance]:
-            if actor.sappers != 0 and attacker == actor.name:
-                dmg_attacker += actor.sappers
-            if actor.sappers != 0 and defender == actor.name:
-                dmg_defender += actor.sappers
             # OWL
-            if actor.name == 'bird' and actor.leader == 'Commander' and attacker == 'bird':
+            if attacker == 'bird' and actor.name == 'bird' and actor.leader == 'Commander':
                 dmg_attacker += 1
+            if brutal_tactics and actor.name == defender:
+                actor.victory_points += 1
 
-        for actor in [self.eyrie, self.vagabond, self.marquise, self.alliance]:
-            if actor.armorers != 0 and defender == actor.name:
-                dmg_attacker = 0
 
-        if armorers:
-            dmg_attacker = 0
+
 
         return dmg_attacker, dmg_defender
 
@@ -425,7 +463,7 @@ class Game():
 
 
     def ambush(self, place, attacker, counterambush):
-        if counterambush:
+        if counterambush or attacker.scouting_party:
             return
 
         if attacker.name == "vagabond":

@@ -45,7 +45,7 @@ def test_marguise_get_options_craft():
     marquise.refresh_craft_activations(map)
     craft_options = marquise.get_options_craft(map)
     assert [craft_option.item for craft_option in craft_options] == [Item("boot")]
-    marquise.get_ambushes()
+    marquise.refresh_ambush_options()
     assert marquise.ambush == {
         "rabbit": 1,
         "mouse": 0,
@@ -311,7 +311,7 @@ def test_eyrie_get_options_craft():
     eyrie.refresh_craft_activations(map)
     craft_options = eyrie.get_options_craft(map)
     assert [craft_option.item for craft_option in craft_options] == [Item("boot")]
-    eyrie.get_ambushes()
+    eyrie.refresh_ambush_options()
     assert eyrie.ambush == {
             "rabbit": 1,
             "mouse": 0,
@@ -390,7 +390,7 @@ def test_alliance_get_options_craft():
     alliance.refresh_craft_activations(map)
     craft_options = alliance.get_options_craft(map)
     assert [craft_option.item for craft_option in craft_options] == [Item("boot")]
-    alliance.get_ambushes()
+    alliance.refresh_ambush_options()
     assert alliance.ambush == {
             "rabbit": 1,
             "mouse": 0,
