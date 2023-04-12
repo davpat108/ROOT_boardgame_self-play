@@ -3,32 +3,20 @@ from deck import Deck, QuestDeck
 from map import build_regular_forest
 from actors import Marquise, Eyrie, Alliance, Vagabond
 from actions import cat_birdsong_wood
-
+from game import Game, random_choose
 if __name__ == "__main__":
-    map = build_regular_forest()
-    common_deck = Deck()
-    discard_deck = Deck(empty=True)
-
-    quest_deck = QuestDeck()
-    discard_quest_deck = QuestDeck(empty=True)
-
-    margquise = Marquise()
-    eerie = Eyrie()
-    alliance = Alliance()
-    vagabond = Vagabond(role = "Thief")
-
-    # Deal initial 3 cards, + supporter cards for alliance
-    for i in range(3):
-        margquise.deck.add_card(common_deck.draw_card())
-        eerie.deck.add_card(common_deck.draw_card())
-        alliance.deck.add_card(common_deck.draw_card())
-        alliance.supporter_deck.add_card(common_deck.draw_card())
-        vagabond.deck.add_card(common_deck.draw_card())
-        vagabond.quest_deck.add_card(quest_deck.draw_card())
-
-
+    game = Game(debug=False)
+    
     winner = "No one"
     while winner == "No one":
-        # Marquise
-        cat_birdsong_wood(map)
+        # CAT
+        #BIRDSONG
+        game.cat_birdsong_wood()
+        # DAYLIGHT
+        # CRAFT
+        craft_options = game.marquise.get_options_craft()
+        choice = random_choose(craft_options)
+        game.marquise.craft(choice)
+        # BULK OF OPTIONS
+        
         

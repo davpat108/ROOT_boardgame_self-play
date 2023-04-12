@@ -4,6 +4,7 @@ from dtos import MoveDTO, CraftDTO, Battle_DTO, OverworkDTO
 from map import build_regular_forest
 from deck import Deck, QuestDeck
 from configs import sympathy_VPs, eyrie_roost_VPs, persistent_effects, Immediate_non_item_effects
+import random
 
 
 
@@ -52,7 +53,38 @@ class Game():
 
             # VAGABOND_STUFF
         else:
-            raise ValueError("Not implemented yet")
+            vagabond_roles = ["Thief"] # ["Thief", "Ranger", "Tinkerer"]
+            eyrie_leaders = ["Despot", "Commander", "Charismatic", "Builder"]
+
+            self.marquise = Marquise(map=self.map)
+            self.eyrie = Eyrie(map=self.map, role=random.choice(eyrie_leaders))
+            self.alliance = Alliance(map=self.map)
+            self.vagabond = Vagabond(map=self.map, role=random.choice(vagabond_roles))
+
+            self.deck = Deck()
+            self.discard_deck = Deck(empty=True)
+            self.quest_deck = QuestDeck()
+            self.discard_quest_deck = QuestDeck(empty=True)
+
+            self.marquise.deck.add_card(self.deck.draw_card())
+            self.marquise.deck.add_card(self.deck.draw_card())
+            self.marquise.deck.add_card(self.deck.draw_card())
+
+            self.eyrie.deck.add_card(self.deck.draw_card())
+            self.eyrie.deck.add_card(self.deck.draw_card())
+            self.eyrie.deck.add_card(self.deck.draw_card())
+
+            self.alliance.deck.add_card(self.deck.draw_card())
+            self.alliance.deck.add_card(self.deck.draw_card())
+            self.alliance.deck.add_card(self.deck.draw_card())
+
+            self.alliance.supporter_deck.add_card(self.deck.draw_card())
+            self.alliance.supporter_deck.add_card(self.deck.draw_card())
+            self.alliance.supporter_deck.add_card(self.deck.draw_card())
+
+            self.vagabond.deck.add_card(self.deck.draw_card())
+            self.vagabond.deck.add_card(self.deck.draw_card())
+            self.vagabond.deck.add_card(self.deck.draw_card())
 
     def stand_and_deliver(self, taker, victim):
         victim.deck.shuffle_deck()
@@ -104,6 +136,14 @@ class Game():
             self.map.places[place_name].update_owner()
         except ValueError:
             raise ValueError("Error in get_no_roosts_left_options")
+
+    def cat_use_bird_card_to_gain_move(self, cardID):
+        self.discard_deck.add_card(self.marquise.deck.get_the_card(cardID))
+        if len(self.deck.cards) == 0: # DECK ONE LINER
+            self.deck = self.discard_deck
+            self.deck.shuffle_deck()
+            self.discard_deck = Deck(empty=True)
+
 
     # Alliance
     def revolt(self, place, cost, soldiers_to_gain):
@@ -590,3 +630,7 @@ class Game():
                     victory_points += 1
                     break
         place.update_owner()
+
+
+def random_choose(options):
+    return random.choice(options)

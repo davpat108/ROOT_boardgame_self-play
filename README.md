@@ -26,8 +26,9 @@ The bigger constats are located here.
 Vagabond discard items down to sack
 crafting, move action, build,recruit, overwork, revolt, sympathy, mobilize, train, organize, ruin_explore, aid, steal, complete quest, strike  tests
 vagabond quest complete options draw or vp
-update owner, update victory points check gain-loss
+update victory points check gain-loss
 losing stuff in general
+bird turmoil, leader choice, despot commander builder(and vp anyways)
 Cards: X means done XX means tested
 Codebreaker X
 cobbler X should be accounted for during the game

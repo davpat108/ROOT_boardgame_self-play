@@ -266,6 +266,12 @@ class Marquise(Actor):
 
         return overwork_clearings
     
+    def get_use_bird_card_to_gain_moves(self):
+        options = []
+        for card in self.deck.cards:
+            if card.card_suit == 'bird':
+                options.append(card.ID)
+        return options
 
 class Eyrie(Actor):
     def __init__(self, map, role) -> None:
