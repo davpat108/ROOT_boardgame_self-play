@@ -80,3 +80,10 @@ buildings_list_marquise = {"sawmill": {"VictoryPoints": [0, 1, 2, 3, 4, 5], "Bon
 
 sympathy_VPs = [0, 1, 1, 1, 2, 2, 3, 4, 4, 4]
 eyrie_roost_VPs = [0, 1, 2, 3, 4, 4, 5]
+
+eyrie_leader_config = {
+    "Despot": ["move", "build"],
+    "Builder": ["recruit", "move"],
+    "Charismatic": ["recruit", "battle"],
+    "Commander": ["move", "battle"],
+}

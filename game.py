@@ -3,7 +3,7 @@ from item import Item
 from dtos import MoveDTO, CraftDTO, Battle_DTO, OverworkDTO
 from map import build_regular_forest
 from deck import Deck, QuestDeck
-from configs import sympathy_VPs, eyrie_roost_VPs, persistent_effects, Immediate_non_item_effects
+from configs import sympathy_VPs, eyrie_roost_VPs, persistent_effects, Immediate_non_item_effects, eyrie_leader_config
 import random
 
 
@@ -434,7 +434,10 @@ class Game():
         if isinstance(costs.card.craft, Item):
             actor.add_item(costs.card.craft)
             self.map.craftables.remove(costs.card.craft)
-            actor.victory_points += costs.card.craft.crafting_reward()
+            if actor == "bird" and actor.leader!= "Builder":
+                actor.victory_points += 1
+            else:
+                actor.victory_points += costs.card.craft.crafting_reward()
 
         else:
             # Persistent effects
@@ -540,15 +543,39 @@ class Game():
         self.map.update_owners()
 
     def recruit(self, place, actor):
-        place.soldiers[actor.name] += 1
-        place.update_owner()
+        if actor.name == "bird" and actor.leader == "Charismatic":
+            place.soldiers[actor.name] += 2
+            place.update_owner()   
+        else:
+            place.soldiers[actor.name] += 1
+            place.update_owner()
 
-    def overwork(self, place):
+    def overwork(self, place, card_id):
         place.tokens.wood += 1
+        self.discard_deck.add_card(self.marquise.deck.get_the_card(card_id))
 
     def eyrie_get_points(self):
         roosts = self.map.count_on_self.map(("building", "roost"))
         self.eyrie.victory_points += eyrie_roost_VPs[roosts]
+
+
+    def bird_turmoil(self, new_commander):
+        
+        vp_loss = 0
+        for decree_field in self.eyrie.decree.values():
+            for value in decree_field:
+                value[1] == 'bird'
+                vp_loss += 1
+        self.eyrie.victory_points -= vp_loss
+
+        self.eyrie.change_role(new_commander)
+        self.eyrie.setup_based_on_leader()
+
+        # ALL cards to the discard_deck! Loyal viziers are not here.
+        for _ in range(len(self.eyrie.decree_deck.cards)):
+            self.discard_deck.add_card(self.eyrie.decree_deck.draw_card())
+        
+    
 
 
     def spread_symp(self, place, cost):

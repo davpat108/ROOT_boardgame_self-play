@@ -1,6 +1,6 @@
 from deck import Deck, QuestDeck
 from dtos import Battle_DTO, CraftDTO, MoveDTO, OverworkDTO
-from configs import buildings_list_marquise, Immediate_non_item_effects, persistent_effects
+from configs import buildings_list_marquise, Immediate_non_item_effects, persistent_effects, eyrie_leader_config
 from itertools import combinations
 from item import Item
 class Actor():
@@ -278,19 +278,16 @@ class Eyrie(Actor):
         super().__init__(map)
         self.items = []
         self.leader = role
+        self.avaible_leaders = ["Despot", "Commander", "Builder", "Charismatic"]
         self.check_role()
         self.name = 'bird'
-        self.decree = {
-            "recruit": [],
-            "move": [],
-            "battle": [],
-            "build": [],
-        }
+        self.setup_based_on_leader()
         self.decree_deck = Deck(empty=True)
 
 
     def check_role(self):
-        if self.leader in["Despot", "Commander", "Builder", "Charismatic"]:
+        if self.leader in self.avaible_leaders:
+            self.avaible_leaders.remove(self.leader)
             return
         else:
             raise ValueError("Invalid role for Eyrie")
@@ -299,9 +296,21 @@ class Eyrie(Actor):
         self.leader = role
         self.check_role()
 
-    def get_options(self, map):
-        return super().get_options()
 
+    def setup_based_on_leader(self):
+        new_loyal_viziers = eyrie_leader_config[self.leader]
+        self.decree = {
+            "recruit": [],
+            "move": [],
+            "battle": [],
+            "build": [],
+        }
+        for action in self.decree.keys():
+            if action in new_loyal_viziers:
+                self.decree[action] += [(-1, "bird")]
+
+    def get_turmoil_options(self):
+        return self.avaible_leaders
 
     def get_decree_options(self):
         decree_options = {
@@ -320,11 +329,15 @@ class Eyrie(Actor):
     def get_resolve_recruit(self, map):
         recruit_options = []
 
-        for card_ID, card_suit in  self.decree["recruit"]:
+        for card_ID, card_suit in self.decree["recruit"]:
             matching_clearings = [place for place in map.places.values() if place.suit == card_suit or card_suit == "bird"]
 
             total_bird_soldiers = sum([place.soldiers["bird"] for place in map.places.values()])
-            if total_bird_soldiers < 20:
+            if self.leader != "Charismatic" and total_bird_soldiers < 20:
+                for clearing in matching_clearings:
+                    if True in [building[0] == 'roost' for building in clearing.building_slots]:
+                        recruit_options.append((clearing.name, card_ID))
+            if self.leader == "Charismatic" and total_bird_soldiers < 19:
                 for clearing in matching_clearings:
                     if True in [building[0] == 'roost' for building in clearing.building_slots]:
                         recruit_options.append((clearing.name, card_ID))

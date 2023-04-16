@@ -23,13 +23,13 @@ I wrote pytests to ensure ther game and its elements work strictly according to 
 The bigger constats are located here.
 
 ## TODO
+X means done XX means tested / means partially tested
 Vagabond discard items down to sack
-crafting, move action, build,recruit, overwork, revolt, sympathy, mobilize, train, organize, ruin_explore, aid, steal, complete quest, strike  tests
-vagabond quest complete options draw or vp
+crafting X/, move action X, build X, recruit X, overwork X, revolt X, sympathy X, mobilize X, train X, organize X, ruin_explore X, aid , steal X, complete quest X, strike X 
 update victory points check gain-loss
 losing stuff in general
-bird turmoil, leader choice, despot commander builder(and vp anyways)
-Cards: X means done XX means tested
+bird turmoil, leader choice, despot commander builder(and vp anyways) X
+Cards:
 Codebreaker X
 cobbler X should be accounted for during the game
 better burrow bank X  

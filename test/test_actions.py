@@ -72,7 +72,6 @@ def test_resolve_battle():
     defender_pice_lose_priorities = ['roost']
     attacker = 'cat'
     defender = 'bird'
-    game.eyrie.change_role('Commander')
     dice_rolls = [3, 3]
 
     attacker_chosen_pieces = game.priority_to_list(attacker_pice_lose_priorities, game.map.places['H'], attacker)
@@ -325,8 +324,6 @@ def test_craft():
     game.vagabond.deck.add_card(Card(*total_common_card_info[17]))
     card_to_give_if_no_sympathy = Card(*total_common_card_info[17])
 
-
-
     game.eyrie.deck.add_card(Card(*total_common_card_info[11]))
     game.eyrie.deck.add_card(Card(*total_common_card_info[13]))
     
@@ -339,6 +336,7 @@ def test_craft():
     assert len(game.marquise.deck.cards) == 1
     assert len(game.discard_deck.cards) == 1
     assert len(game.marquise.items) == 1
+    assert game.marquise.victory_points == 1
 
     # favor regular cat
     game.map.places['D'].update_pieces(buildings = [("workshop", "cat"), ("workshop", "cat")])
@@ -360,9 +358,7 @@ def test_craft():
     game.craft(game.marquise, options[options.index(CraftDTO(Card(*total_common_card_info[8])))])
     assert game.marquise.win_condition == "rabbit"
 
+    # Vagabond, bird vps
 
 def test_move():
     pass
-
-
-test_movement_slip()
