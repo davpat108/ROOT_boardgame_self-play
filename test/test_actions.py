@@ -183,6 +183,7 @@ def test_recruit_and_add_to_resolve():
     game.recruit(options[0][0], game.eyrie)
     assert game.map.places['L'].soldiers['bird'] == 9
     assert game.eyrie.victory_points == 0
+    assert sorted(game.eyrie.avaible_leaders) == sorted(["Builder", "Commander"])
     
 
 def test_overwork():
@@ -225,4 +226,36 @@ def test_revolt_sympathy():
     assert game.discard_deck.get_the_card(15) == Card(*total_common_card_info[15])
 
 
+def test_mobilize_train_organize():
+    game = Game()
 
+    options = game.alliance.get_mobilize_options()
+    options.sort()
+    game.mobilize(options[1])
+    assert game.alliance.deck.get_the_card(29) == "Card not in the deck"
+
+
+    game.map.places['L'].update_pieces(buildings = [("base", 'alliance')])
+
+    assert len(game.alliance.deck.cards) == 3
+    options = game.alliance.get_train_options(game.map)
+    options.sort()
+    game.train(options[0])
+    assert game.alliance.deck.get_the_card(1) == "Card not in the deck"
+    assert game.alliance.total_officers == 1
+
+    game.alliance.refresh_officers()
+    game.map.places['D'].update_pieces(soldiers = {'cat': 1, 'bird': 1, 'alliance': 1})
+    options = game.alliance.get_organize_options(game.map)
+    options.sort()
+    game.organize(options[0])
+    assert game.alliance.current_officers == 0
+    assert game.map.places['D'].tokens == ['sympathy']
+    assert game.map.places['D'].soldiers == {'cat': 1, 'bird': 1, 'alliance': 0}
+
+
+    game.alliance.refresh_officers()
+    game.map.places['D'].update_pieces(soldiers = {'cat': 1, 'bird': 1, 'alliance': 1})
+    options = game.alliance.get_organize_options(game.map)
+
+    assert options == []

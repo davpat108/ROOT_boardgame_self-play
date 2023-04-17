@@ -26,7 +26,7 @@ The bigger constats are located here.
 X means done XX means tested / means partially tested
 
 Vagabond discard items down to sack
-crafting XX, move action X/, build XX, recruit XX, overwork XX, revolt XX, sympathy XX, mobilize X, train X, organize X, ruin_explore X, aid , steal X, complete quest X, strike X 
+crafting XX, move action X/, build XX, recruit XX, overwork XX, revolt XX, sympathy XX, mobilize XX, train XX, organize XX, ruin_explore X, aid , steal X, complete quest X, strike X 
 update victory points check gain-loss
 losing stuff in general
 bird turmoil, leader choice, despot commander builder(and vp anyways) X

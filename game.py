@@ -299,6 +299,8 @@ class Game():
         :param discard_deck: DiscardDeck
         :param vagabond_items: list, items to damage
         """ 
+        if attacker == "alliance":
+            self.alliance.current_officers -= 1
         if attacker != "vagabond" and place.soldiers[attacker] == 0:
             return
         # So vagabond cant attack its allies with its allies
@@ -551,6 +553,9 @@ class Game():
         else:
             place.soldiers[actor.name] += 1
             place.update_owner()
+        
+        if actor.name == "alliance":
+            self.alliance.current_officers -= 1
 
     def overwork(self, place, card_id):
         place.tokens += ['wood']
@@ -591,18 +596,19 @@ class Game():
         place.update_owner()
 
 
-    def mobilize(self, card):
-        self.alliance.supporter_deck.add_card(self.alliance.deck.get_the_card(card.ID))
+    def mobilize(self, card_ID):
+        self.alliance.supporter_deck.add_card(self.alliance.deck.get_the_card(card_ID))
 
-    def train(self, card):
-        self.discard_deck.add_card(self.alliance.deck.get_the_card(card.ID))
+    def train(self, card_ID):
+        self.discard_deck.add_card(self.alliance.deck.get_the_card(card_ID))
         self.alliance.total_officers += 1
 
     def organize(self, place):
-        symp_count = self.map.count_on_self.map(("token", "sympathy"), per_suit=False)
-        place.solderiers["alliance"] -= 1
+        symp_count = self.map.count_on_map(("token", "sympathy"), per_suit=False)
+        place.soldiers["alliance"] -= 1
         place.tokens += ["sympathy"]
         self.alliance.victory_points += sympathy_VPs[symp_count]
+        self.alliance.current_officers -= 1
 
     # Vagabond
     def explore_ruin(self, place):

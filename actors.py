@@ -686,7 +686,7 @@ class Alliance(Actor):
         
         for place in map.places.values():
             if place.soldiers['alliance']>0 and not 'sympathy' in place.tokens:
-                organize_options.append(place.name)
+                organize_options.append(place)
 
         return organize_options
     

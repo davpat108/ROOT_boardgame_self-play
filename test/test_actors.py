@@ -424,7 +424,7 @@ def test_alliance_get_options_battle_recruit_and_organize():
     map.places['K'].update_pieces(soldiers = {'cat': 1, 'bird' : 1, 'alliance' : 1})
     map.update_owners()
     organize = alliance.get_organize_options(map)
-    assert organize == ['K']
+    assert organize == [map.places['K']]
 
 
 def test_alliance_move():
