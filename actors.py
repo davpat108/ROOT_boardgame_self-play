@@ -233,7 +233,7 @@ class Marquise(Actor):
         Returns a dict of building options for the Marquise.
         """
         bulding_costs = [0, 1, 2, 3, 3, 4]
-        building_options = {"sawmill": {"where" : [], "cost" : 9}, "workshop": {"where" : [], "cost" : 9}, "recruiter": {"where" : [], "cost" : 9}} # 9 is a placeholder for infinity
+        building_options = []
 
         for building in ["sawmill", "workshop", "recruiter"]:
             count = map.count_on_map(("building", building))
@@ -246,8 +246,7 @@ class Marquise(Actor):
                 if place.owner == 'cat' and True in [slot[0] == "empty" for slot in place.building_slots]:
                     if not place.forest:
                         if woods >= cost:
-                            building_options[building]["where"].append(place.name)
-                            building_options[building]["cost"] = cost
+                            building_options.append((place.name, building, cost))
 
         return building_options
     
@@ -262,7 +261,7 @@ class Marquise(Actor):
                 if place.owner == 'cat':
                     for slot in place.building_slots:
                         if slot[0] == 'sawmill' and (place.suit == card.card_suit or card.card_suit == 'bird'):
-                            overwork_clearings.append(OverworkDTO(place.name, card.ID, card.card_suit))
+                            overwork_clearings.append(OverworkDTO(place.name, card.ID))
 
         return overwork_clearings
     
@@ -336,11 +335,11 @@ class Eyrie(Actor):
             if self.leader != "Charismatic" and total_bird_soldiers < 20:
                 for clearing in matching_clearings:
                     if True in [building[0] == 'roost' for building in clearing.building_slots]:
-                        recruit_options.append((clearing.name, card_ID))
+                        recruit_options.append((clearing, card_ID))
             if self.leader == "Charismatic" and total_bird_soldiers < 19:
                 for clearing in matching_clearings:
                     if True in [building[0] == 'roost' for building in clearing.building_slots]:
-                        recruit_options.append((clearing.name, card_ID))
+                        recruit_options.append((clearing, card_ID))
 
         return recruit_options
 
@@ -495,11 +494,12 @@ class Alliance(Actor):
                 has_base = self.base_search(map, place.suit)
 
                 if not has_base:
+                    soldiers_to_gain = map.count_on_map(("token", "sympathy"), per_suit=True)[suit]
                     matching_cards = [card for card in self.supporter_deck.cards if card.card_suit == suit or card.card_suit == "bird"]
                     card_combinations = self.get_card_combinations(matching_cards, 2)
 
                     for combination in card_combinations:
-                        revolt_options.append((place.name, combination[0].ID, combination[1].ID))
+                        revolt_options.append((place, combination[0].ID, combination[1].ID, soldiers_to_gain))
 
         return revolt_options
 
@@ -725,7 +725,7 @@ class Vagabond(Actor):
     def get_options(self):
         return super().get_options()
 
-    def get_options_craft(self):
+    def get_options_craft(self, map):
         craft_options = []
         activations = 0
         for item in self.satchel + self.other_items:
@@ -1016,7 +1016,11 @@ class Vagabond(Actor):
             item.exhausted = False
     
     def deactivate(self, cost):
-        raise NotImplementedError("Deactivate not implemented for vagabond")
-    
+        total = 0
+        for amount in cost.values():
+            total += amount
+        for _ in range(total):
+            self.exhaust_item(Item("hammer"))
+
     def get_discard_items_down_to_sack_options(self):
         pass

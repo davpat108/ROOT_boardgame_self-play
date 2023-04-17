@@ -37,7 +37,7 @@ class Deck:
             self.cards.remove(Card(*total_common_card_info[ID]))
             return Card(*total_common_card_info[ID])
         except:
-            return("Card not in the deck")
+            return "Card not in the deck"
     
     def draw_card(self):
         if len(self.cards) == 0:

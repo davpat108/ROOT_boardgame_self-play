@@ -3,7 +3,7 @@ from item import Item
 from dtos import MoveDTO, CraftDTO, Battle_DTO, OverworkDTO
 from map import build_regular_forest
 from deck import Deck, QuestDeck
-from configs import sympathy_VPs, eyrie_roost_VPs, persistent_effects, Immediate_non_item_effects, eyrie_leader_config
+from configs import sympathy_VPs, eyrie_roost_VPs, persistent_effects, Immediate_non_item_effects, eyrie_leader_config, buildings_list_marquise
 import random
 
 
@@ -124,7 +124,7 @@ class Game():
                     self.map.places[key].update_pieces(tokens = self.map.places[key].tokens + ["wood"])  
 
     def add_card_to_decree(self, action, card_ID, card_suit):
-        self.eyrie.decree[action].append(card_suit)
+        self.eyrie.decree[action].append((card_ID, card_suit))
 
         if self.eyrie.decree_deck.add_card(self.eyrie.deck.get_the_card(card_ID)) is not None:
             raise ValueError("Eyrie tried to add wrong card to decree deck")
@@ -146,11 +146,11 @@ class Game():
 
 
     # Alliance
-    def revolt(self, place, cost, soldiers_to_gain):
+    def revolt(self, place, card_ID1, card_ID2, soldiers_to_gain):
         # Clear all buildings
         victory_points = 0
         victory_points += place.clear_buildings()
-        victory_points += place.clear_tokens(exception_token="sympathy")
+        victory_points += place.clear_tokens(exception_faction = "alliance")
         place.clear_soldiers(exception_faction="alliance")
 
         # Add a base for the alliance
@@ -161,8 +161,8 @@ class Game():
             for item in self.vagabond.items_to_damage[:3]:
                 self.vagabond.damage_item(item)
 
-        self.discard_deck.add_card(self.alliance.supporter_deck.get_the_card(cost[0]))
-        self.discard_deck.add_card(self.alliance.supporter_deck.get_the_card(cost[1]))
+        self.discard_deck.add_card(self.alliance.supporter_deck.get_the_card(card_ID1))
+        self.discard_deck.add_card(self.alliance.supporter_deck.get_the_card(card_ID2))
 
         for _ in range(soldiers_to_gain):
             if sum([place.soldiers["alliance"] for place in self.map.places.values()]) + self.alliance.total_officers >= 10:
@@ -183,7 +183,7 @@ class Game():
             if self.discard_deck.add_card(self.alliance.supporter_deck.get_the_card(cardID)) is not None:
                 raise ValueError("Error in spread_sympathy: card not in supporter deck")
 
-        victory_points = sympathy_VPs[self.map.count_on_self.map(what_to_look_for=('token', 'sympathy'), per_suit = False)]
+        victory_points = sympathy_VPs[self.map.count_on_map(what_to_look_for=('token', 'sympathy'), per_suit = False)]
         self.alliance.victory_points += victory_points
 
     def slip(self, place, card_to_give_if_sympathy):
@@ -434,7 +434,7 @@ class Game():
         if isinstance(costs.card.craft, Item):
             actor.add_item(costs.card.craft)
             self.map.craftables.remove(costs.card.craft)
-            if actor == "bird" and actor.leader!= "Builder":
+            if actor.name == "bird" and actor.leader!= "Builder":
                 actor.victory_points += 1
             else:
                 actor.victory_points += costs.card.craft.crafting_reward()
@@ -530,14 +530,16 @@ class Game():
                         i -= 1
                 if not i:
                     break
-        for building_slot in place.building_slots:
-            if building_slot == ("empty", "No one"):
-                building_slot = (building, actor.name)
+
+            actor.victory_points += buildings_list_marquise[building]["VictoryPoints"][self.map.count_on_map(("building", building))]
+        for i in range(len(place.building_slots)):
+            if place.building_slots[i] == ("empty", "No one"):
+                place.building_slots[i] = (building, actor.name)
                 break
         place.update_owner()
 
     def recruit_cat(self):
-        for place in self.map.place.values():
+        for place in self.map.places.values():
             if ("recruiter", "cat") in place.building_slots and sum([place.soldiers["cat"] for place in self.map.places.values()]) < 25:
                 place.soldiers["cat"] += 1
         self.map.update_owners()
@@ -551,7 +553,7 @@ class Game():
             place.update_owner()
 
     def overwork(self, place, card_id):
-        place.tokens.wood += 1
+        place.tokens += ['wood']
         self.discard_deck.add_card(self.marquise.deck.get_the_card(card_id))
 
     def eyrie_get_points(self):
@@ -564,9 +566,10 @@ class Game():
         vp_loss = 0
         for decree_field in self.eyrie.decree.values():
             for value in decree_field:
-                value[1] == 'bird'
-                vp_loss += 1
+                if value[1] == 'bird':
+                    vp_loss += 1
         self.eyrie.victory_points -= vp_loss
+        self.eyrie.victory_points = max(self.eyrie.victory_points, 0)
 
         self.eyrie.change_role(new_commander)
         self.eyrie.setup_based_on_leader()

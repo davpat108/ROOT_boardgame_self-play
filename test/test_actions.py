@@ -358,7 +358,126 @@ def test_craft():
     game.craft(game.marquise, options[options.index(CraftDTO(Card(*total_common_card_info[8])))])
     assert game.marquise.win_condition == "rabbit"
 
-    # Vagabond, bird vps
+    # bird vps
+    assert game.eyrie.victory_points == 0
+    game.map.places['G'].update_pieces(buildings = [("roost", "bird"), ("ruin", "No one")])
+    game.map.places['J'].update_pieces(buildings = [("roost", "bird"), ("ruin", "No one")])
+    game.map.update_owners()
+    game.eyrie.refresh_craft_activations(game.map)
+    game.eyrie.deck.add_card(Card(*total_common_card_info[14]))
+    options = game.eyrie.get_options_craft(game.map)
+    game.craft(game.eyrie, options[options.index(CraftDTO(Card(*total_common_card_info[14])))])
+    assert game.eyrie.victory_points == 1
+    assert len(game.eyrie.deck.cards) == 2
 
-def test_move():
-    pass
+
+    # Vagabond,
+    assert game.vagabond.victory_points == 0
+    game.vagabond.add_item(Item("hammer"))
+    game.vagabond.add_item(Item("hammer"))
+    game.vagabond.deck.add_card(Card(*total_common_card_info[3]))
+    options = game.vagabond.get_options_craft(game.map)
+    game.craft(game.vagabond, options[options.index(CraftDTO(Card(*total_common_card_info[3])))])
+    assert game.vagabond.victory_points == 3
+    assert Item("money") in game.vagabond.other_items
+
+def test_bird_builder_craft():
+    game = Game()
+    game.eyrie = Eyrie(game.map, 'Builder')
+    game.marquise = Marquise(game.map)
+    game.alliance = Alliance(game.map)
+    game.vagabond = Vagabond(game.map)
+
+    game.eyrie.deck.add_card(Card(*total_common_card_info[11]))
+    game.eyrie.deck.add_card(Card(*total_common_card_info[13]))
+    
+
+    assert game.eyrie.victory_points == 0
+    game.map.places['G'].update_pieces(buildings = [("roost", "bird"), ("ruin", "No one")])
+    game.map.places['J'].update_pieces(buildings = [("roost", "bird"), ("ruin", "No one")])
+    game.map.update_owners()
+    game.eyrie.refresh_craft_activations(game.map)
+    game.eyrie.deck.add_card(Card(*total_common_card_info[14]))
+    options = game.eyrie.get_options_craft(game.map)
+    game.craft(game.eyrie, options[options.index(CraftDTO(Card(*total_common_card_info[14])))])
+    assert game.eyrie.victory_points == 2
+    assert len(game.eyrie.deck.cards) == 2
+
+
+def test_build():
+    game = Game()
+
+    game.cat_birdsong_wood()
+
+    options = game.marquise.get_build_options(game.map)
+    options.sort(key=lambda x: (x[0], x[1]))
+    game.build(place=options[0][0], building=options[0][1], actor=game.marquise, cost = options[0][2])
+    assert game.marquise.victory_points == 1
+    assert game.map.places['B'].building_slots == [('recruiter', 'cat'), ('empty', 'No one')]
+    assert game.map.count_on_map(('token', "wood")) == 0
+
+
+def test_recruit_and_add_to_resolve():
+    game = Game()
+
+    game.cat_birdsong_wood()
+
+    options = game.marquise.get_can_recruit(game.map)
+    if options:
+        game.recruit_cat()
+    assert game.map.places['E'].soldiers['cat'] == 2
+
+    decree_options = game.eyrie.get_decree_options()
+    game.add_card_to_decree("recruit", *sorted(decree_options["recruit"], key=lambda x: x[0])[0])
+
+    options = game.eyrie.get_resolve_recruit(game.map)
+    game.recruit(options[0][0], game.eyrie)
+    assert game.map.places['L'].soldiers['bird'] == 7
+
+    assert game.eyrie.victory_points == 0
+    game.bird_turmoil("Charismatic")
+    options = game.eyrie.get_resolve_recruit(game.map)
+    game.recruit(options[0][0], game.eyrie)
+    assert game.map.places['L'].soldiers['bird'] == 9
+    assert game.eyrie.victory_points == 0
+    
+def test_overwork():
+    game = Game()
+    assert game.map.count_on_map(('token', 'wood')) == 0
+    game.marquise.deck.add_card(Card(*total_common_card_info[49]))
+    game.overwork(game.map.places['A'], 49)
+    assert game.map.count_on_map(('token', 'wood')) == 1
+    assert game.marquise.deck.get_the_card(49) == "Card not in the deck"
+
+def test_revolt_sympathy():
+    game = Game()
+    options = game.alliance.get_spread_sympathy_options(game.map)
+    options.sort(key=lambda x: (x[0], x[1]))
+    assert options[0] == ("B", [])
+    game.spread_sympathy(*options[0])
+    assert game.map.places['B'].tokens == ["sympathy"]
+
+    options = game.alliance.get_spread_sympathy_options(game.map)
+    options.sort(key=lambda x: (x[0], x[1]))
+    assert options[0] == ("C", [51])
+    game.spread_sympathy(*options[0])
+    assert game.map.places['C'].tokens == ["sympathy"]
+
+    game.alliance.supporter_deck.add_card(Card(*total_common_card_info[15]))
+    game.alliance.supporter_deck.add_card(Card(*total_common_card_info[16]))
+
+    options = game.alliance.get_revolt_options(game.map)
+    options.sort(key=lambda x: (x[0], x[1], x[2])) #place card1 card2 soldiers to gain
+    assert options[0] == (game.map.places['C'], 15, 16, 1)
+
+    game.revolt(*options[0])
+
+    assert game.map.places['C'].soldiers['alliance'] == 1
+    assert game.map.places['C'].tokens == ["sympathy"]
+    assert game.alliance.supporter_deck.get_the_card(15) == "Card not in the deck"
+    assert game.alliance.supporter_deck.get_the_card(16) == "Card not in the deck"
+    assert game.map.places['C'].building_slots == [("base", "alliance"), ("empty", "No one")]
+    assert game.discard_deck.get_the_card(15) == Card(*total_common_card_info[15])
+
+
+

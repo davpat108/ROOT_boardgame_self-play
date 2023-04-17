@@ -24,11 +24,13 @@ The bigger constats are located here.
 
 ## TODO
 X means done XX means tested / means partially tested
+
 Vagabond discard items down to sack
-crafting X/, move action X, build X, recruit X, overwork X, revolt X, sympathy X, mobilize X, train X, organize X, ruin_explore X, aid , steal X, complete quest X, strike X 
+crafting XX, move action X/, build XX, recruit XX, overwork XX, revolt XX, sympathy XX, mobilize X, train X, organize X, ruin_explore X, aid , steal X, complete quest X, strike X 
 update victory points check gain-loss
 losing stuff in general
 bird turmoil, leader choice, despot commander builder(and vp anyways) X
+
 Cards:
 Codebreaker X
 cobbler X should be accounted for during the game

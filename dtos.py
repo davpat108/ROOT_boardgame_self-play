@@ -17,7 +17,8 @@ class Battle_DTO(ActionDTO):
             return True
         else:
             return False
-    
+
+
 class CraftDTO(ActionDTO):
     # Everything except ambush, ambush is a taken care of in Actor class
     def __init__(self, card) -> None:
@@ -71,19 +72,15 @@ class MoveDTO(ActionDTO):
             return False
         
 class OverworkDTO(ActionDTO):
-    def __init__(self, place, cardID, card_suit) -> None:
+    def __init__(self, place, cardID) -> None:
         super().__init__()
         self.place = place
         self.cardID = cardID
-        self.card_suit = card_suit
-        self.check()
-
+        
     def __eq__(self, other) -> bool:
-        if self.place == other.place and self.card_suit == other.card_suit and self.cardID == other.cardID:
+        if self.place == other.place and self.cardID == other.cardID:
             return True
         else:
             return False
         
-    def check(self):
-        assert self.card_suit in ["rabbit", "mouse", "fox", "bird"]
 
