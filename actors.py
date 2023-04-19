@@ -758,12 +758,21 @@ class Vagabond(Actor):
         move_options = []
         for neighbor in map.places[map.vagabond_position].neighbors:
             if not neighbor[1]:
-                if self.relations[ map.places[neighbor[0]].owner ] == 'hostile':
+                if self.relations[map.places[neighbor[0]].owner] == 'hostile':
                     boot_cost = 2
                 else:
                     boot_cost = 1
                 if [item for item in self.satchel if item.exhausted == False and item.damaged == False].count(Item("boot")) >= boot_cost:
                     move_options.append(MoveDTO(map.vagabond_position, map.places[neighbor[0]].name, how_many=0))
+                    if self.relations['cat'] == 'friendly' and map.places[map.vagabond_position].soldiers['cat'] > 0:
+                        for i in range(map.places[map.vagabond_position].soldiers['cat']):
+                            move_options.append(MoveDTO(map.vagabond_position, map.places[neighbor[0]].name, how_many=1, vagabond_allies=(i+1, 'cat')))
+                    if self.relations['bird'] == 'friendly' and map.places[map.vagabond_position].soldiers['bird'] > 0:
+                        for i in range(map.places[map.vagabond_position].soldiers['bird']):
+                            move_options.append(MoveDTO(map.vagabond_position, map.places[neighbor[0]].name, how_many=1, vagabond_allies=(i+1, 'bird')))
+                    if self.relations['alliance'] == 'friendly' and map.places[map.vagabond_position].soldiers['alliance'] > 0:
+                        for i in range(map.places[map.vagabond_position].soldiers['alliance']):
+                            move_options.append(MoveDTO(map.vagabond_position, map.places[neighbor[0]].name, how_many=1, vagabond_allies=(i+1, 'alliance')))
         return move_options
     
     def get_refresh_options(self):

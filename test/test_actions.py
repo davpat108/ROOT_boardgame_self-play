@@ -338,5 +338,4 @@ def test_vagabond_explore_stuff():
     assert game.vagabond.victory_points == 5
     assert game.map.places['H'].tokens == ['wood']
 
-test_vagabond_explore_stuff()
-
+    

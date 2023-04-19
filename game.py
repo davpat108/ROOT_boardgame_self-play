@@ -391,8 +391,7 @@ class Game():
                     self.alliance.supporter_deck.add_card(actor.deck.get_the_card(card_to_give_if_sympathy.ID))#CORRECT ASSUMING card_to_give_if_no_sympathy is correct
         place.update_owner()
 
-    def move(self, starting_place, destination, quantity, actor, card_to_give_if_sympathy, boot_cost):
-        # TODO vagabond moveing with allied soldiers
+    def move(self, starting_place, destination, quantity, actor, card_to_give_if_sympathy, boot_cost, vagabond_allies = (0, None)):
         if actor.name != 'vagabond':
             starting_place.soldiers[actor.name] -= quantity
             destination.soldiers[actor.name] += quantity
@@ -404,6 +403,9 @@ class Game():
             self.map.move_vagabond(destination.name)
             for _ in range(boot_cost):
                 actor.exhaust_item(Item('boot'))
+            if vagabond_allies[0]:
+                starting_place.soldiers[vagabond_allies[1]] -= vagabond_allies[0]
+                destination.soldiers[vagabond_allies[1]] += vagabond_allies[0]
 
         if actor.name == 'alliance':
             actor.current_officers -= 1
