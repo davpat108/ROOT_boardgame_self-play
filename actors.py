@@ -40,7 +40,10 @@ class Actor():
         self.win_condition = "points" #None, rabbit, mouse, fox, bird, coalition
         self.refresh_craft_activations(map)
         self.refresh_ambush_options()
-        
+    
+    def __lt__(self, other):
+        return self.name < other.name
+
     def add_item(self, item):
         self.items.append(item)
 
@@ -852,7 +855,8 @@ class Vagabond(Actor):
         for quest_card in self.quest_deck.cards:
             if (quest_card.suit == current_clearing.suit and
                     self.has_items(quest_card.item1, quest_card.item2)):
-                quest_options.append(quest_card.ID)
+                quest_options.append((quest_card.ID, 'draw'))
+                quest_options.append((quest_card.ID, 'VP'))
 
         return quest_options
 
@@ -915,31 +919,24 @@ class Vagabond(Actor):
         current_clearing = map.places[map.vagabond_position]
         # Iterates through name
         i = 0
-        for opponent_name in ['cat', 'bird', 'alliance']:
-            if current_clearing.has_opponent_pieces(opponent_name):
-                relation = self.relations[opponent_name]
+        for opponent in opponents:
+            if current_clearing.has_opponent_pieces(opponent.name):
+                relation = self.relations[opponent.name]
                 if relation == 'hostile':
                     continue
-
-                if relation == 'indifferent':
-                    cost = 1
-                elif relation == 'good':
-                    cost = 2
-                else:  # friendly or very good
-                    cost = 3
 
                 item_choices = []  # Get items from the opponent
                 for item in opponents[i].items: #Iterates through opponent objects from arquments
                     item_choices.append(Item(item.name))
                 item_choices = set(item_choices)
 
-                usable_card_combinations = list(combinations([card.ID for card in self.deck.cards if card.card_suit == current_clearing.suit or card.card_suit == 'bird'], cost))
-                for combination in usable_card_combinations:
-                    if item_choices:
-                        for item in item_choices:
-                            aid_options.append((opponent_name, list(combination), item.name))
-                    else:
-                        aid_options.append((opponent_name, list(combination), None))
+                for card in self.deck.cards:
+                    if card.card_suit == current_clearing.suit or card.card_suit == 'bird':
+                        if item_choices:
+                            for item in item_choices:
+                                aid_options.append((opponent, card.ID, item))
+                        else:
+                            aid_options.append((opponent, card.ID, None))
             i += 1
 
         return aid_options

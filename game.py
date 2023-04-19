@@ -3,7 +3,7 @@ from item import Item
 from dtos import MoveDTO, CraftDTO, Battle_DTO, OverworkDTO
 from map import build_regular_forest
 from deck import Deck, QuestDeck
-from configs import sympathy_VPs, eyrie_roost_VPs, persistent_effects, Immediate_non_item_effects, eyrie_leader_config, buildings_list_marquise
+from configs import sympathy_VPs, eyrie_roost_VPs, persistent_effects, Immediate_non_item_effects, eyrie_leader_config, buildings_list_marquise, vagabond_quest_card_info
 import random
 
 
@@ -85,6 +85,10 @@ class Game():
             self.vagabond.deck.add_card(self.deck.draw_card())
             self.vagabond.deck.add_card(self.deck.draw_card())
             self.vagabond.deck.add_card(self.deck.draw_card())
+
+            self.vagabond.quest_deck.add_card(self.quest_deck.draw_card())
+            self.vagabond.quest_deck.add_card(self.quest_deck.draw_card())
+            self.vagabond.quest_deck.add_card(self.quest_deck.draw_card())
 
     def stand_and_deliver(self, taker, victim):
         victim.deck.shuffle_deck()
@@ -611,61 +615,88 @@ class Game():
         self.alliance.current_officers -= 1
 
     # Vagabond
-    def explore_ruin(self, place):
-        for building_slot in place.building_slots:
-            if building_slot[0] == "ruin":
-                self.vagabond.add_item(building_slot[1])
-                building_slot = ("empty", "No one")
+    def explore_ruin(self, placename):
+        for i in range(len(self.map.places[placename].building_slots)):
+            if self.map.places[placename].building_slots[i][0] == "ruin":
+                self.vagabond.add_item(self.map.places[placename].building_slots[i][1])
+                self.map.places[placename].building_slots[i] = ("empty", "No one")
                 self.vagabond.satchel[self.vagabond.satchel.index(Item('torch'))].exhausted = True
                 self.vagabond.victory_points += 1
                 return
         raise ValueError("Try to explore but no ruin")
 
-    def aid(self, other_player, choosen_item, choosen_card):
-        other_player.deck.add_card(self.vagabond.deck.get_the_card(choosen_card.ID))
-        other_player.item.remove(choosen_item)
-        self.vagabond.add_item(choosen_item)
-        # VPS
+    def aid(self, other_player, choosen_card_id, choosen_item, consequitive_aids):
 
-    def steal(self, other_player, choosen_card):
-        self.vagabond.deck.add_card(other_player.deck.get_the_card(choosen_card.ID))
+        other_player.deck.add_card(self.vagabond.deck.get_the_card(choosen_card_id))
+
+        if choosen_item is not None:
+            other_player.items.remove(choosen_item)
+            self.vagabond.add_item(choosen_item)
+        
+        if self.vagabond.relations[other_player.name] == "friendly":
+            self.vagabond.victory_points += 2
+            return 0
+        
+        if self.vagabond.relations[other_player.name] == "hostile":
+            raise ValueError("You can't aid a hostile player")
+
+        if self.vagabond.relations[other_player.name] == "indifferent":
+            self.vagabond.victory_points += 1
+            self.vagabond.relations[other_player.name] = "good"
+            return 0
+
+        if self.vagabond.relations[other_player.name] == "good" and consequitive_aids == 1:
+            self.vagabond.victory_points += 2
+            self.vagabond.relations[other_player.name] = "very good"
+            return 0
+
+        if self.vagabond.relations[other_player.name] == "very good" and consequitive_aids == 2:
+            self.vagabond.victory_points += 2
+            self.vagabond.relations[other_player.name] = "friendly"
+            return 0
+
+        return consequitive_aids + 1 # Reset at the end of every vagabond turn
+
+    def steal(self, other_player_name):
+        for player in [self.marquise, self.alliance, self.eyrie]:
+            if player.name == other_player_name:
+                player.deck.shuffle_deck()
+                self.vagabond.deck.add_card(player.deck.draw_card())
+                player.deck.cards.sort(key=lambda x: x.ID)
         self.vagabond.satchel[self.vagabond.satchel.index(Item('torch'))].exhausted = True
 
-    def complete_quest(self, quest_card, items, draw_or_VP):
-        self.quest_discard_deck.add_card(self.vagabond.quest_deck.get_the_card(quest_card.ID))
+    def complete_quest(self, quest_card_ID, draw_or_VP):
+        self.discard_quest_deck.add_card(self.vagabond.quest_deck.get_the_card(quest_card_ID))
         self.vagabond.quest_deck.add_card(self.quest_deck.draw_card())
 
         if draw_or_VP == "draw":
             self.vagabond.deck.add_card(self.deck.draw_card())
         if draw_or_VP == "VP":
-            self.vagabond.victory_points += sum([card.suit == quest_card.suit  for card in self.quest_discard_deck])
+            self.vagabond.victory_points += sum([card.suit == vagabond_quest_card_info[quest_card_ID][-1] for card in self.discard_quest_deck.cards])
 
-        self.vagabond.exhaust_item(items[0])
-        self.vagabond.exhaust_item(items[1])
+        item1 = vagabond_quest_card_info[quest_card_ID][1]
+        item2 = vagabond_quest_card_info[quest_card_ID][2]
+        self.vagabond.exhaust_item(item1)
+        self.vagabond.exhaust_item(item2)
+        self.vagabond.quest_deck.add_card(self.quest_deck.draw_card())
 
 
-    def strike(self, place, opponent, target):
+    def strike(self, placename, opponent, target):
         if target == "wood" or target == "keep" or target == "sympathy":
-            place.tokens.remove(target)
-            if self.vagabond.relationships[opponent.name] == "hostile":
-                victory_points += 1
+            self.map.places[placename].tokens.remove(target)
             self.vagabond.victory_points += 1
 
         elif target == "soldier":
-            place.soldiers[opponent.name] -= 1
-            if self.vagabond.relationships[opponent.name] == "hostile":
-                victory_points += 1
-            self.vagabond.relationships[opponent.name] = "hostile"
+            self.map.places[placename].soldiers[opponent] -= 1
+            self.vagabond.relations[opponent] = "hostile"
 
         else:
-            for building_slot in place.building_slots:
-                if building_slot[0] == target:
-                    building_slot = ("empty", "No one")
-                    if self.vagabond.relationships[opponent.name] == "hostile":
-                        victory_points += 1
+            for i in range(len(self.map.places[placename].building_slots)):
+                if self.map.places[placename].building_slots[i][0] == target:
+                    self.map.places[placename].building_slots[i] = ("empty", "No one")
                     victory_points += 1
                     break
-        place.update_owner()
+        self.map.places[placename].update_owner()
 
 
 def random_choose(options):

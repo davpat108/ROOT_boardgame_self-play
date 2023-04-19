@@ -259,3 +259,84 @@ def test_mobilize_train_organize():
     options = game.alliance.get_organize_options(game.map)
 
     assert options == []
+
+def test_vagabond_explore_stuff():
+    game = Game()
+    #AID
+    game.map.move_vagabond('L')
+    options = game.vagabond.get_aid_options(game.map, (game.marquise, game.eyrie, game.alliance))
+    options.sort(key=lambda x: x[0])
+    conseq_aids = game.aid(*options[0], 0)
+    assert conseq_aids == 0
+    assert game.vagabond.victory_points == 1
+    assert game.vagabond.deck.get_the_card(3) == "Card not in the deck"
+    assert game.eyrie.deck.get_the_card(3) != "Card not in the deck"
+
+    game.map.move_vagabond('N')
+    options = game.vagabond.get_aid_options(game.map, (game.marquise, game.eyrie, game.alliance))
+    assert options == []
+
+    game.map.move_vagabond('A')
+    game.marquise.items.append(Item("sword"))
+    game.vagabond.relations[game.marquise.name] = "good"
+    conseq_aids = 0
+    options = game.vagabond.get_aid_options(game.map, (game.marquise, game.eyrie, game.alliance))
+    conseq_aids = game.aid(*options[0], conseq_aids)
+    assert conseq_aids == 1
+    assert game.vagabond.victory_points == 1
+    assert game.vagabond.deck.get_the_card(33) == "Card not in the deck"
+    assert game.marquise.deck.get_the_card(33) != "Card not in the deck"
+    assert game.vagabond.satchel[game.vagabond.satchel.index(Item("sword"))] == Item("sword")
+
+
+    game.marquise.items.append(Item("sword"))
+    options = game.vagabond.get_aid_options(game.map, (game.marquise, game.eyrie, game.alliance))
+    conseq_aids = game.aid(*options[0], conseq_aids)
+    assert conseq_aids == 0
+    assert game.vagabond.victory_points == 3
+    assert game.vagabond.relations[game.marquise.name] == "very good"
+
+    # EXPLORE
+    game.map.move_vagabond('H')
+    options = game.vagabond.get_ruin_explore_options(game.map)
+    if options:
+        game.explore_ruin(game.map.vagabond_position)
+    assert game.vagabond.victory_points == 4
+    assert ('ruin', Item("boot")) not in game.map.places['H'].building_slots
+    assert game.vagabond.satchel.count(Item("boot")) == 2
+
+    # QUEST
+    assert len(game.vagabond.deck.cards) == 1
+    assert len(game.marquise.deck.cards) == 4
+    game.vagabond.refresh_item(Item("torch"))
+    options = game.vagabond.get_thief_ability(game.map)
+    game.steal(options[0])
+    assert len(game.vagabond.deck.cards) == 2
+    assert len(game.marquise.deck.cards) == 3
+    assert game.vagabond.satchel[game.vagabond.satchel.index(Item("torch"))].exhausted == True
+
+    game.vagabond.refresh_item(Item("torch"))
+    game.vagabond.add_item(Item("crossbow"))
+    options = game.vagabond.get_quest_options(game.map)
+    options.sort(key=lambda x: (x[0], x[1]))
+    game.complete_quest(*options[1])
+    assert game.vagabond.victory_points == 4
+    assert game.vagabond.satchel[game.vagabond.satchel.index(Item("torch"))].exhausted == True
+    assert game.vagabond.satchel[game.vagabond.satchel.index(Item("crossbow"))].exhausted == True
+    assert len(game.vagabond.deck.cards) == 3
+
+    # STRIKE
+    game.vagabond.repair_and_refresh_all()
+    game.map.places['H'].update_pieces(tokens = ['sympathy', 'wood'])
+    options = game.vagabond.get_strike_options(game.map)
+    options.sort(key=lambda x: (x[1], x[2]))
+    game.strike(*options[1])
+    assert game.vagabond.victory_points == 4
+    assert game.map.places['H'].tokens == ['sympathy', 'wood']
+    assert game.map.places['H'].soldiers == {'cat': 0, 'bird': 0, 'alliance': 0}
+    game.strike(*options[0]) # Should not be used like this, but it's just a test
+    assert game.vagabond.victory_points == 5
+    assert game.map.places['H'].tokens == ['wood']
+
+test_vagabond_explore_stuff()
+

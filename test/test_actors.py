@@ -526,11 +526,11 @@ def test_vagabond():
     vagabond.add_item(Item('crossbow'))
 
     quest_options = vagabond.get_quest_options(map)
-    assert quest_options == [10]
+    assert quest_options == [(10, 'draw'), (10, 'VP')]
     vagabond.repair_item(Item('sword'))
     vagabond.refresh_item(Item('sword'))
     quest_options = vagabond.get_quest_options(map)
-    assert quest_options == [10, 11]
+    assert quest_options == [(10, 'draw'), (10, 'VP'), (11, 'draw'), (11, 'VP')]
 
     vagabond.exhaust_item(Item('torch'))
     vagabond.exhaust_item(Item('sword'))
@@ -589,17 +589,18 @@ def test_vagabond():
     vagabond.relations['cat'] = 'very good'
     aid_options = vagabond.get_aid_options(map, [marquise, eyrie, alliance]) # alliance, cat
     aid_options = sorted(aid_options, key= lambda x: (x[0], x[1]))
-    assert aid_options == sorted([('alliance', [33], None), ('alliance', [34], None), ('alliance', [50], None), ('cat', [33, 34, 50],  None)], key= lambda x: (x[0], x[1]))
+    print(aid_options)
+    assert aid_options == sorted([(alliance, 33, None), (alliance, 34, None), (alliance, 50, None), (marquise, 33, None), (marquise, 34, None), (marquise, 50, None)], key= lambda x: (x[0], x[1]))
 
     marquise.items = [Item('sword'), Item('sword'), Item('sword')]
     aid_options = vagabond.get_aid_options(map, [marquise, eyrie, alliance]) # alliance, cat
     aid_options = sorted(aid_options, key= lambda x: (x[0], x[1]))
-    assert aid_options == sorted([('alliance', [33], None), ('alliance', [34], None), ('alliance', [50], None), ('cat', [33, 34, 50],  'sword')], key= lambda x: (x[0], x[1]))
+    assert aid_options == sorted([(alliance, 33, None), (alliance, 34, None), (alliance, 50, None), (marquise, 33, Item('sword')), (marquise, 34, Item('sword')), (marquise, 50, Item('sword'))], key= lambda x: (x[0], x[1]))
 
     alliance.items = [Item('sword'), Item('crossbow')]
     aid_options = vagabond.get_aid_options(map, [marquise, eyrie, alliance]) # alliance, cat
     aid_options = sorted(aid_options, key= lambda x: (x[0], x[1], x[2]))
-    assert aid_options == sorted([('alliance', [33], 'sword'), ('alliance', [34], 'sword'), ('alliance', [50], 'sword'), ('alliance', [33], 'crossbow'), ('alliance', [34], 'crossbow'), ('alliance', [50], 'crossbow'), ('cat', [33, 34, 50],  'sword')], key= lambda x: (x[0], x[1], x[2]))
+    assert aid_options == sorted([(alliance, 33, Item('sword')), (alliance, 34, Item('sword')), (alliance, 50, Item('sword')), (alliance, 33, Item('crossbow')), (alliance, 34, Item('crossbow')), (alliance, 50, Item('crossbow')), (marquise, 33, Item('sword')), (marquise, 34, Item('sword')), (marquise, 50, Item('sword'))], key= lambda x: (x[0], x[1], x[2]))
 
     vagabond.deck.draw_card()
     vagabond.deck.draw_card()
