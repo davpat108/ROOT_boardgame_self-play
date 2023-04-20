@@ -391,24 +391,29 @@ class Game():
                     self.alliance.supporter_deck.add_card(actor.deck.get_the_card(card_to_give_if_sympathy.ID))#CORRECT ASSUMING card_to_give_if_no_sympathy is correct
         place.update_owner()
 
-    def move(self, starting_place, destination, quantity, actor, card_to_give_if_sympathy, boot_cost, vagabond_allies = (0, None)):
-        if actor.name != 'vagabond':
-            starting_place.soldiers[actor.name] -= quantity
-            destination.soldiers[actor.name] += quantity
+    def move(self, move_action, card_to_give_if_sympathy):
+        if move_action.who != 'vagabond':
+            self.map.places[move_action.start].soldiers[move_action.who] -= move_action.how_many
+            self.map.places[move_action.end].soldiers[move_action.who] += move_action.how_many
 
-        if actor.name != 'alliance' and destination.tokens.count("sympathy") > 0:
-            self.alliance.supporter_deck.add_card(actor.deck.get_the_card(card_to_give_if_sympathy.ID))
+        if move_action.who != 'alliance' and self.map.places[move_action.end].tokens.count("sympathy") > 0:
+            for actor in [self.eyrie, self.vagabond, self.marquise]:
+                if actor.name == move_action.who:
+                    self.alliance.supporter_deck.add_card(actor.deck.get_the_card(card_to_give_if_sympathy.ID))
 
-        if actor.name == 'vagabond':
-            self.map.move_vagabond(destination.name)
+        if move_action.who == 'vagabond':
+            self.map.move_vagabond(move_action.end)
+            boot_cost = 2 if self.vagabond.relations[self.map.places[move_action.end].owner] == 'hostile' else 1
             for _ in range(boot_cost):
-                actor.exhaust_item(Item('boot'))
-            if vagabond_allies[0]:
-                starting_place.soldiers[vagabond_allies[1]] -= vagabond_allies[0]
-                destination.soldiers[vagabond_allies[1]] += vagabond_allies[0]
+                self.vagabond.exhaust_item(Item('boot'))
+            if move_action.vagabond_allies[0]:
+                self.map.places[move_action.start].soldiers[move_action.vagabond_allies[1]] -= move_action.vagabond_allies[0]
+                self.map.places[move_action.end].soldiers[move_action.vagabond_allies[1]] += move_action.vagabond_allies[0]
 
-        if actor.name == 'alliance':
-            actor.current_officers -= 1
+        if move_action.who == 'alliance':
+            for actor in [self.eyrie, self.vagabond, self.marquise]:
+                if actor.name == move_action.who:
+                    actor.current_officers -= 1
         self.map.update_owners()
 
     def craft(self, actor, costs: CraftDTO):

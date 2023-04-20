@@ -205,7 +205,7 @@ class Marquise(Actor):
                 for neighbor in place.neighbors:
                     if place.owner == 'cat' or map.places[neighbor[0]].owner == 'cat':
                         if place.forest == False and map.places[neighbor[0]].forest == False:
-                            moves.append(MoveDTO(place.name, map.places[neighbor[0]].name, how_many=i + 1))
+                            moves.append(MoveDTO(place.name, map.places[neighbor[0]].name, who='cat', how_many=i + 1))
         return moves    
     
     def get_can_recruit(self, map):
@@ -358,7 +358,7 @@ class Eyrie(Actor):
                         if not neighbor[1]:
                             dest_clearing = map.places[neighbor[0]]
                             for soldiers in range(1, source_clearing.soldiers["bird"] + 1):
-                                move_options.append(MoveDTO(source_clearing.name, dest_clearing.name, soldiers, card_ID))
+                                move_options.append(MoveDTO(source_clearing.name, dest_clearing.name, how_many=soldiers,card_ID=card_ID, who="bird"))
         return move_options
 
     def get_resolve_battle(self, map, vagabond):
@@ -668,7 +668,7 @@ class Alliance(Actor):
                 for neighbor in place.neighbors:
                     if place.owner == 'alliance' or map.places[neighbor[0]].owner == 'alliance':
                         if place.forest == False and map.places[neighbor[0]].forest == False:
-                            moves.append(MoveDTO(place.name, map.places[neighbor[0]].name, how_many=i + 1))
+                            moves.append(MoveDTO(place.name, map.places[neighbor[0]].name, how_many=i + 1, who='alliance'))
         return moves
 
     def get_recruits(self, map):
@@ -695,7 +695,6 @@ class Alliance(Actor):
     
 
 class Vagabond(Actor):
-    # First lets just make him thief
     def __init__(self, map, role = "Thief") -> None:
         super().__init__(map)
         self.quest_deck = QuestDeck(empty=True)
@@ -751,7 +750,7 @@ class Vagabond(Actor):
     def get_slip_options(self, map):
         slip_options = []
         for neighbor in map.places[map.vagabond_position].neighbors:
-            slip_options.append(MoveDTO(map.vagabond_position, map.places[neighbor[0]].name, 0))
+            slip_options.append(MoveDTO(map.vagabond_position, map.places[neighbor[0]].name, 0, who='vagabond'))
         return slip_options
     
     def get_moves(self, map):
@@ -763,16 +762,16 @@ class Vagabond(Actor):
                 else:
                     boot_cost = 1
                 if [item for item in self.satchel if item.exhausted == False and item.damaged == False].count(Item("boot")) >= boot_cost:
-                    move_options.append(MoveDTO(map.vagabond_position, map.places[neighbor[0]].name, how_many=0))
+                    move_options.append(MoveDTO(map.vagabond_position, map.places[neighbor[0]].name, how_many=0, who='vagabond'))
                     if self.relations['cat'] == 'friendly' and map.places[map.vagabond_position].soldiers['cat'] > 0:
                         for i in range(map.places[map.vagabond_position].soldiers['cat']):
-                            move_options.append(MoveDTO(map.vagabond_position, map.places[neighbor[0]].name, how_many=1, vagabond_allies=(i+1, 'cat')))
+                            move_options.append(MoveDTO(map.vagabond_position, map.places[neighbor[0]].name, how_many=1, who='vagabond', vagabond_allies=(i+1, 'cat')))
                     if self.relations['bird'] == 'friendly' and map.places[map.vagabond_position].soldiers['bird'] > 0:
                         for i in range(map.places[map.vagabond_position].soldiers['bird']):
-                            move_options.append(MoveDTO(map.vagabond_position, map.places[neighbor[0]].name, how_many=1, vagabond_allies=(i+1, 'bird')))
+                            move_options.append(MoveDTO(map.vagabond_position, map.places[neighbor[0]].name, how_many=1,  who='vagabond', vagabond_allies=(i+1, 'bird')))
                     if self.relations['alliance'] == 'friendly' and map.places[map.vagabond_position].soldiers['alliance'] > 0:
                         for i in range(map.places[map.vagabond_position].soldiers['alliance']):
-                            move_options.append(MoveDTO(map.vagabond_position, map.places[neighbor[0]].name, how_many=1, vagabond_allies=(i+1, 'alliance')))
+                            move_options.append(MoveDTO(map.vagabond_position, map.places[neighbor[0]].name, how_many=1,  who='vagabond', vagabond_allies=(i+1, 'alliance')))
         return move_options
     
     def get_refresh_options(self):
@@ -959,14 +958,14 @@ class Vagabond(Actor):
         return item_dmg_options
 
     def damage_item(self, other_item, place = None):
-        # Place: when the vagabond is allied to a faction, the factions soldiers are considered items
+        # Place: when the vagabond is allied to a faction, the factions soldiers are considered items, vagabond doesn't care
         if isinstance(other_item, Item):
             for item in self.satchel:
-                if item.name == other_item.name:
+                if item.name == other_item.name and not item.damaged:
                     item.damaged = True
                     return True
             for item in self.other_items:
-                if item.name == other_item.name:
+                if item.name == other_item.name and not item.damaged:
                     item.damaged = True
                     return True
         if place and not isinstance(other_item, Item):
@@ -982,36 +981,36 @@ class Vagabond(Actor):
 
     def exhaust_item(self, other_item):
         for item in self.satchel:
-            if item.name == other_item.name:
+            if item.name == other_item.name and not item.exhausted:
                 item.exhausted = True
                 return
         for item in self.other_items:
-            if item.name == other_item.name:
+            if item.name == other_item.name and not item.exhausted:
                 item.exhausted = True
                 return
-        raise ValueError("Item not found")
+        raise ValueError("Item not found or exhausted")
 
     def repair_item(self, other_item):
         for item in self.satchel:
-            if item.name == other_item.name:
+            if item.name == other_item.name and item.damaged:
                 item.damaged = False
                 return
         for item in self.other_items:
-            if item.name == other_item:
+            if item.name == other_item and item.damaged:
                 item.damaged = False
                 return
-        raise ValueError("Item not found")
+        raise ValueError("Item not found or not damaged")
     
     def refresh_item(self, other_item):
         for item in self.satchel:
-            if item.name == other_item.name:
+            if item.name == other_item.name and item.exhausted:
                 item.exhausted = False
                 return
         for item in self.other_items:
-            if item.name == other_item.name:
+            if item.name == other_item.name and item.exhausted:
                 item.exhausted = False
                 return
-        raise ValueError("Item not found")
+        raise ValueError("Item not found or not exhausted")
     
     def repair_and_refresh_all(self):
         for item in self.satchel:

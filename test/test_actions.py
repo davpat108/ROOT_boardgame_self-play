@@ -34,25 +34,47 @@ def test_movement_slip():
     game.vagabond.deck.add_card(Card(*total_common_card_info[17]))
     card_to_give_if_no_sympathy = Card(*total_common_card_info[17])
     game.map.move_vagabond('C')
-    game.move(game.map.places['C'], game.map.places['D'], 0, game.vagabond, card_to_give_if_no_sympathy, 1)
+    move_action = MoveDTO(start = 'C', end = 'D', how_many = 0, who = 'vagabond')
+    game.move(move_action, card_to_give_if_no_sympathy)
     assert game.map.places['D'].vagabond_is_here == True
     assert len(game.vagabond.deck.cards) == 1
     assert game.vagabond.satchel[game.vagabond.satchel.index(Item('boot'))].exhausted == True
 
-    game.move(game.map.places['D'], game.map.places['C'], 0, game.vagabond, card_to_give_if_no_sympathy, 1)
+    game.vagabond.refresh_item(Item('boot'))
+    move_action = MoveDTO(start = 'D', end = 'C', how_many = 0, who = 'vagabond')
+    game.move(move_action, card_to_give_if_no_sympathy)
     assert game.map.places['C'].vagabond_is_here == True
     assert len(game.vagabond.deck.cards) == 0
     assert len(game.alliance.supporter_deck.cards) == 6
 
-    game.move(game.map.places['C'], game.map.places['H'], 1, game.marquise, card_to_give_if_no_sympathy, 1)
+    move_action = MoveDTO(start = 'C', end = 'H', how_many = 1, who = 'cat')
+    game.move(move_action, card_to_give_if_no_sympathy)
     assert game.map.places['H'].soldiers['cat'] == 2
     assert game.map.places['C'].soldiers['cat'] == 0 
 
-    game.move(game.map.places['L'], game.map.places['I'], 6, game.eyrie, card_to_give_if_no_sympathy, 1)    
+    move_action = MoveDTO(start = 'L', end = 'I', how_many = 6, who = 'bird')
+    game.move(move_action, card_to_give_if_no_sympathy)    
     assert game.map.places['I'].soldiers['bird'] == 6
     assert game.map.places['L'].soldiers['bird'] == 0
 
-    # vagabond MOVE with allies
+    game.vagabond.repair_and_refresh_all()
+    game.map.move_vagabond('I')
+    game.vagabond.relations['bird'] = "friendly"
+    move_action = MoveDTO(start = 'I', end = 'L', how_many = 0, who = 'vagabond', vagabond_allies=(6, 'bird'))
+    game.move(move_action, card_to_give_if_no_sympathy)
+    assert game.map.places['L'].soldiers['bird'] == 6
+    assert game.map.places['I'].soldiers['bird'] == 0
+    assert game.vagabond.satchel[game.vagabond.satchel.index(Item('boot'))].exhausted == True
+
+    game.vagabond.repair_and_refresh_all()
+    game.map.move_vagabond('I')
+    game.vagabond.relations['bird'] = "hostile"
+    game.vagabond.add_item(Item('boot'))
+    move_action = MoveDTO(start = 'I', end = 'L', how_many = 0, who = 'vagabond')
+    game.move(move_action, card_to_give_if_no_sympathy)
+    for item in game.vagabond.satchel:
+        if item.name == 'boot':
+            assert item.exhausted == True
 
 
 
@@ -339,3 +361,4 @@ def test_vagabond_explore_stuff():
     assert game.map.places['H'].tokens == ['wood']
 
     
+test_movement_slip()

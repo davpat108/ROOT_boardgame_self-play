@@ -92,13 +92,13 @@ def test_marquise_move():
     map.update_owners()
     marguise = game.marquise
     move_options = marguise.get_moves(map)
-    assert move_options == [MoveDTO('A', 'B', 1),
-                             MoveDTO('A', 'C', 1),
-                             MoveDTO('B', 'A', 1),
-                              MoveDTO('B', 'D', 1),
-                                 MoveDTO('C', 'A', 1),
-                                     MoveDTO('D', 'B', 1),
-                                     MoveDTO('D', 'B', 2)]
+    assert move_options == [MoveDTO('A', 'B', 1, who='cat'),
+                             MoveDTO('A', 'C', 1, who='cat'),
+                             MoveDTO('B', 'A', 1, who='cat'),
+                              MoveDTO('B', 'D', 1, who='cat'),
+                                 MoveDTO('C', 'A', 1, who='cat'),
+                                     MoveDTO('D', 'B', 1, who='cat'),
+                                     MoveDTO('D', 'B', 2, who='cat')]
     
 def test_marquise_get_connected_wood_tokens():
     game = Game(debug=True)
@@ -259,8 +259,8 @@ def test_resolves():
     decree_options = eyrie.get_decree_options()
     eyrie.decree = decree_options # Not how your supposed to do it, but it works for testing
     move_options = eyrie.get_resolve_move(map)
-    assert move_options[0] == MoveDTO('L', 'H', 1, 0)
-    assert move_options[-1] == MoveDTO('L', 'K', 6, 53)
+    assert move_options[0] == MoveDTO('L', 'H', 1,card_ID=0, who='bird')
+    assert move_options[-1] == MoveDTO('L', 'K', 6,card_ID=53, who='bird')
 
     recruit_options = eyrie.get_resolve_recruit(map)
     assert recruit_options == [(map.places['L'], 0), (map.places['L'], 53)]
@@ -451,13 +451,13 @@ def test_alliance_move():
     alliance.total_officers = 1
     alliance.refresh_officers()
     move_options = alliance.get_moves(map)
-    assert move_options == [MoveDTO('A', 'B', 1),
-                             MoveDTO('A', 'C', 1),
-                             MoveDTO('B', 'A', 1),
-                              MoveDTO('B', 'D', 1),
-                                 MoveDTO('C', 'A', 1),
-                                     MoveDTO('D', 'B', 1),
-                                     MoveDTO('D', 'B', 2)]
+    assert move_options == [MoveDTO('A', 'B', 1, who='alliance'),
+                             MoveDTO('A', 'C', 1, who='alliance'),
+                             MoveDTO('B', 'A', 1, who='alliance'),
+                              MoveDTO('B', 'D', 1, who='alliance'),
+                                 MoveDTO('C', 'A', 1, who='alliance'),
+                                     MoveDTO('D', 'B', 1, who='alliance'),
+                                     MoveDTO('D', 'B', 2, who='alliance')]
     
 
 def test_vagabond():
@@ -472,10 +472,10 @@ def test_vagabond():
     # SLIP and MOVE
     slip_options = vagabond.get_slip_options(map)
     slip_options = sorted(slip_options, key= lambda x: (x.start, x.end))
-    assert slip_options == sorted([MoveDTO('O', 'C', 0), MoveDTO('O', 'D', 0), MoveDTO('O', 'G', 0), MoveDTO('O', 'H', 0), MoveDTO('O', 'I', 0)], key= lambda x: (x.start, x.end))
+    assert slip_options == sorted([MoveDTO('O', 'C', 0, who='vagabond'), MoveDTO('O', 'D', 0, who='vagabond'), MoveDTO('O', 'G', 0, who='vagabond'), MoveDTO('O', 'H', 0, who='vagabond'), MoveDTO('O', 'I', 0, who='vagabond')], key= lambda x: (x.start, x.end))
 
     move_options = vagabond.get_moves(map)
-    assert move_options == sorted([MoveDTO('O', 'C', 0), MoveDTO('O', 'D', 0), MoveDTO('O', 'G', 0), MoveDTO('O', 'H', 0), MoveDTO('O', 'I', 0)], key= lambda x: (x.start, x.end))
+    assert move_options == sorted([MoveDTO('O', 'C', 0, who='vagabond'), MoveDTO('O', 'D', 0, who='vagabond'), MoveDTO('O', 'G', 0, who='vagabond'), MoveDTO('O', 'H', 0, who='vagabond'), MoveDTO('O', 'I', 0, who='vagabond')], key= lambda x: (x.start, x.end))
 
     vagabond.damage_item(Item('boot'))
     move_options = vagabond.get_moves(map)
@@ -486,13 +486,13 @@ def test_vagabond():
     map.move_vagabond('C')
     slip_options = vagabond.get_slip_options(map)
     slip_options =sorted(slip_options, key= lambda x: (x.start, x.end))
-    assert slip_options == sorted([MoveDTO('C', 'B', 0), MoveDTO('C', 'D', 0), MoveDTO('C', 'I', 0), MoveDTO('C', 'M', 0), MoveDTO('C', 'O', 0)], key= lambda x: (x.start, x.end))
+    assert slip_options == sorted([MoveDTO('C', 'B', 0, who='vagabond'), MoveDTO('C', 'D', 0, who='vagabond'), MoveDTO('C', 'I', 0, who='vagabond'), MoveDTO('C', 'M', 0, who='vagabond'), MoveDTO('C', 'O', 0, who='vagabond')], key= lambda x: (x.start, x.end))
 
     # REPAIR
     vagabond.repair_item(Item('boot'))
     move_options = vagabond.get_moves(map)
     move_options = sorted(move_options, key= lambda x: (x.start, x.end))
-    assert move_options == sorted([MoveDTO('C', 'B', 0), MoveDTO('C', 'D', 0), MoveDTO('C', 'I', 0)], key= lambda x: (x.start, x.end))
+    assert move_options == sorted([MoveDTO('C', 'B', 0, who='vagabond'), MoveDTO('C', 'D', 0, who='vagabond'), MoveDTO('C', 'I', 0, who='vagabond')], key= lambda x: (x.start, x.end))
 
     # REFRESH
     vagabond.exhaust_item(Item('boot'))

@@ -58,13 +58,14 @@ class CraftDTO(ActionDTO):
             if cost[0] in ["rabbit", "mouse", "fox"]:
                 self.cost[cost[0]] = cost[1]
 class MoveDTO(ActionDTO):
-    def __init__(self, start, end, how_many, card_ID=None, vagabond_allies = (0, None)) -> None:
+    def __init__(self, start, end, how_many, who, card_ID=None, vagabond_allies = (0, None)) -> None:
         super().__init__()
         self.how_many = how_many
         self.start = start
         self.end = end
         self.card_ID = card_ID
         self.vagabond_allies = vagabond_allies
+        self.who = who
 
     def __eq__(self, other) -> bool:
         if self.start == other.start and self.end == other.end and self.how_many == other.how_many and self.card_ID == other.card_ID and self.vagabond_allies == other.vagabond_allies:
