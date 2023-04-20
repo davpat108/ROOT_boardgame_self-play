@@ -360,5 +360,19 @@ def test_vagabond_explore_stuff():
     assert game.vagabond.victory_points == 5
     assert game.map.places['H'].tokens == ['wood']
 
+def test_cards():
+
+    #STAND AND DELIVER
+    game = Game()
+    game.marquise.stand_and_deliver = True
+    options = game.marquise.stand_and_deliver_options([game.eyrie, game.alliance, game.vagabond])
+    game.stand_and_deliver(taker=game.marquise, victim=options[1])
+    assert len(game.marquise.deck.cards) == 4
+    assert len(game.eyrie.deck.cards) == 3
+    assert game.eyrie.victory_points == 1
+
+    # SCOUTING PARTY IN BATTLE TESTS
     
-test_movement_slip()
+
+
+test_cards()

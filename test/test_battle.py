@@ -30,6 +30,83 @@ def test_resolve_battle():
     assert game.map.places['H'].soldiers['bird'] == 0
     assert game.map.places['H'].building_slots == [('sawmill', 'cat'), ('workshop', 'cat'), ('empty', 'No one')]
 
+
+    # CAT VS BIRD BIRD AMBUSH
+    place_name = 'H'
+    attacker = 'cat'
+    defender = 'bird'
+    dice_rolls = [2, 1]
+    game.map.places['H'].update_pieces(soldiers ={'cat': 3, 'bird': 1, 'alliance': 0}, buildings = [('sawmill', 'cat'), ('workshop', 'cat'), ('roost', 'bird'),], tokens = ['wood'])
+    game.map.update_owners()
+    
+    attacker_pice_lose_priorities = ['wood','sawmill', 'workshop', 'recruiter', 'keep']
+    defender_pice_lose_priorities = ['roost']
+    attacker_chosen_pieces = game.priority_to_list(attacker_pice_lose_priorities, game.map.places['H'], attacker)
+    defender_chosen_pieces = game.priority_to_list(defender_pice_lose_priorities, game.map.places['H'], defender)
+    game.eyrie.deck.add_card(game.deck.get_the_card(48))
+    options_defender = game.eyrie.get_ambush_options(game.map.places['H'])
+    if options_defender[1]:
+        options_attacker = game.marquise.get_ambush_options(game.map.places['H'])
+        game.ambush(place = game.map.places['H'], attacker=game.marquise, defender=game.eyrie, bird_or_suit_defender=options_defender[1], bird_or_suit_attacker=options_attacker[0])
+    dmg_attacker, dmg_defender = game.get_battle_damages(attacker, defender, dice_rolls, place_name, armorers = [False, False])
+    game.resolve_battle(game.map.places['H'], attacker, defender, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces)
+    assert game.map.places['H'].soldiers['cat'] == 0
+    assert game.map.places['H'].soldiers['bird'] == 0
+    assert game.map.places['H'].building_slots == [('sawmill', 'cat'), ('workshop', 'cat'), ('roost', 'bird')]
+    assert game.eyrie.deck.get_the_card(48) == "Card not in the deck"
+
+    # CAT VS BIRD BIRD AMBUSH, CAT SCOUTING PARTY
+    place_name = 'H'
+    attacker = 'cat'
+    defender = 'bird'
+    dice_rolls = [2, 1]
+    game.map.places['H'].update_pieces(soldiers ={'cat': 3, 'bird': 1, 'alliance': 0}, buildings = [('sawmill', 'cat'), ('workshop', 'cat'), ('roost', 'bird'),], tokens = ['wood'])
+    game.map.update_owners()
+    game.marquise.scouting_party = True
+    
+    attacker_pice_lose_priorities = ['wood','sawmill', 'workshop', 'recruiter', 'keep']
+    defender_pice_lose_priorities = ['roost']
+    attacker_chosen_pieces = game.priority_to_list(attacker_pice_lose_priorities, game.map.places['H'], attacker)
+    defender_chosen_pieces = game.priority_to_list(defender_pice_lose_priorities, game.map.places['H'], defender)
+    game.eyrie.deck.add_card(game.deck.get_the_card(25))
+    options_defender = game.eyrie.get_ambush_options(game.map.places['H'])
+    if options_defender[1]:
+        options_attacker = game.marquise.get_ambush_options(game.map.places['H'])
+        game.ambush(place = game.map.places['H'], attacker=game.marquise, defender=game.eyrie, bird_or_suit_defender=options_defender[1], bird_or_suit_attacker=options_attacker[0])
+    dmg_attacker, dmg_defender = game.get_battle_damages(attacker, defender, dice_rolls, place_name, armorers = [False, False])
+    game.resolve_battle(game.map.places['H'], attacker, defender, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces)
+    assert game.map.places['H'].soldiers['cat'] == 2
+    assert game.map.places['H'].soldiers['bird'] == 0
+    assert game.map.places['H'].building_slots == [('sawmill', 'cat'), ('workshop', 'cat'), ('empty', 'No one')]
+    assert game.eyrie.deck.get_the_card(25) == "Card not in the deck"
+
+    # CAT VS BIRD BIRD AMBUSH, CAT COUNTER AMBUSH
+    place_name = 'H'
+    attacker = 'cat'
+    defender = 'bird'
+    dice_rolls = [2, 1]
+    game.map.places['H'].update_pieces(soldiers ={'cat': 3, 'bird': 1, 'alliance': 0}, buildings = [('sawmill', 'cat'), ('workshop', 'cat'), ('roost', 'bird'),], tokens = ['wood'])
+    game.map.update_owners()
+    game.marquise.scouting_party = False
+    
+    attacker_pice_lose_priorities = ['wood','sawmill', 'workshop', 'recruiter', 'keep']
+    defender_pice_lose_priorities = ['roost']
+    attacker_chosen_pieces = game.priority_to_list(attacker_pice_lose_priorities, game.map.places['H'], attacker)
+    defender_chosen_pieces = game.priority_to_list(defender_pice_lose_priorities, game.map.places['H'], defender)
+    game.eyrie.deck.add_card(game.discard_deck.get_the_card(25))
+    game.marquise.deck.add_card(game.deck.get_the_card(49))
+    options_defender = game.eyrie.get_ambush_options(game.map.places['H'])
+    if options_defender[1]:
+        options_attacker = game.marquise.get_ambush_options(game.map.places['H'])
+        game.ambush(place = game.map.places['H'], attacker=game.marquise, defender=game.eyrie, bird_or_suit_defender=options_defender[1], bird_or_suit_attacker=options_attacker[1])
+    dmg_attacker, dmg_defender = game.get_battle_damages(attacker, defender, dice_rolls, place_name, armorers = [False, False])
+    game.resolve_battle(game.map.places['H'], attacker, defender, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces)
+    assert game.map.places['H'].soldiers['cat'] == 2
+    assert game.map.places['H'].soldiers['bird'] == 0
+    assert game.map.places['H'].building_slots == [('sawmill', 'cat'), ('workshop', 'cat'), ('empty', 'No one')]
+    assert game.eyrie.deck.get_the_card(25) == "Card not in the deck"
+    assert game.marquise.deck.get_the_card(49) == "Card not in the deck"
+
     # BIRDS VS CAT more cat
     defender_pice_lose_priorities = ['wood','sawmill', 'workshop', 'recruiter', 'keep']
     attacker_pice_lose_priorities = ['roost']
@@ -265,3 +342,4 @@ def test_resolve_battle():
     assert game.vagabond.satchel[game.vagabond.satchel.index(Item('torch'))].damaged == True
     assert game.vagabond.relations['bird'] == "hostile"
 
+test_resolve_battle()

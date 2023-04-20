@@ -45,14 +45,6 @@ def test_marguise_get_options_craft():
     marquise.refresh_craft_activations(map)
     craft_options = marquise.get_options_craft(map)
     assert [craft_option.item for craft_option in craft_options] == [Item("boot")]
-    marquise.refresh_ambush_options()
-    assert marquise.ambush == {
-        "rabbit": 1,
-        "mouse": 0,
-        "fox": 0,
-        "bird": 0,
-    }
-
 def test_marquise_battle():
     game = Game(debug=True)
     marquise = game.marquise
@@ -309,13 +301,7 @@ def test_eyrie_get_options_craft():
     eyrie.refresh_craft_activations(map)
     craft_options = eyrie.get_options_craft(map)
     assert [craft_option.item for craft_option in craft_options] == [Item("boot")]
-    eyrie.refresh_ambush_options()
-    assert eyrie.ambush == {
-            "rabbit": 1,
-            "mouse": 0,
-            "fox": 0,
-            "bird": 0,
-        }
+
     
 
 def test_alliance_revolt_options():
@@ -388,14 +374,7 @@ def test_alliance_get_options_craft():
     alliance.refresh_craft_activations(map)
     craft_options = alliance.get_options_craft(map)
     assert [craft_option.item for craft_option in craft_options] == [Item("boot")]
-    alliance.refresh_ambush_options()
-    assert alliance.ambush == {
-            "rabbit": 1,
-            "mouse": 0,
-            "fox": 0,
-            "bird": 0,
-        }
-    
+
 def test_alliance_get_options_train():
     game = Game(debug=True)
     alliance = game.alliance
@@ -610,5 +589,3 @@ def test_vagabond():
     aid_options = vagabond.get_aid_options(map, [marquise, eyrie, alliance]) # alliance, cat
     aid_options = sorted(aid_options, key= lambda x: (x[0], x[1], x[2]))
     assert aid_options == []
-
-test_discard_down_to_five()

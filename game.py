@@ -91,9 +91,11 @@ class Game():
             self.vagabond.quest_deck.add_card(self.quest_deck.draw_card())
 
     def stand_and_deliver(self, taker, victim):
+        if victim == "No one":
+            return
         victim.deck.shuffle_deck()
         taker.deck.add_card(victim.deck.draw_card())
-        taker.victory_points += 1
+        victim.victory_points += 1
 
     def better_burrow_bank(self, actor, other):
         actor.deck.add_card(self.deck.draw_card())
@@ -518,8 +520,25 @@ class Game():
             user.win_condition = suit
 
 
-    def ambush(self, place, attacker, counterambush):
-        if counterambush or attacker.scouting_party:
+    def ambush(self, place, attacker, defender, bird_or_suit_defender, bird_or_suit_attacker):
+        if bird_or_suit_defender == "suit":
+            for card in defender.deck.cards:
+                if card.craft == "ambush" and card.card_suit == place.suit:
+                    self.discard_deck.add_card(defender.deck.get_the_card(card.ID))
+        if bird_or_suit_defender == "bird":
+            for card in defender.deck.cards:
+                if card.craft == "ambush" and card.card_suit == "bird":
+                    self.discard_deck.add_card(defender.deck.get_the_card(card.ID))
+
+        if bird_or_suit_attacker or attacker.scouting_party:
+            if not attacker.scouting_party and bird_or_suit_attacker == "suit":
+                for card in attacker.deck.cards:
+                    if card.craft == "ambush" and card.card_suit == place.suit:
+                        self.discard_deck.add_card(attacker.deck.get_the_card(card.ID))
+            if not attacker.scouting_party and bird_or_suit_attacker == "bird":
+                for card in attacker.deck.cards:
+                    if card.craft == "ambush" and card.card_suit == "bird":
+                        self.discard_deck.add_card(attacker.deck.get_the_card(card.ID))
             return
 
         if attacker.name == "vagabond":
@@ -529,7 +548,7 @@ class Game():
         else:
             place.soldiers[attacker.name] -= 2 
             place.soldiers[attacker.name] = max(place.soldiers[attacker.name], 0)
-
+        place.update_owner()
 
     def build(self, place, actor, building, cost = 0):
         if actor.name == "cat": #Choosing which woods to remove is too much work for now

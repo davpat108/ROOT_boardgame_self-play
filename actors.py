@@ -25,12 +25,6 @@ class Actor():
             'alliance': False,
             'vagabond': False
         }
-        self.ambush ={
-            "rabbit": 0,
-            "mouse": 0,
-            "fox": 0,
-            "bird": 0,
-        }
         self.victory_points = 0
         self.craft_activations = {
             "rabbit": 0,
@@ -39,7 +33,6 @@ class Actor():
         }
         self.win_condition = "points" #None, rabbit, mouse, fox, bird, coalition
         self.refresh_craft_activations(map)
-        self.refresh_ambush_options()
     
     def __lt__(self, other):
         return self.name < other.name
@@ -66,7 +59,7 @@ class Actor():
         options = ['No one'] # Maybe you can take from supporter deck but its not implemented
         for actor in actors:
             if actor != self and len(actor.deck.cards) > 0:
-                options.append(actor.name)
+                options.append(actor)
         return options
 
     def bbb_options(self, actors):
@@ -97,11 +90,6 @@ class Actor():
                 matching_cards.append(card)
         return matching_cards
         
-    def refresh_ambush_options(self):
-        for card in self.deck.cards:
-            if card.craft_suit == "ambush":
-                self.ambush[card.card_suit] += 1
-    
     def card_to_give_to_alliace_options(self, suit):
         options = []
         for card in self.deck.cards:
@@ -115,9 +103,13 @@ class Actor():
         return [True, False]
     
     def get_ambush_options(self, place):
-        if self.ambush[place.suit] == 0:
-            return
-        return [True, False]
+        options = [False]
+        for card in self.deck.cards:
+            if card.craft == "ambush" and card.card_suit == place.suit and "suit" not in options:
+                options.append("suit")
+            if card.craft == "ambush" and card.card_suit == 'bird' and "bird" not in options:
+                options.append("bird")
+        return options
     
     def get_royal_claim_options(self):
         if not self.royal_claim:
@@ -133,7 +125,14 @@ class Actor():
             if place.soldiers[self.name] > 0:
                 options.append(place.name)
     
-
+    def get_counterambush_options(self, place):
+        options = [False]
+        for card in self.deck.cards:
+            if card.craft == "ambush" and card.card_suite == place.suit and "suit" not in options:
+                options.append("suit")
+            if card.craft == "ambush" and card.card_suite == 'bird' and "bird" not in options:
+                options.append("bird")
+        return options
 
 class Marquise(Actor):
     def __init__(self, map) -> None:

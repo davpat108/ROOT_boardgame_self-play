@@ -26,12 +26,13 @@ The bigger constats are located here.
 X means done XX means tested / means partially tested
 
 Vagabond discard items down to sack
-crafting XX, move action X/, build XX, recruit XX, overwork XX, revolt XX, sympathy XX, mobilize XX, train XX, organize XX, ruin_explore XX, aid XX, steal XX, complete quest XX, strike XX
+crafting XX, move action XX, build XX, recruit XX, overwork XX, revolt XX, sympathy XX, mobilize XX, train XX, organize XX, ruin_explore XX, aid XX, steal XX, complete quest XX, strike XX
 update victory points check gain-loss
 losing stuff in general 
 bird turmoil, leader choice, despot commander builder(and vp anyways) XX
 
 Cards:
+ambush XX
 Codebreaker X
 cobbler X should be accounted for during the game
 better burrow bank X  
@@ -39,11 +40,12 @@ tax collctor X
 armorers X
 sappers X
 brutal tactics X
-stand and deliver X
+stand and deliver XX
 command warren X should be accounted for during the game
-scouting party X
+scouting party XX
 royal claim X
 
 # TODO first gonna skip
 which woods to use to build, if you can build by the rule supply lines, you might be able to build unsupported wood
 which craft activations to use for royal claim
+which craft
