@@ -33,17 +33,17 @@ bird turmoil, leader choice, despot commander builder(and vp anyways) XX
 
 Cards:
 ambush XX
-Codebreaker X
-cobbler X should be accounted for during the game
-better burrow bank X  
-tax collctor X
-armorers X
-sappers X
-brutal tactics X
+Codebreaker XX
+cobbler XX should be accounted for during the game
+better burrow bank XX
+tax collctor XX
+armorers XX
+sappers XX
+brutal tactics XX
 stand and deliver XX
-command warren X should be accounted for during the game
+command warren XX should be accounted for during the game
 scouting party XX
-royal claim X
+royal claim XX
 
 # TODO first gonna skip
 which woods to use to build, if you can build by the rule supply lines, you might be able to build unsupported wood

@@ -246,9 +246,15 @@ class Game():
                 dmg_defender += min(dice_rolls[0], self.map.places[place_name].soldiers[defender])
 
         if armorers[0]:
+            for actor in [self.eyrie, self.vagabond, self.marquise, self.alliance]:
+                if actor.name == attacker:
+                    actor.armorers = False
             dmg_defender = 0
 
         if armorers[1]:
+            for actor in [self.eyrie, self.vagabond, self.marquise, self.alliance]:
+                if actor.name == defender:
+                    actor.armorers = False
             dmg_attacker = 0        
 
         # No defender
@@ -256,6 +262,9 @@ class Game():
             dmg_attacker = min(dmg_attacker, 1)
 
         if sappers:
+            for actor in [self.eyrie, self.vagabond, self.marquise, self.alliance]:
+                if actor.name == defender:
+                    actor.sappers = False
             dmg_defender += 1
 
         if brutal_tactics:
@@ -427,24 +436,19 @@ class Game():
             actor.deck.get_the_card(costs.card.ID)
         else:
             self.discard_deck.add_card(actor.deck.get_the_card(costs.card.ID))
-
-        if actor == "vagabond":
-            for _ in range(sum(costs.cost.values())):
-                actor.exhaust_item("hammer")
-        else:
-            if costs.cost == "anything": # Royal claim card, Making the AI choose what to deactivate is too much work for now
-                i = 4
-                for _ in range(i):
-                    for key in actor.craft_activations.keys():
-                        if not i:
-                            break
-                        if actor.craft_activations[key] > 0:
-                            actor.craft_activations[key] -= 1
-                            i -= 1
+        if costs.cost == "anything": # Royal claim card, Making the AI choose what to deactivate is too much work for now
+            i = 4
+            for _ in range(i):
+                for key in actor.craft_activations.keys():
                     if not i:
                         break
-            elif costs.cost:
-                actor.deactivate(costs.cost)
+                    if actor.craft_activations[key] > 0:
+                        actor.craft_activations[key] -= 1
+                        i -= 1
+                if not i:
+                    break
+        elif costs.cost:
+            actor.deactivate(costs.cost)
 
         if isinstance(costs.card.craft, Item):
             actor.add_item(costs.card.craft)

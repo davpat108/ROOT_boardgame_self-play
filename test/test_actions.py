@@ -371,8 +371,32 @@ def test_cards():
     assert len(game.eyrie.deck.cards) == 3
     assert game.eyrie.victory_points == 1
 
-    # SCOUTING PARTY IN BATTLE TESTS
-    
+    # SCOUTING PARTY and Ambush IN BATTLE TESTS
 
+    # CODEBREAKERS and crafting persistants in general
+    game.alliance.deck.add_card(game.deck.get_the_card(17))
+    game.map.places['E'].update_pieces(tokens = ['sympathy'])
+    game.alliance.refresh_craft_activations(game.map)
+    options = game.alliance.get_options_craft(game.map)
+    game.craft(game.alliance, options[0])
+    assert game.alliance.codebreakers == True
 
+    #Better_burrow_bank
+    game.eyrie.better_burrow_bank = True
+    options = game.eyrie.bbb_options([game.marquise, game.alliance, game.vagabond])
+    options.sort(key=lambda x: x.name)
+    assert options[0].name == "alliance"
+
+    game.eyrie.tax_collector = True
+    options = game.eyrie.get_tax_collector_options(game.map)
+    assert options == ['L']
+
+    game.map.places['H'].update_pieces(buildings = [('workshop', 'cat'), ('workshop', 'cat'), ('workshop', 'cat')])
+    game.marquise.deck.cards = []
+    game.marquise.deck.add_card(Card(*total_common_card_info[53]))
+    game.marquise.refresh_craft_activations(game.map)
+    options = game.marquise.get_options_craft(game.map)
+    game.craft(game.marquise, options[0])
+    assert game.marquise.royal_claim == True
+    assert game.marquise.deck.cards == []
 test_cards()

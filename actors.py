@@ -68,7 +68,7 @@ class Actor():
         options = []
         for actor in actors:
             if actor != self:
-                options.append(actor.name)
+                options.append(actor)
         return options
 
     def discard_down_to_five_options(self):
@@ -124,15 +124,9 @@ class Actor():
         for place in map.places.values():
             if place.soldiers[self.name] > 0:
                 options.append(place.name)
-    
-    def get_counterambush_options(self, place):
-        options = [False]
-        for card in self.deck.cards:
-            if card.craft == "ambush" and card.card_suite == place.suit and "suit" not in options:
-                options.append("suit")
-            if card.craft == "ambush" and card.card_suite == 'bird' and "bird" not in options:
-                options.append("bird")
         return options
+    
+
 
 class Marquise(Actor):
     def __init__(self, map) -> None:
@@ -150,7 +144,7 @@ class Marquise(Actor):
                 if card.craft_suit == "ambush":
                     pass
                 elif card.craft_suit == "anything":
-                    if sum(self.craft_activations.values()) > card.craft_cost:
+                    if sum(self.craft_activations.values()) >= card.craft_cost:
                         craft_options.append(CraftDTO(card))
                 elif card.craft_suit == "all":
                     if self.craft_activations["fox"] >= 1 and self.craft_activations["rabbit"] >= 1 and self.craft_activations["mouse"] >= 1:
@@ -444,7 +438,7 @@ class Eyrie(Actor):
                 elif self.craft_activations[card.craft_suit] >= card.craft_cost:
                     craft_options.append(CraftDTO(card))
                 elif card.craft_suit == "anything":
-                    if sum(self.craft_activations.values()) > card.craft_cost:
+                    if sum(self.craft_activations.values()) >= card.craft_cost:
                         craft_options.append(CraftDTO(card))
                 elif card.craft_suit == "all":
                     if self.craft_activations["fox"] >= 1 and self.craft_activations["rabbit"] >= 1 and self.craft_activations["mouse"] >= 1:
@@ -590,16 +584,16 @@ class Alliance(Actor):
             if card.craft in Immediate_non_item_effects or card.craft in map.craftables or card.craft in persistent_effects:
                 if card.craft_suit == "ambush":
                     pass
-                elif self.craft_activations[card.craft_suit] >= card.craft_cost:
-                    craft_options.append(CraftDTO(card))
                 elif card.craft_suit == "anything":
-                    if sum(self.craft_activations.values()) > card.craft_cost:
+                    if sum(self.craft_activations.values()) >= card.craft_cost:
                         craft_options.append(CraftDTO(card))
                 elif card.craft_suit == "all":
                     if self.craft_activations["fox"] >= 1 and self.craft_activations["rabbit"] >= 1 and self.craft_activations["mouse"] >= 1:
                         craft_options.append(CraftDTO(card))
                 elif card.craft_suit == "dominance" and self.victory_points >= 10 and self.win_condition == "points":
                     craft_options.append(CraftDTO(card))
+                elif self.craft_activations[card.craft_suit] >= card.craft_cost:
+                   craft_options.append(CraftDTO(card))
         return craft_options
     
     def get_mobilize_options(self):

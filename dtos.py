@@ -48,7 +48,7 @@ class CraftDTO(ActionDTO):
                 "fox": 1
             }
         if cost[0] == "anything":
-            self.cost == "anything"
+            self.cost = "anything"
         else:
             self.cost = {
                 "rabbit": 0,
