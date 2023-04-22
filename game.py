@@ -99,7 +99,7 @@ class Game():
 
     def better_burrow_bank(self, actor, other):
         actor.deck.add_card(self.deck.draw_card())
-        if len(self.deck.cards) == 0: # DECK ONE LINER
+        if len(self.deck.cards) >= 0: # DECK ONE LINER
             self.deck = self.discard_deck
             self.deck.shuffle_deck()
             self.discard_deck = Deck(empty=True)
@@ -112,7 +112,7 @@ class Game():
         self.map.places[placename].soldiers[actor.name] -= 1
         actor.deck.add_card(self.deck.draw_card())
         self.map.places[placename].update_owner()
-        if len(self.deck.cards) == 0: # DECK ONE LINER
+        if len(self.deck.cards) >= 0: # DECK ONE LINER
             self.deck = self.discard_deck
             self.deck.shuffle_deck()
             self.discard_deck = Deck(empty=True)
@@ -126,7 +126,7 @@ class Game():
     def cat_birdsong_wood(self):
         for key in list(self.map.places.keys()):
             for building_slot in self.map.places[key].building_slots:
-                if building_slot[0] == "sawmill":
+                if building_slot[0] == "sawmill" and self.map.count_on_map(('token', 'wood')) < 8:
                     self.map.places[key].update_pieces(tokens = self.map.places[key].tokens + ["wood"])  
 
     def add_card_to_decree(self, action, card_ID, card_suit):
@@ -145,7 +145,7 @@ class Game():
 
     def cat_use_bird_card_to_gain_move(self, cardID):
         self.discard_deck.add_card(self.marquise.deck.get_the_card(cardID))
-        if len(self.deck.cards) == 0: # DECK ONE LINER
+        if len(self.deck.cards) >= 0: # DECK ONE LINER
             self.deck = self.discard_deck
             self.deck.shuffle_deck()
             self.discard_deck = Deck(empty=True)
@@ -318,23 +318,29 @@ class Game():
             self.alliance.current_officers -= 1
         if attacker != "vagabond" and place.soldiers[attacker] == 0:
             return
+        
         # So vagabond cant attack its allies with its allies
         if attacker == "vagabond":
             if self.vagabond.relations[defender] == "friendly":
                 self.vagabond.allied_soldiers = self.remove_soldiers_from_vagabond_items(self.vagabond.allied_soldiers, defender)
                 self.vagabond.items_to_damage = self.remove_soldiers_from_vagabond_items(self.vagabond.items_to_damage, defender)
+
         victory_points_attacker = 0
         victory_points_defender = 0
         sympathy_killed = False
+
         # Process attacker's damage
         if defender == "vagabond":
             for item in self.vagabond.items_to_damage[:dmg_attacker]:
                 self.vagabond.damage_item(item)
         else:
             # If attacker dealt more damage than defender's soldiers, remove additional pieces
-            extra_dmg_attacker = dmg_attacker - place.soldiers[defender]
-            if attacker == "vagabond":
+            extra_dmg_attacker = max(dmg_attacker - place.soldiers[defender], 0)
+
+            # Accounting for the killed soldiers
+            if attacker == "vagabond": 
                 victory_points_attacker += dmg_attacker-extra_dmg_attacker
+            # If a defender soldier dies while set relations to hostile
             if attacker == "vagabond" and dmg_attacker-extra_dmg_attacker > 0 and self.vagabond.relations[defender] != "hostile":
                 self.vagabond.relations[defender] = "hostile"
                 victory_points_attacker-=1 # THAT one soldier doesn't count as VP
@@ -348,6 +354,8 @@ class Game():
                         victory_points_attacker += 1
                         if attacker == "vagabond" and self.vagabond.relations[defender] == "hostile":
                             victory_points_attacker += 1
+                        if piece[0] == 'sawmill' or piece[0] == 'workshop' or piece[0] == 'recruiter':
+                            self.marquise.victory_points -= buildings_list_marquise[piece[0]]["VictoryPoints"][self.map.count_on_map(("building", piece[0]))+1] # +1 because we already removed the building
                     elif piece[1] == "token":
                         place.tokens.remove(piece[0])
                         victory_points_attacker += 1
@@ -355,6 +363,7 @@ class Game():
                             victory_points_attacker += 1
                         if piece[0] == "sympathy":
                             sympathy_killed = True
+                            self.alliance.victory_points -= sympathy_VPs[self.map.count_on_map(("token", "sympathy"))+1]
 
 
         # Process defender's damage
@@ -372,9 +381,10 @@ class Game():
 
         else:
             # If defender dealt more damage than attacker's soldiers, remove additional pieces
-            extra_dmg_defender = dmg_defender - place.soldiers[attacker]
+            extra_dmg_defender = max(dmg_defender - place.soldiers[attacker], 0)
             if defender == "vagabond" and dmg_defender-extra_dmg_defender > 0:
                 self.vagabond.relations[attacker] = "hostile"
+
             if extra_dmg_defender <=0:
                 place.soldiers[attacker] -= dmg_defender
             else:
@@ -383,24 +393,37 @@ class Game():
                     if piece[1] == "building":
                         place.remove_building(piece[0])
                         victory_points_defender += 1
+                        if piece[0] == 'sawmill' or piece[0] == 'workshop' or piece[0] == 'recruiter':
+                            self.marquise.victory_points -= buildings_list_marquise[piece[0]]["VictoryPoints"][self.map.count_on_map(("building", piece[0]))+1] # +1 because we already removed the building
                     elif piece[1] == "token":
                         place.tokens.remove(piece[0])
                         victory_points_defender += 1
                         if piece[0] == "sympathy":
                             sympathy_killed = True
+                            self.alliance.victory_points -= sympathy_VPs[self.map.count_on_map(("token", "sympathy"))+1]
 
         for actor in [self.eyrie, self.vagabond, self.marquise, self.alliance]:
             if actor.name == attacker:
                 actor.victory_points += victory_points_attacker
                 if sympathy_killed and card_to_give_if_sympathy:
                     self.alliance.supporter_deck.add_card(actor.deck.get_the_card(card_to_give_if_sympathy.ID)) # CORRECT ASSUMING card_to_give_if_no_sympathy is correct
+                if sympathy_killed and not card_to_give_if_sympathy:
+                    self.alliance.supporter_deck.add_card(self.deck.draw_card())
 
 
             elif actor.name == defender:
                 actor.victory_points += victory_points_defender
                 if sympathy_killed and card_to_give_if_sympathy:
                     self.alliance.supporter_deck.add_card(actor.deck.get_the_card(card_to_give_if_sympathy.ID))#CORRECT ASSUMING card_to_give_if_no_sympathy is correct
+                if sympathy_killed and not card_to_give_if_sympathy:
+                    self.alliance.supporter_deck.add_card(self.deck.draw_card())
+
         place.update_owner()
+        if len(self.deck.cards) <=0:
+            self.deck = self.discard_deck
+            self.deck.shuffle_deck()
+            self.discard_deck = Deck(empty=True)
+
 
     def move(self, move_action, card_to_give_if_sympathy):
         if move_action.who != 'vagabond':
@@ -409,8 +432,15 @@ class Game():
 
         if move_action.who != 'alliance' and self.map.places[move_action.end].tokens.count("sympathy") > 0:
             for actor in [self.eyrie, self.vagabond, self.marquise]:
-                if actor.name == move_action.who:
+                if actor.name == move_action.who and card_to_give_if_sympathy:
                     self.alliance.supporter_deck.add_card(actor.deck.get_the_card(card_to_give_if_sympathy.ID))
+                if actor.name == move_action.who and not card_to_give_if_sympathy:
+                    self.alliance.supporter_deck.add_card(self.deck.draw_card())
+
+        if len(self.deck.cards) <= 0:
+            self.deck = self.discard_deck
+            self.deck.shuffle_deck()
+            self.discard_deck = Deck(empty=True)
 
         if move_action.who == 'vagabond':
             self.map.move_vagabond(move_action.end)
@@ -701,6 +731,10 @@ class Game():
 
         if draw_or_VP == "draw":
             self.vagabond.deck.add_card(self.deck.draw_card())
+            if len(self.deck.cards) <=0:
+                self.deck = self.discard_deck
+                self.deck.shuffle_deck()
+                self.discard_deck = Deck(empty=True)
         if draw_or_VP == "VP":
             self.vagabond.victory_points += sum([card.suit == vagabond_quest_card_info[quest_card_ID][-1] for card in self.discard_quest_deck.cards])
 
@@ -711,10 +745,20 @@ class Game():
         self.vagabond.quest_deck.add_card(self.quest_deck.draw_card())
 
 
-    def strike(self, placename, opponent, target):
+    def strike(self, placename, opponent, target, card_to_give_if_sympathy):
         if target == "wood" or target == "keep" or target == "sympathy":
             self.map.places[placename].tokens.remove(target)
             self.vagabond.victory_points += 1
+            if target == "sympathy" and card_to_give_if_sympathy:
+                self.alliance.supporter_deck.add_card(self.vagabond.deck.get_the_card(card_to_give_if_sympathy))
+            if target == "sympathy" and not  card_to_give_if_sympathy:
+                self.alliance.supporter_deck.add_card(self.deck.draw_card())
+                if len(self.deck.cards) <= 0:
+                    self.deck = self.discard_deck
+                    self.deck.shuffle_deck()
+                    self.discard_deck = Deck(empty=True)
+            if target == "sympathy":
+                self.alliance.victory_points -= sympathy_VPs[self.map.count_on_map(("token", "sympathy"))+1]
 
         elif target == "soldier":
             self.map.places[placename].soldiers[opponent] -= 1
@@ -725,6 +769,8 @@ class Game():
                 if self.map.places[placename].building_slots[i][0] == target:
                     self.map.places[placename].building_slots[i] = ("empty", "No one")
                     victory_points += 1
+                    if target == 'sawmill' or target == 'workshop' or target == 'recruiter':
+                        self.marquise.victory_points -= buildings_list_marquise[target]["VictoryPoints"][self.map.count_on_map(("building", target))+1] # +1 because we already removed the building
                     break
         self.map.places[placename].update_owner()
 

@@ -349,16 +349,18 @@ def test_vagabond_explore_stuff():
 
     # STRIKE
     game.vagabond.repair_and_refresh_all()
+    game.vagabond.deck.add_card(Card(*total_common_card_info[22]))
     game.map.places['H'].update_pieces(tokens = ['sympathy', 'wood'])
     options = game.vagabond.get_strike_options(game.map)
     options.sort(key=lambda x: (x[1], x[2]))
-    game.strike(*options[1])
+    game.strike(*options[1], card_to_give_if_sympathy=22)
     assert game.vagabond.victory_points == 4
     assert game.map.places['H'].tokens == ['sympathy', 'wood']
     assert game.map.places['H'].soldiers == {'cat': 0, 'bird': 0, 'alliance': 0}
-    game.strike(*options[0]) # Should not be used like this, but it's just a test
+    game.strike(*options[0], card_to_give_if_sympathy=22) # Should not be used like this, but it's just a test
     assert game.vagabond.victory_points == 5
     assert game.map.places['H'].tokens == ['wood']
+    assert game.alliance.supporter_deck.get_the_card(22) != "Card not in the deck"
 
 def test_cards():
 
@@ -399,4 +401,5 @@ def test_cards():
     game.craft(game.marquise, options[0])
     assert game.marquise.royal_claim == True
     assert game.marquise.deck.cards == []
-test_cards()
+
+test_vagabond_explore_stuff()
