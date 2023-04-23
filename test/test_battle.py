@@ -19,11 +19,11 @@ def test_resolve_battle():
     game.map.places['H'].update_pieces(soldiers ={'cat': 3, 'bird': 1, 'alliance': 0}, buildings = [('sawmill', 'cat'), ('workshop', 'cat'), ('roost', 'bird'),], tokens = ['wood'])
     game.map.update_owners()
     
-    attacker_pice_lose_priorities = ['wood','sawmill', 'workshop', 'recruiter', 'keep']
-    defender_pice_lose_priorities = ['roost']
+    attacker_piece_lose_priorities = ['wood','sawmill', 'workshop', 'recruiter', 'keep']
+    defender_piece_lose_priorities = ['roost']
 
-    attacker_chosen_pieces = game.priority_to_list(attacker_pice_lose_priorities, game.map.places['H'], attacker)
-    defender_chosen_pieces = game.priority_to_list(defender_pice_lose_priorities, game.map.places['H'], defender)
+    attacker_chosen_pieces = game.priority_to_list(attacker_piece_lose_priorities, game.map.places['H'], attacker)
+    defender_chosen_pieces = game.priority_to_list(defender_piece_lose_priorities, game.map.places['H'], defender)
     dmg_attacker, dmg_defender = game.get_battle_damages(attacker, defender, dice_rolls, place_name, armorers = [False, False])
     game.resolve_battle(game.map.places['H'], attacker, defender, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces)
     assert game.map.places['H'].soldiers['cat'] == 2
@@ -39,10 +39,10 @@ def test_resolve_battle():
     game.map.places['H'].update_pieces(soldiers ={'cat': 3, 'bird': 1, 'alliance': 0}, buildings = [('sawmill', 'cat'), ('workshop', 'cat'), ('roost', 'bird'),], tokens = ['wood'])
     game.map.update_owners()
     
-    attacker_pice_lose_priorities = ['wood','sawmill', 'workshop', 'recruiter', 'keep']
-    defender_pice_lose_priorities = ['roost']
-    attacker_chosen_pieces = game.priority_to_list(attacker_pice_lose_priorities, game.map.places['H'], attacker)
-    defender_chosen_pieces = game.priority_to_list(defender_pice_lose_priorities, game.map.places['H'], defender)
+    attacker_piece_lose_priorities = ['wood','sawmill', 'workshop', 'recruiter', 'keep']
+    defender_piece_lose_priorities = ['roost']
+    attacker_chosen_pieces = game.priority_to_list(attacker_piece_lose_priorities, game.map.places['H'], attacker)
+    defender_chosen_pieces = game.priority_to_list(defender_piece_lose_priorities, game.map.places['H'], defender)
     game.eyrie.deck.add_card(game.deck.get_the_card(48))
     options_defender = game.eyrie.get_ambush_options(game.map.places['H'])
     if options_defender[1]:
@@ -64,10 +64,10 @@ def test_resolve_battle():
     game.map.update_owners()
     game.marquise.scouting_party = True
     
-    attacker_pice_lose_priorities = ['wood','sawmill', 'workshop', 'recruiter', 'keep']
-    defender_pice_lose_priorities = ['roost']
-    attacker_chosen_pieces = game.priority_to_list(attacker_pice_lose_priorities, game.map.places['H'], attacker)
-    defender_chosen_pieces = game.priority_to_list(defender_pice_lose_priorities, game.map.places['H'], defender)
+    attacker_piece_lose_priorities = ['wood','sawmill', 'workshop', 'recruiter', 'keep']
+    defender_piece_lose_priorities = ['roost']
+    attacker_chosen_pieces = game.priority_to_list(attacker_piece_lose_priorities, game.map.places['H'], attacker)
+    defender_chosen_pieces = game.priority_to_list(defender_piece_lose_priorities, game.map.places['H'], defender)
     game.eyrie.deck.add_card(game.deck.get_the_card(25))
     options_defender = game.eyrie.get_ambush_options(game.map.places['H'])
     if options_defender[1]:
@@ -89,10 +89,10 @@ def test_resolve_battle():
     game.map.update_owners()
     game.marquise.scouting_party = False
     
-    attacker_pice_lose_priorities = ['wood','sawmill', 'workshop', 'recruiter', 'keep']
-    defender_pice_lose_priorities = ['roost']
-    attacker_chosen_pieces = game.priority_to_list(attacker_pice_lose_priorities, game.map.places['H'], attacker)
-    defender_chosen_pieces = game.priority_to_list(defender_pice_lose_priorities, game.map.places['H'], defender)
+    attacker_piece_lose_priorities = ['wood','sawmill', 'workshop', 'recruiter', 'keep']
+    defender_piece_lose_priorities = ['roost']
+    attacker_chosen_pieces = game.priority_to_list(attacker_piece_lose_priorities, game.map.places['H'], attacker)
+    defender_chosen_pieces = game.priority_to_list(defender_piece_lose_priorities, game.map.places['H'], defender)
     game.eyrie.deck.add_card(game.discard_deck.get_the_card(25))
     game.marquise.deck.add_card(game.deck.get_the_card(49))
     options_defender = game.eyrie.get_ambush_options(game.map.places['H'])
@@ -108,15 +108,15 @@ def test_resolve_battle():
     assert game.marquise.deck.get_the_card(49) == "Card not in the deck"
 
     # BIRDS VS CAT more cat
-    defender_pice_lose_priorities = ['wood','sawmill', 'workshop', 'recruiter', 'keep']
-    attacker_pice_lose_priorities = ['roost']
+    defender_piece_lose_priorities = ['wood','sawmill', 'workshop', 'recruiter', 'keep']
+    attacker_piece_lose_priorities = ['roost']
     game.map.places['H'].update_pieces(soldiers ={'cat': 3, 'bird': 1, 'alliance': 0}, buildings = [('sawmill', 'cat'), ('workshop', 'cat'), ('roost', 'bird'),], tokens = ['wood'])
     game.map.update_owners()
     attacker = 'bird'
     defender = 'cat'
 
-    attacker_chosen_pieces = game.priority_to_list(attacker_pice_lose_priorities, game.map.places['H'], attacker)
-    defender_chosen_pieces = game.priority_to_list(defender_pice_lose_priorities, game.map.places['H'], defender)
+    attacker_chosen_pieces = game.priority_to_list(attacker_piece_lose_priorities, game.map.places['H'], attacker)
+    defender_chosen_pieces = game.priority_to_list(defender_piece_lose_priorities, game.map.places['H'], defender)
     dmg_attacker, dmg_defender = game.get_battle_damages(attacker, defender, dice_rolls, place_name, armorers = [False, False])
     game.resolve_battle(game.map.places['H'], attacker, defender, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces)
     assert game.map.places['H'].soldiers['cat'] == 2
@@ -126,15 +126,15 @@ def test_resolve_battle():
     # LOTS OF BIRDS + OWL BONUS VS 2 CATS
     game.map.places['H'].update_pieces(soldiers ={'cat': 2, 'bird': 3, 'alliance': 0}, buildings = [('sawmill', 'cat'), ('workshop', 'cat'), ('roost', 'bird'),], tokens = ['wood'])
     game.map.update_owners()
-    defender_pice_lose_priorities = ['wood','sawmill', 'workshop', 'recruiter', 'keep']
-    attacker_pice_lose_priorities = ['roost']
+    defender_piece_lose_priorities = ['wood','sawmill', 'workshop', 'recruiter', 'keep']
+    attacker_piece_lose_priorities = ['roost']
     attacker = 'bird'
     defender = 'cat'
     game.eyrie.change_role('Commander')
     dice_rolls = [3, 3]
     
-    attacker_chosen_pieces = game.priority_to_list(attacker_pice_lose_priorities, game.map.places['H'], attacker)
-    defender_chosen_pieces = game.priority_to_list(defender_pice_lose_priorities, game.map.places['H'], defender)
+    attacker_chosen_pieces = game.priority_to_list(attacker_piece_lose_priorities, game.map.places['H'], attacker)
+    defender_chosen_pieces = game.priority_to_list(defender_piece_lose_priorities, game.map.places['H'], defender)
     dmg_attacker, dmg_defender = game.get_battle_damages(attacker, defender, dice_rolls, place_name, armorers = [False, False])
     game.resolve_battle(game.map.places['H'], attacker, defender, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces)
     assert game.map.places['H'].soldiers['cat'] == 0
@@ -145,14 +145,14 @@ def test_resolve_battle():
     # CATS VS BIRDS + OWL BONUS (shouldn't apply)
     game.map.places['H'].update_pieces(soldiers ={'cat': 2, 'bird': 3, 'alliance': 0}, buildings = [('sawmill', 'cat'), ('workshop', 'cat'), ('roost', 'bird'),], tokens = ['wood'])
     game.map.update_owners()
-    attacker_pice_lose_priorities = ['wood','sawmill', 'workshop', 'recruiter', 'keep']
-    defender_pice_lose_priorities = ['roost']
+    attacker_piece_lose_priorities = ['wood','sawmill', 'workshop', 'recruiter', 'keep']
+    defender_piece_lose_priorities = ['roost']
     attacker = 'cat'
     defender = 'bird'
     dice_rolls = [3, 3]
 
-    attacker_chosen_pieces = game.priority_to_list(attacker_pice_lose_priorities, game.map.places['H'], attacker)
-    defender_chosen_pieces = game.priority_to_list(defender_pice_lose_priorities, game.map.places['H'], defender)    
+    attacker_chosen_pieces = game.priority_to_list(attacker_piece_lose_priorities, game.map.places['H'], attacker)
+    defender_chosen_pieces = game.priority_to_list(defender_piece_lose_priorities, game.map.places['H'], defender)    
     dmg_attacker, dmg_defender = game.get_battle_damages(attacker, defender, dice_rolls, place_name, armorers = [False, False])
     game.resolve_battle(game.map.places['H'], attacker, defender, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces)
     assert game.map.places['H'].soldiers['cat'] == 0
@@ -165,8 +165,8 @@ def test_resolve_battle():
     game.map.places['H'].update_pieces(soldiers ={'cat': 2, 'bird': 3, 'alliance': 0}, buildings = [('sawmill', 'cat'), ('workshop', 'cat'), ('roost', 'bird'),], tokens = ['wood'])
     game.map.update_owners()
     game.map.move_vagabond('H')
-    attacker_pice_lose_priorities = []
-    defender_pice_lose_priorities = ['wood','sawmill', 'workshop', 'recruiter', 'keep']
+    attacker_piece_lose_priorities = []
+    defender_piece_lose_priorities = ['wood','sawmill', 'workshop', 'recruiter', 'keep']
     attacker = 'vagabond'
     defender = 'cat'
     dice_rolls = [3, 3]
@@ -176,8 +176,8 @@ def test_resolve_battle():
     game.vagabond.items_to_damage = [Item('money'), Item('sack'), Item('boot'), Item('root_tea'), Item('hammer'), Item('crossbow'), Item('torch'), Item('sword')]
 
     assert game.vagabond.other_items[game.vagabond.other_items.index(Item('money'))].damaged == False
-    attacker_chosen_pieces = game.priority_to_list(attacker_pice_lose_priorities, game.map.places['H'], attacker)
-    defender_chosen_pieces = game.priority_to_list(defender_pice_lose_priorities, game.map.places['H'], defender)
+    attacker_chosen_pieces = game.priority_to_list(attacker_piece_lose_priorities, game.map.places['H'], attacker)
+    defender_chosen_pieces = game.priority_to_list(defender_piece_lose_priorities, game.map.places['H'], defender)
     dmg_attacker, dmg_defender = game.get_battle_damages(attacker, defender, dice_rolls, place_name, armorers = [False, False])
     game.resolve_battle(game.map.places['H'], attacker, defender, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces)
     assert game.map.places['H'].soldiers['cat'] == 0
@@ -192,8 +192,8 @@ def test_resolve_battle():
     game.map.update_owners()
     game.vagabond = Vagabond(game.map)
     game.map.move_vagabond('H')
-    defender_pice_lose_priorities = []
-    attacker_pice_lose_priorities = ['wood','sawmill', 'workshop', 'recruiter', 'keep']
+    defender_piece_lose_priorities = []
+    attacker_piece_lose_priorities = ['wood','sawmill', 'workshop', 'recruiter', 'keep']
     attacker = 'cat'
     defender = 'vagabond'
     dice_rolls = [3, 3]
@@ -203,8 +203,8 @@ def test_resolve_battle():
     game.vagabond.items_to_damage = [Item('money'), Item('boot'), Item('root_tea'), Item('hammer'), Item('crossbow'), Item('torch'), Item('sword')]
 
     assert game.vagabond.other_items[game.vagabond.other_items.index(Item('money'))].damaged == False
-    attacker_chosen_pieces = game.priority_to_list(attacker_pice_lose_priorities, game.map.places['H'], attacker)
-    defender_chosen_pieces = game.priority_to_list(defender_pice_lose_priorities, game.map.places['H'], defender)
+    attacker_chosen_pieces = game.priority_to_list(attacker_piece_lose_priorities, game.map.places['H'], attacker)
+    defender_chosen_pieces = game.priority_to_list(defender_piece_lose_priorities, game.map.places['H'], defender)
     dmg_attacker, dmg_defender = game.get_battle_damages(attacker, defender, dice_rolls, place_name, armorers = [False, False])
     game.resolve_battle(game.map.places['H'], attacker, defender, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces)
     assert game.map.places['H'].soldiers['cat'] == 0
@@ -220,8 +220,8 @@ def test_resolve_battle():
     game.map.update_owners()
     game.vagabond = Vagabond(game.map)
     game.map.move_vagabond('H')
-    attacker_pice_lose_priorities = []
-    defender_pice_lose_priorities = ['sympathy','base']
+    attacker_piece_lose_priorities = []
+    defender_piece_lose_priorities = ['sympathy','base']
     attacker = 'vagabond'
     defender = 'alliance'
     dice_rolls = [3, 0]
@@ -233,8 +233,8 @@ def test_resolve_battle():
     card_to_give_if_no_sympathy = Card(*total_common_card_info[17])
 
     assert game.vagabond.other_items[game.vagabond.other_items.index(Item('money'))].damaged == False
-    attacker_chosen_pieces = game.priority_to_list(attacker_pice_lose_priorities, game.map.places['H'], attacker)
-    defender_chosen_pieces = game.priority_to_list(defender_pice_lose_priorities, game.map.places['H'], defender)
+    attacker_chosen_pieces = game.priority_to_list(attacker_piece_lose_priorities, game.map.places['H'], attacker)
+    defender_chosen_pieces = game.priority_to_list(defender_piece_lose_priorities, game.map.places['H'], defender)
     dmg_attacker, dmg_defender = game.get_battle_damages(attacker, defender, dice_rolls, place_name, armorers = [False, False])
     game.resolve_battle(game.map.places['H'], attacker, defender, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces, card_to_give_if_no_sympathy)
     assert game.map.places['H'].soldiers['alliance'] == 1
@@ -249,8 +249,8 @@ def test_resolve_battle():
     game.vagabond = Vagabond(game.map)
     game.alliance.supporter_deck = Deck(empty=True)
     game.map.move_vagabond('H')
-    defender_pice_lose_priorities = []
-    attacker_pice_lose_priorities = ['sympathy','base']
+    defender_piece_lose_priorities = []
+    attacker_piece_lose_priorities = ['sympathy','base']
     attacker = 'alliance'
     defender = 'vagabond'
     dice_rolls = [3, 3]
@@ -262,8 +262,8 @@ def test_resolve_battle():
     card_to_give_if_no_sympathy = Card(*total_common_card_info[17])
 
     assert game.vagabond.other_items[game.vagabond.other_items.index(Item('money'))].damaged == False
-    attacker_chosen_pieces = game.priority_to_list(attacker_pice_lose_priorities, game.map.places['H'], attacker)
-    defender_chosen_pieces = game.priority_to_list(defender_pice_lose_priorities, game.map.places['H'], defender)
+    attacker_chosen_pieces = game.priority_to_list(attacker_piece_lose_priorities, game.map.places['H'], attacker)
+    defender_chosen_pieces = game.priority_to_list(defender_piece_lose_priorities, game.map.places['H'], defender)
     dmg_attacker, dmg_defender = game.get_battle_damages(attacker, defender, dice_rolls, place_name, armorers = [False, False])
     game.resolve_battle(game.map.places['H'], attacker, defender, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces, card_to_give_if_no_sympathy)
     assert game.map.places['H'].soldiers['alliance'] == 0
@@ -279,8 +279,8 @@ def test_resolve_battle():
     game.map.update_owners()
     game.vagabond = Vagabond(game.map)
     game.map.move_vagabond('H')
-    defender_pice_lose_priorities = []
-    attacker_pice_lose_priorities = []
+    defender_piece_lose_priorities = []
+    attacker_piece_lose_priorities = []
     attacker = 'vagabond'
     defender = 'cat'
     dice_rolls = [3, 3]
@@ -288,8 +288,8 @@ def test_resolve_battle():
     game.vagabond.allied_soldiers = ['bird', 'bird', 'bird']
     game.vagabond.items_to_damage = ['bird', 'bird',  Item('torch'), Item('sword')]
 
-    attacker_chosen_pieces = game.priority_to_list(attacker_pice_lose_priorities, game.map.places['H'], attacker)
-    defender_chosen_pieces = game.priority_to_list(defender_pice_lose_priorities, game.map.places['H'], defender)
+    attacker_chosen_pieces = game.priority_to_list(attacker_piece_lose_priorities, game.map.places['H'], attacker)
+    defender_chosen_pieces = game.priority_to_list(defender_piece_lose_priorities, game.map.places['H'], defender)
     dmg_attacker, dmg_defender = game.get_battle_damages(attacker, defender, dice_rolls, place_name, armorers = [False, False])
     game.resolve_battle(game.map.places['H'], attacker, defender, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces, card_to_give_if_no_sympathy)
     assert game.map.places['H'].soldiers['cat'] == 0
@@ -302,8 +302,8 @@ def test_resolve_battle():
     game.map.update_owners()
     game.vagabond = Vagabond(game.map)
     game.map.move_vagabond('H')
-    defender_pice_lose_priorities = []
-    attacker_pice_lose_priorities = []
+    defender_piece_lose_priorities = []
+    attacker_piece_lose_priorities = []
     attacker = 'vagabond'
     defender = 'cat'
     dice_rolls = [3, 3]
@@ -311,8 +311,8 @@ def test_resolve_battle():
     game.vagabond.allied_soldiers = ['bird', 'bird', 'bird']
     game.vagabond.items_to_damage = ['bird',  Item('torch'), 'bird', Item('sword')]
 
-    attacker_chosen_pieces = game.priority_to_list(attacker_pice_lose_priorities, game.map.places['H'], attacker)
-    defender_chosen_pieces = game.priority_to_list(defender_pice_lose_priorities, game.map.places['H'], defender)
+    attacker_chosen_pieces = game.priority_to_list(attacker_piece_lose_priorities, game.map.places['H'], attacker)
+    defender_chosen_pieces = game.priority_to_list(defender_piece_lose_priorities, game.map.places['H'], defender)
     dmg_attacker, dmg_defender = game.get_battle_damages(attacker, defender, dice_rolls, place_name, armorers = [False, False])
     game.resolve_battle(game.map.places['H'], attacker, defender, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces, card_to_give_if_no_sympathy)
     assert game.map.places['H'].soldiers['bird'] == 2
@@ -324,8 +324,8 @@ def test_resolve_battle():
     game.map.update_owners()
     game.vagabond = Vagabond(game.map)
     game.map.move_vagabond('H')
-    defender_pice_lose_priorities = []
-    attacker_pice_lose_priorities = []
+    defender_piece_lose_priorities = []
+    attacker_piece_lose_priorities = []
     attacker = 'vagabond'
     defender = 'bird'
     dice_rolls = [3, 3]
@@ -333,8 +333,8 @@ def test_resolve_battle():
     game.vagabond.allied_soldiers = ['bird', 'bird', 'bird']
     game.vagabond.items_to_damage = ['bird',  Item('torch'), 'bird', Item('sword'), Item('boot')]
 
-    attacker_chosen_pieces = game.priority_to_list(attacker_pice_lose_priorities, game.map.places['H'], attacker)
-    defender_chosen_pieces = game.priority_to_list(defender_pice_lose_priorities, game.map.places['H'], defender)
+    attacker_chosen_pieces = game.priority_to_list(attacker_piece_lose_priorities, game.map.places['H'], attacker)
+    defender_chosen_pieces = game.priority_to_list(defender_piece_lose_priorities, game.map.places['H'], defender)
     dmg_attacker, dmg_defender = game.get_battle_damages(attacker, defender, dice_rolls, place_name, armorers = [False, False])
     game.resolve_battle(game.map.places['H'], attacker, defender, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces, card_to_give_if_no_sympathy)
     assert game.map.places['H'].soldiers['cat'] == 0
@@ -352,11 +352,11 @@ def test_resolve_battle():
     game.map.update_owners()
     game.marquise.armorers = True
     
-    attacker_pice_lose_priorities = ['wood','sawmill', 'workshop', 'recruiter', 'keep']
-    defender_pice_lose_priorities = ['roost']
+    attacker_piece_lose_priorities = ['wood','sawmill', 'workshop', 'recruiter', 'keep']
+    defender_piece_lose_priorities = ['roost']
 
-    attacker_chosen_pieces = game.priority_to_list(attacker_pice_lose_priorities, game.map.places['H'], attacker)
-    defender_chosen_pieces = game.priority_to_list(defender_pice_lose_priorities, game.map.places['H'], defender)
+    attacker_chosen_pieces = game.priority_to_list(attacker_piece_lose_priorities, game.map.places['H'], attacker)
+    defender_chosen_pieces = game.priority_to_list(defender_piece_lose_priorities, game.map.places['H'], defender)
     dmg_attacker, dmg_defender = game.get_battle_damages(attacker, defender, dice_rolls, place_name, armorers = [True, False]) #armoeres index 0 attac 1 def
     game.resolve_battle(game.map.places['H'], attacker, defender, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces)
     assert game.map.places['H'].soldiers['cat'] == 3
@@ -374,11 +374,11 @@ def test_resolve_battle():
     game.map.update_owners()
     game.eyrie.armorers = True
     
-    attacker_pice_lose_priorities = ['wood','sawmill', 'workshop', 'recruiter', 'keep']
-    defender_pice_lose_priorities = ['roost']
+    attacker_piece_lose_priorities = ['wood','sawmill', 'workshop', 'recruiter', 'keep']
+    defender_piece_lose_priorities = ['roost']
 
-    attacker_chosen_pieces = game.priority_to_list(attacker_pice_lose_priorities, game.map.places['H'], attacker)
-    defender_chosen_pieces = game.priority_to_list(defender_pice_lose_priorities, game.map.places['H'], defender)
+    attacker_chosen_pieces = game.priority_to_list(attacker_piece_lose_priorities, game.map.places['H'], attacker)
+    defender_chosen_pieces = game.priority_to_list(defender_piece_lose_priorities, game.map.places['H'], defender)
     dmg_attacker, dmg_defender = game.get_battle_damages(attacker, defender, dice_rolls, place_name, armorers = [False, True]) #armoeres index 0 attac 1 def
     game.resolve_battle(game.map.places['H'], attacker, defender, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces)
     assert game.map.places['H'].soldiers['cat'] == 2
@@ -396,11 +396,11 @@ def test_resolve_battle():
     game.map.update_owners()
     game.marquise.brutal_tactics = True
     
-    attacker_pice_lose_priorities = ['wood','sawmill', 'workshop', 'recruiter', 'keep']
-    defender_pice_lose_priorities = ['roost']
+    attacker_piece_lose_priorities = ['wood','sawmill', 'workshop', 'recruiter', 'keep']
+    defender_piece_lose_priorities = ['roost']
 
-    attacker_chosen_pieces = game.priority_to_list(attacker_pice_lose_priorities, game.map.places['H'], attacker)
-    defender_chosen_pieces = game.priority_to_list(defender_pice_lose_priorities, game.map.places['H'], defender)
+    attacker_chosen_pieces = game.priority_to_list(attacker_piece_lose_priorities, game.map.places['H'], attacker)
+    defender_chosen_pieces = game.priority_to_list(defender_piece_lose_priorities, game.map.places['H'], defender)
     dmg_attacker, dmg_defender = game.get_battle_damages(attacker, defender, dice_rolls, place_name, armorers = [False, False], brutal_tactics=True) #armoeres index 0 attac 1 def
     game.resolve_battle(game.map.places['H'], attacker, defender, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces)
     assert game.map.places['H'].soldiers['cat'] == 2
@@ -419,11 +419,11 @@ def test_resolve_battle():
     game.map.update_owners()
     game.eyrie.sappers = True
     
-    attacker_pice_lose_priorities = ['wood','sawmill', 'workshop', 'recruiter', 'keep']
-    defender_pice_lose_priorities = ['roost']
+    attacker_piece_lose_priorities = ['wood','sawmill', 'workshop', 'recruiter', 'keep']
+    defender_piece_lose_priorities = ['roost']
 
-    attacker_chosen_pieces = game.priority_to_list(attacker_pice_lose_priorities, game.map.places['H'], attacker)
-    defender_chosen_pieces = game.priority_to_list(defender_pice_lose_priorities, game.map.places['H'], defender)
+    attacker_chosen_pieces = game.priority_to_list(attacker_piece_lose_priorities, game.map.places['H'], attacker)
+    defender_chosen_pieces = game.priority_to_list(defender_piece_lose_priorities, game.map.places['H'], defender)
     dmg_attacker, dmg_defender = game.get_battle_damages(attacker, defender, dice_rolls, place_name, armorers = [False, False], sappers=True) #armoeres index 0 attac 1 def
     game.resolve_battle(game.map.places['H'], attacker, defender, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces)
     assert game.map.places['H'].soldiers['cat'] == 1

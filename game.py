@@ -773,7 +773,60 @@ class Game():
                         self.marquise.victory_points -= buildings_list_marquise[target]["VictoryPoints"][self.map.count_on_map(("building", target))+1] # +1 because we already removed the building
                     break
         self.map.places[placename].update_owner()
-
-
+        
 def random_choose(options):
     return random.choice(options)
+
+#BATTLE HELPER FUNCTIONS
+def get_loss_prios(actor_name):
+    if actor_name == 'bird':
+        return ['roost']
+    if actor_name == 'cat':
+        options = ['sawmill', 'workshop', 'recruiter', 'wood', 'keep']
+        random.shuffle(options)
+        return options
+    if actor_name == 'alliance':
+        return ['sympathy', "base"]
+    if actor_name == 'vagabond':
+        return []
+    
+def roll_dice():
+    dice1 = random.randint(0,3)
+    dice2 = random.randint(0,3)
+    return [dice1, dice2]
+
+def get_sappers_usage(defender_name, game):
+    for actor in [game.marquise, game.alliance, game.eyrie, game.vagabond]:
+        if actor.name == defender_name:
+            return actor.get_sappers_options()
+    
+def get_ambush_usage(defender_name, game, placename):
+    for actor in [game.marquise, game.alliance, game.eyrie, game.vagabond]:
+        if actor.name == defender_name:
+            ambush_options = actor.get_ambush_options(game.map.places[placename])
+    return ambush_options
+
+
+def battle_cat(game, option):
+    # AMBUSH
+    ambush_options_defender = get_ambush_usage(option.against_whom, game, option.where)
+    ambush_option = random_choose(ambush_options_defender)
+    if ambush_option:
+        options_attacker = game.marquise.get_ambush_options(game.map.places[option.where])
+        game.ambush(place = game.map.places['H'], attacker=game.marquise, defender=game.eyrie, bird_or_suit_defender=ambush_options_defender[1], bird_or_suit_attacker=options_attacker[0])
+    # BATTLE
+    dice_rolls = roll_dice()
+    card_to_give_if_sympathy = game.marquise.card_to_give_to_alliace_options(game.map.places[option.where].suit)
+    attacker_chosen_pieces = game.priority_to_list(get_loss_prios('cat'), option.where, 'cat')
+    defender_chosen_pieces = game.priority_to_list(get_loss_prios(option.against_whom), option.where, option.against_whom)
+    dmg_attacker, dmg_defender = game.get_battle_damages('cat', option.against_whom, dice_rolls, option.where, sappers = get_sappers_usage(option.against_whom, game), armorers = option.armorer_usage, brutal_tactics = option.brutal_tactics_usage)
+    game.resolve_battle(option.where, 'cat', option.against_whom, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces, card_to_give_if_sympathy)
+
+
+def cat_daylight_actions(game, option, recruited_already=False):
+    recruited = False
+    # BATTLE
+    if isinstance(option, Battle_DTO):
+        battle_cat(game, option)
+
+    return recruited

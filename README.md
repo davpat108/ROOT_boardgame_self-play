@@ -27,8 +27,8 @@ X means done XX means tested / means partially tested
 
 Vagabond discard items down to sack
 crafting XX, move action XX, build XX, recruit XX, overwork XX, revolt XX, sympathy XX, mobilize XX, train XX, organize XX, ruin_explore XX, aid XX, steal XX, complete quest XX, strike XX
-update victory points check gain-loss
-losing stuff in general 
+update victory points check gain-loss XX
+losing stuff in general  XX
 bird turmoil, leader choice, despot commander builder(and vp anyways) XX
 
 Cards:
@@ -45,7 +45,8 @@ command warren XX should be accounted for during the game
 scouting party XX
 royal claim XX
 
+maybe priority list for battle losses not that good and full list is necessery?
+
 # TODO first gonna skip
 which woods to use to build, if you can build by the rule supply lines, you might be able to build unsupported wood
 which craft activations to use for royal claim
-which craft

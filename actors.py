@@ -3,6 +3,7 @@ from dtos import Battle_DTO, CraftDTO, MoveDTO, OverworkDTO
 from configs import buildings_list_marquise, Immediate_non_item_effects, persistent_effects, eyrie_leader_config
 from itertools import combinations
 from item import Item
+import random
 class Actor():
 
     def __init__(self, map) -> None:
@@ -136,6 +137,11 @@ class Marquise(Actor):
     
     def refresh_craft_activations(self, map):
         self.craft_activations = map.count_on_map(("building", "workshop"), per_suit=True)
+
+    def pieces_to_lose_in_battle(self):
+        chosen_pieces = ['wood','sawmill', 'workshop', 'recruiter', 'keep']
+        random.shuffle(chosen_pieces)
+        return chosen_pieces
 
     def get_options_craft(self, map):
         craft_options = []
@@ -279,6 +285,8 @@ class Eyrie(Actor):
         self.setup_based_on_leader()
         self.decree_deck = Deck(empty=True)
 
+    def pieces_to_lose_in_battle(self):
+        return ['roost']
 
     def check_role(self):
         if self.leader in self.avaible_leaders:
@@ -457,6 +465,9 @@ class Alliance(Actor):
         self.total_officers = 0
         self.name = "alliance"
     
+    def pieces_to_lose_in_battle(self):
+        return ['sympathy', 'base']
+
     def refresh_officers(self):
         self.current_officers = self.total_officers
 
