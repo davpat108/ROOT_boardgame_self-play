@@ -108,6 +108,14 @@ class Game():
     def codebreakers(self, actor, other):
         actor.known_hands[other.name] = True
 
+    def discard_down_to_five(self, actor):
+        card_options = actor.get_card_prios()
+        card_choices = choose_card_prios(card_options)
+        # pops the last card in the list, which is the lowest priority card
+        while len(actor.deck.cards) > 5:
+            self.discard_deck.add_card(actor.deck.get_the_card(card_choices.pop()))
+
+
     def tax_collection(self, actor, placename):
         self.map.places[placename].soldiers[actor.name] -= 1
         actor.deck.add_card(self.deck.draw_card())
@@ -191,9 +199,17 @@ class Game():
         victory_points = sympathy_VPs[self.map.count_on_map(what_to_look_for=('token', 'sympathy'), per_suit = False)]
         self.alliance.victory_points += victory_points
 
+
     def slip(self, place, card_to_give_if_sympathy):
         if 'sympathy' in self.map.places[place.name].tokens:
-            self.alliance.supporter_deck.add_card(self.vagabond.deck.get_the_card(card_to_give_if_sympathy.ID))
+            if card_to_give_if_sympathy and len(self.vagabond.deck.cards) > 0:
+                options = self.alliance.take_card_from_a_player_options(self.vagabond)
+                card_id = alliance_choose_card(options)
+                self.alliance.supporter_deck.add_card(self.vagabond.deck.get_the_card(card_id))
+            if card_to_give_if_sympathy and len(self.vagabond.deck.cards) == 0:
+                self.alliance.supporter_deck.add_card(self.deck.draw_card())
+            else:
+                self.alliance.supporter_deck.add_card(self.vagabond.deck.get_the_card(card_to_give_if_sympathy))
         self.map.move_vagabond(place.name)
 
 
@@ -402,20 +418,30 @@ class Game():
                             self.alliance.victory_points -= sympathy_VPs[self.map.count_on_map(("token", "sympathy"))+1]
 
         for actor in [self.eyrie, self.vagabond, self.marquise, self.alliance]:
-            if actor.name == attacker:
+            if actor.name == attacker and actor.name != "alliance":
                 actor.victory_points += victory_points_attacker
                 if sympathy_killed and card_to_give_if_sympathy:
                     self.alliance.supporter_deck.add_card(actor.deck.get_the_card(card_to_give_if_sympathy.ID)) # CORRECT ASSUMING card_to_give_if_no_sympathy is correct
                 if sympathy_killed and not card_to_give_if_sympathy:
-                    self.alliance.supporter_deck.add_card(self.deck.draw_card())
+                    if len(actor.deck.cards) == 0:
+                        self.alliance.supporter_deck.add_card(self.deck.draw_card())
+                    else:  
+                        options = self.alliance.take_card_from_a_player_options(self.vagabond)
+                        card_id = alliance_choose_card(options)
+                        self.alliance.supporter_deck.add_card(self.vagabond.deck.get_the_card(card_id))
 
 
-            elif actor.name == defender:
+            elif actor.name == defender and actor.name != "alliance":
                 actor.victory_points += victory_points_defender
                 if sympathy_killed and card_to_give_if_sympathy:
-                    self.alliance.supporter_deck.add_card(actor.deck.get_the_card(card_to_give_if_sympathy.ID))#CORRECT ASSUMING card_to_give_if_no_sympathy is correct
+                    self.alliance.supporter_deck.add_card(actor.deck.get_the_card(card_to_give_if_sympathy.ID)) # CORRECT ASSUMING card_to_give_if_no_sympathy is correct
                 if sympathy_killed and not card_to_give_if_sympathy:
-                    self.alliance.supporter_deck.add_card(self.deck.draw_card())
+                    if len(actor.deck.cards) == 0:
+                        self.alliance.supporter_deck.add_card(self.deck.draw_card())
+                    else:  
+                        options = self.alliance.take_card_from_a_player_options(self.vagabond)
+                        card_id = alliance_choose_card(options)
+                        self.alliance.supporter_deck.add_card(self.vagabond.deck.get_the_card(card_id))
 
         place.update_owner()
         if len(self.deck.cards) <=0:
@@ -433,8 +459,12 @@ class Game():
             for actor in [self.eyrie, self.vagabond, self.marquise]:
                 if actor.name == move_action.who and card_to_give_if_sympathy:
                     self.alliance.supporter_deck.add_card(actor.deck.get_the_card(card_to_give_if_sympathy.ID))
-                if actor.name == move_action.who and not card_to_give_if_sympathy:
+                elif actor.name == move_action.who and not card_to_give_if_sympathy and len(actor.deck.cards) == 0:
                     self.alliance.supporter_deck.add_card(self.deck.draw_card())
+                elif actor.name == move_action.who and not card_to_give_if_sympathy and len(actor.deck.cards) > 0:
+                    options = self.alliance.take_card_from_a_player_options(self.vagabond)
+                    card_id = alliance_choose_card(options)
+                    self.alliance.supporter_deck.add_card(self.vagabond.deck.get_the_card(card_id))
 
         if len(self.deck.cards) <= 0:
             self.deck = self.discard_deck
@@ -775,6 +805,13 @@ class Game():
         
 def random_choose(options):
     return random.choice(options)
+
+# ALLIANCE PICK AND CHOOSE CARD
+def alliance_choose_card(options):
+    return random_choose(options)
+
+def choose_card_prios(card_IDS):
+    return random.shuffle(card_IDS)
 
 #BATTLE HELPER FUNCTIONS
 def get_loss_prios(actor_name):

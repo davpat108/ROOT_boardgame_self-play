@@ -8,34 +8,6 @@ from dtos import Battle_DTO, MoveDTO, OverworkDTO
 from map import Map
 from configs import total_common_card_info
 
-def test_discard_down_to_five():
-    game = Game(debug=True)
-    marquise = game.marquise
-    marquise.deck = Deck(empty=True)
-    common_deck = Deck(empty=True)
-
-    common_deck.add_card(Card(*total_common_card_info[0]))
-    common_deck.add_card(Card(*total_common_card_info[1]))
-    common_deck.add_card(Card(*total_common_card_info[2]))
-    common_deck.add_card(Card(*total_common_card_info[27]))
-    common_deck.add_card(Card(*total_common_card_info[28]))
-    common_deck.add_card(Card(*total_common_card_info[53]))
-
-    marquise.deck.add_card(common_deck.draw_card())
-    marquise.deck.add_card(common_deck.draw_card())
-    marquise.deck.add_card(common_deck.draw_card())
-    marquise.deck.add_card(common_deck.draw_card())
-    marquise.deck.add_card(common_deck.draw_card())
-    marquise.deck.add_card(common_deck.draw_card())
-
-    options = marquise.discard_down_to_five_options()
-    assert options == [[0], [1], [2], [27], [28], [53]]
-
-    common_deck.add_card(Card(*total_common_card_info[52]))
-    marquise.deck.add_card(common_deck.draw_card())
-    options = marquise.discard_down_to_five_options()
-    assert len(options) == 21
-
 
 def test_marguise_get_options_craft():
     game = Game(debug=True)

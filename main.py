@@ -9,6 +9,7 @@ if __name__ == "__main__":
     
     winner = "No one"
     while winner == "No one":
+
         # CAT
         #BIRDSONG
         game.cat_birdsong_wood()
@@ -38,4 +39,19 @@ if __name__ == "__main__":
             if more_moves_choice:
                 game.marquise.cat_use_bird_card_to_gain_move(more_moves_choice)
                 actions += 1
+        # EVENING
+        draws = game.marquise.count_for_card_draw()
+        for _ in range(draws):
+            game.marquise.deck.add_card(game.deck.draw_card())
+            if len(game.deck.cards) >= 0: # DECK ONE LINER
+                game.deck = game.discard_deck
+                game.deck.shuffle_deck()
+                game.discard_deck = Deck(empty=True)
         
+        # EYRIE
+
+
+        # ALLIANCE
+
+
+        # VAGABOND

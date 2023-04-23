@@ -74,9 +74,9 @@ vagabond_quest_card_info = [[0, Item("root_tea"), Item("money"), "fox"],
                             [13, Item("boot"), Item("boot"), "mouse"],
                             [14, Item("sword"), Item("sword"), "mouse"]]
 
-buildings_list_marquise = {"sawmill": {"VictoryPoints": [0, 1, 2, 3, 4, 5], "BonusCard":[0, 0, 0, 0, 0, 0]},
-                            "workshop": {"VictoryPoints": [0, 2, 2, 3, 4, 5], "BonusCard":[0, 0, 0, 0, 0, 0]},
-                            "recruiter": {"VictoryPoints": [0, 1, 2, 3, 3, 4], "BonusCard":[0, 0, 1, 0, 1, 0]}}
+buildings_list_marquise = {"sawmill": {"VictoryPoints": [0, 1, 2, 3, 4, 5]},
+                            "workshop": {"VictoryPoints": [0, 2, 2, 3, 4, 5]},
+                            "recruiter": {"VictoryPoints": [0, 1, 2, 3, 3, 4]}}
 
 sympathy_VPs = [0, 1, 1, 1, 2, 2, 3, 4, 4, 4]
 eyrie_roost_VPs = [0, 1, 2, 3, 4, 4, 5]

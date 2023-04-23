@@ -34,6 +34,7 @@ class Actor():
         }
         self.win_condition = "points" #None, rabbit, mouse, fox, bird, coalition
         self.refresh_craft_activations(map)
+        self.card_prios = []
     
     def __lt__(self, other):
         return self.name < other.name
@@ -53,6 +54,10 @@ class Actor():
     def deactivate(self, cost):
         for suit, amount in cost.items():
             self.craft_activations[suit] -= amount
+
+    def get_card_options(self):
+        card_ids = [card.ID for card in self.deck.cards]
+        return card_ids
 
     def stand_and_deliver_options(self, actors):
         if not self.stand_and_deliver:
@@ -143,6 +148,14 @@ class Marquise(Actor):
         random.shuffle(chosen_pieces)
         return chosen_pieces
 
+    def count_for_card_draw(self, map):
+        draws = 1
+        recruiter_count = map.count_on_map(("building", "recruiter"))
+        if recruiter_count > 3:
+            draws += 1
+        if recruiter_count > 5:
+            draws += 1
+        return draws
 
     def get_options_craft(self, map):
         craft_options = []
@@ -468,6 +481,11 @@ class Alliance(Actor):
     
     def pieces_to_lose_in_battle(self):
         return ['sympathy', 'base']
+
+    def take_card_from_a_player_options(self, player):
+        self.known_hands[player.name] = True
+        return [card.ID for card in player.deck.cards]
+
 
     def refresh_officers(self):
         self.current_officers = self.total_officers
