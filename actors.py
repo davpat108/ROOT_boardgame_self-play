@@ -143,6 +143,7 @@ class Marquise(Actor):
         random.shuffle(chosen_pieces)
         return chosen_pieces
 
+
     def get_options_craft(self, map):
         craft_options = []
         for card in self.deck.cards:
@@ -161,7 +162,7 @@ class Marquise(Actor):
                     craft_options.append(CraftDTO(card))
         return craft_options
     
-    def get_battles(self, map, vagabond):
+    def get_battles(self, map):
         battle_options = []
         for key in sorted(list(map.places.keys())):
             place = map.places[key]
@@ -209,8 +210,8 @@ class Marquise(Actor):
     
     def get_can_recruit(self, map):
         if sum([place.soldiers["cat"] for place in map.places.values()]) >= 25:
-            return False
-        return map.count_on_map(("building", "recruiter")) > 0
+            return (False, 'recruit')
+        return (map.count_on_map(("building", "recruiter")) > 0, 'recruit')
     
     def get_wood_tokens_to_build(self, map, place):
         """
@@ -268,7 +269,7 @@ class Marquise(Actor):
         return overwork_clearings
     
     def get_use_bird_card_to_gain_moves(self):
-        options = []
+        options = [False]
         for card in self.deck.cards:
             if card.card_suit == 'bird':
                 options.append(card.ID)
@@ -784,11 +785,11 @@ class Vagabond(Actor):
         exhausted_items = [item for item in all_items if item.exhausted]
         return list(combinations(exhausted_items, min(item_num, len(exhausted_items))))
     
-    def get_damage_options(self, num_dmged):
-        all_items = self.satchel + self.other_items
-        non_damaged_items = [item for item in all_items if not item.damaged]
-        non_damaged_items += self.allied_soldiers
-        return list(combinations(non_damaged_items, min(num_dmged, len(non_damaged_items))))
+    #def get_damage_options(self, num_dmged):
+    #    all_items = self.satchel + self.other_items
+    #    non_damaged_items = [item for item in all_items if not item.damaged]
+    #    non_damaged_items += self.allied_soldiers
+    #    return list(combinations(non_damaged_items, min(num_dmged, len(non_damaged_items))))
 
     def get_repair_options(self):
         hammer_avaible = any(item for item in self.satchel if item.name == "hammer" and not item.damaged and not item.exhausted)
@@ -953,13 +954,25 @@ class Vagabond(Actor):
 
         return aid_options
 
+    def refresh_allied_soldiers(self, map):
+        current_clearing = map.places[map.vagabond_position]
+        for opponent in ['cat', 'bird', 'alliance']:
+            if self.relations[opponent] == 'friendly':
+                for _ in range(current_clearing.soldiers[opponent]):
+                    self.allied_soldiers += opponent
+
     def get_item_dmg_options(self):
         """Returns a list of items that can be damaged"""
         item_dmg_options = []
         for item in self.satchel + self.other_items:
             if not item.damaged:
                 item_dmg_options.append(item)
-        return item_dmg_options
+        self.refresh_allied_soldiers()
+        for soldier in self.allied_soldiers:
+            item_dmg_options.append(soldier)
+
+        random.shuffle(item_dmg_options)
+        self.items_to_damage = item_dmg_options
 
     def damage_item(self, other_item, place = None):
         # Place: when the vagabond is allied to a faction, the factions soldiers are considered items, vagabond doesn't care

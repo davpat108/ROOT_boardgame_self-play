@@ -150,7 +150,6 @@ class Game():
             self.deck.shuffle_deck()
             self.discard_deck = Deck(empty=True)
 
-
     # Alliance
     def revolt(self, place, card_ID1, card_ID2, soldiers_to_gain):
         # Clear all buildings
@@ -236,7 +235,7 @@ class Game():
                 dmg_attacker += min(dice_rolls[0], self.map.places[place_name].soldiers[attacker])
                 dmg_defender += min(dice_rolls[1], len(list(item for item in self.vagabond.satchel if item.name == "sword" and not item.damaged)) +  len(self.vagabond.allied_soldiers))
 
-        elif attacker == 'vagabond': # Should cover all cases
+        elif attacker == 'vagabond':
             if defender != 'alliance':
                 dmg_attacker += min(dice_rolls[0], len(list(item for item in self.vagabond.satchel if item.name == "sword" and not item.damaged)) +  len(self.vagabond.allied_soldiers))
                 dmg_defender += min(dice_rolls[1], self.map.places[place_name].soldiers[defender])
@@ -815,6 +814,8 @@ def battle_cat(game, option):
         options_attacker = game.marquise.get_ambush_options(game.map.places[option.where])
         game.ambush(place = game.map.places['H'], attacker=game.marquise, defender=game.eyrie, bird_or_suit_defender=ambush_options_defender[1], bird_or_suit_attacker=options_attacker[0])
     # BATTLE
+    if option.against_whom == 'vagabond':
+        game.vagabond.get_item_dmg_options()
     dice_rolls = roll_dice()
     card_to_give_if_sympathy = game.marquise.card_to_give_to_alliace_options(game.map.places[option.where].suit)
     attacker_chosen_pieces = game.priority_to_list(get_loss_prios('cat'), option.where, 'cat')
@@ -822,11 +823,39 @@ def battle_cat(game, option):
     dmg_attacker, dmg_defender = game.get_battle_damages('cat', option.against_whom, dice_rolls, option.where, sappers = get_sappers_usage(option.against_whom, game), armorers = option.armorer_usage, brutal_tactics = option.brutal_tactics_usage)
     game.resolve_battle(option.where, 'cat', option.against_whom, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces, card_to_give_if_sympathy)
 
+def get_all_daylight_option_cat(game, recruited_already=False):
+    options = []
+    options += game.marquise.get_battles(game.map)
+    options += game.marquise.get_moves(game.map)
+    if not recruited_already:
+        options += game.marquise.get_can_recruit(game.map)
+    options += game.marquise.get_build_options(game.map)
+    options += game.marquise.get_overwork(game.map)
+    return options
+
+def cat_move(game, option):
+    card_to_give_if_sympathy = game.marquise.card_to_give_to_alliace_options(game.map.places[option.where].suit)
+    game.move(option.where, card_to_give_if_sympathy)
 
 def cat_daylight_actions(game, option, recruited_already=False):
-    recruited = False
+    recruited = recruited_already
+    moved = False
     # BATTLE
     if isinstance(option, Battle_DTO):
         battle_cat(game, option)
-
-    return recruited
+    # RECRUIT
+    elif option[1] == 'recruit' and not recruited_already:
+        recruited = True
+        game.recruit_cat()
+    # MOVE
+    elif isinstance(option, MoveDTO):
+        cat_move(game, option)
+        moved = True
+    # BUILD
+    elif len(option) == 3:
+        game.build(place=option[0], building=option[1], actor=game.marquise, cost = option[2])
+    # OVERWORK
+    elif isinstance(option, OverworkDTO):
+        game.overwork(option.place, option.cardID)
+    
+    return recruited, moved

@@ -45,10 +45,10 @@ def test_marguise_get_options_craft():
     marquise.refresh_craft_activations(map)
     craft_options = marquise.get_options_craft(map)
     assert [craft_option.item for craft_option in craft_options] == [Item("boot")]
+
 def test_marquise_battle():
     game = Game(debug=True)
     marquise = game.marquise
-    vagabond = game.vagabond
     map = game.map
 
     soldiers = {
@@ -59,7 +59,7 @@ def test_marquise_battle():
     map.places['A'].update_pieces(soldiers=soldiers)
     map.places['A'].update_pieces(tokens=["sympathy"])
     
-    battle_options = marquise.get_battles(map, vagabond)
+    battle_options = marquise.get_battles(map)
     assert battle_options == [Battle_DTO('A', "bird"), Battle_DTO('A', "alliance")]
 
 def test_marquise_move():

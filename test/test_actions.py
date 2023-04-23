@@ -402,4 +402,4 @@ def test_cards():
     assert game.marquise.royal_claim == True
     assert game.marquise.deck.cards == []
 
-test_vagabond_explore_stuff()
+test_build()
