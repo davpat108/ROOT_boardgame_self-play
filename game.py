@@ -315,7 +315,7 @@ class Game():
 
         return chosen_pieces
 
-    def resolve_battle(self, place, attacker, defender, dmg_attacker, dmg_defender, attacker_chosen_pieces=None, defender_chosen_pieces=None, card_to_give_if_sympathy=None):
+    def resolve_battle(self, place, attacker, defender, dmg_attacker, dmg_defender, attacker_chosen_pieces=None, defender_chosen_pieces=None, card_to_give_if_sympathy=None, Card_ID=None):
         """
         :param self.map: Map
         :param place_name: str
@@ -443,6 +443,9 @@ class Game():
                         card_id = alliance_choose_card(options)
                         self.alliance.supporter_deck.add_card(self.vagabond.deck.get_the_card(card_id))
 
+        if attacker == "bird":
+            self.eyrie.remove_from_temp_decree(Card_ID, "battle")
+
         place.update_owner()
         if len(self.deck.cards) <=0:
             self.deck = self.discard_deck
@@ -484,6 +487,10 @@ class Game():
             for actor in [self.eyrie, self.vagabond, self.marquise]:
                 if actor.name == move_action.who:
                     actor.current_officers -= 1
+
+        if move_action.who == "bird":
+            self.eyrie.remove_from_temp_decree(move_action.card_ID, 'move')
+
         self.map.update_owners()
 
     def craft(self, actor, costs: CraftDTO):
@@ -613,7 +620,9 @@ class Game():
             place.soldiers[attacker.name] = max(place.soldiers[attacker.name], 0)
         place.update_owner()
 
-    def build(self, place, actor, building, cost = 0):
+    def build(self, place, actor, building, cost = 0, Card_ID=None):
+        if actor.name == "bird":
+            actor.remove_from_temp_decree(Card_ID, "build")
         if actor.name == "cat": #Choosing which woods to remove is too much work for now
             i = cost
             for _ in range(i):
@@ -639,7 +648,7 @@ class Game():
                 place.soldiers["cat"] += 1
         self.map.update_owners()
 
-    def recruit(self, place, actor):
+    def recruit(self, place, actor, card_ID = None):
         if actor.name == "bird" and actor.leader == "Charismatic":
             place.soldiers[actor.name] += 2
             place.update_owner()   
@@ -649,6 +658,9 @@ class Game():
         
         if actor.name == "alliance":
             self.alliance.current_officers -= 1
+        
+        if actor.name == "bird":
+            self.eyrie.remove_from_temp_decree(card_ID, 'recruit')
 
     def overwork(self, place, card_id):
         place.tokens += ['wood']
@@ -870,29 +882,77 @@ def get_all_daylight_option_cat(game, recruited_already=False):
     options += game.marquise.get_overwork(game.map)
     return options
 
-def cat_move(game, option):
-    card_to_give_if_sympathy = game.marquise.card_to_give_to_alliace_options(game.map.places[option.where].suit)
-    game.move(option.where, card_to_give_if_sympathy)
+def move_and_account_to_sympathy(game, choice):
+    card_to_give_if_sympathy = game.marquise.card_to_give_to_alliace_options(game.map.places[choice.where].suit)
+    game.move(choice, card_to_give_if_sympathy)
 
-def cat_daylight_actions(game, option, recruited_already=False):
+
+def cat_daylight_actions(game, choice, recruited_already=False):
     recruited = recruited_already
     moved = False
     # BATTLE
-    if isinstance(option, Battle_DTO):
-        battle_cat(game, option)
+    if isinstance(choice, Battle_DTO):
+        battle_cat(game, choice)
     # RECRUIT
-    elif option[1] == 'recruit' and not recruited_already:
+    elif choice[1] == 'recruit' and not recruited_already:
         recruited = True
         game.recruit_cat()
     # MOVE
-    elif isinstance(option, MoveDTO):
-        cat_move(game, option)
+    elif isinstance(choice, MoveDTO):
+        move_and_account_to_sympathy(game, choice)
         moved = True
     # BUILD
-    elif len(option) == 3:
-        game.build(place=option[0], building=option[1], actor=game.marquise, cost = option[2])
+    elif len(choice) == 3:
+        game.build(place=choice[0], building=choice[1], actor=game.marquise, cost = choice[2])
     # OVERWORK
-    elif isinstance(option, OverworkDTO):
-        game.overwork(option.place, option.cardID)
+    elif isinstance(choice, OverworkDTO):
+        game.overwork(choice.place, choice.cardID)
     
     return recruited, moved
+
+def eyrie_birdsong_actions(game):
+        # DRAW IF HAND EMPTY
+    if len(game.eyrie.deck.cards) == 0:
+        game.eyrie.deck.add_card(game.deck.draw_card())
+        if len(game.deck.cards) >= 0: # DECK ONE LINER
+            game.deck = game.discard_deck
+            game.deck.shuffle_deck()
+            game.discard_deck = Deck(empty=True)
+    
+    # ADD UP TO TWO CARDS TO DECREE
+    options = game.eyrie.get_decree_options()
+    choice = random_choose(options)
+    game.eyrie.add_card_to_decree(*choice)
+    options = game.eyrie.get_decree_options()
+    options.append(False)
+    choice = random_choose(options)
+    if choice:
+        game.eyrie.add_card_to_decree(*choice)
+    options = game.eyrie.get_no_roosts_left_options(game.map)
+    if options:
+        choice = random_choose(options)
+        game.place_roost_if_zero_roost(choice)
+        
+def eyrie_daylight_actions(game):
+    choice = True
+    game.eyrie.refresh_craft_activations(game.map)
+    while choice:
+        options = game.eyrie.get_options_craft(game.map)
+        choice = random_choose(options)
+        if choice:
+            game.craft(game.eyrie, choice)
+
+    game.eyrie.refresh_temp_decree()
+
+    for _ in range(len(game.eyrie.decrees['recruit'])):
+        options = game.eyrie.get_resolve_recruit(game.map)
+        if options:
+            choice = random_choose(options)
+            game.recruit(place = choice[0], actor = game.eyrie, card_ID=choice[1])
+    
+    for _ in range(len(game.eyrie.decrees['move'])):
+        options = game.eyrie.get_resolve_move(game.map)
+        if options:
+            choice = random_choose(options)
+            move_and_account_to_sympathy(game, choice)
+        

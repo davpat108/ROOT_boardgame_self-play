@@ -193,7 +193,8 @@ def test_recruit_and_add_to_resolve():
     assert game.map.places['E'].soldiers['cat'] == 2
 
     decree_options = game.eyrie.get_decree_options()
-    game.add_card_to_decree("recruit", *sorted(decree_options["recruit"], key=lambda x: x[0])[0])
+    game.add_card_to_decree(*decree_options[0])
+    game.eyrie.refresh_temp_decree()
 
     options = game.eyrie.get_resolve_recruit(game.map)
     game.recruit(options[0][0], game.eyrie)
@@ -402,4 +403,4 @@ def test_cards():
     assert game.marquise.royal_claim == True
     assert game.marquise.deck.cards == []
 
-test_build()
+test_recruit_and_add_to_resolve()

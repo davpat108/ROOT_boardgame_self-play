@@ -298,6 +298,12 @@ class Eyrie(Actor):
         self.name = 'bird'
         self.setup_based_on_leader()
         self.decree_deck = Deck(empty=True)
+        self.temp_decree = {
+            "recruit": [],
+            "move": [],
+            "battle": [],
+            "build": [],
+        } # Remove cards from this decree while resolving
 
     def pieces_to_lose_in_battle(self):
         return ['roost']
@@ -330,23 +336,26 @@ class Eyrie(Actor):
         return self.avaible_leaders
 
     def get_decree_options(self):
-        decree_options = {
-            "recruit": [],
-            "move": [],
-            "battle": [],
-            "build": [],
-        }
+        actions = ["recruit", "move", "battle", "build"]
+        options = []
 
         for card in self.deck.cards:
-            for action in decree_options.keys():
-                decree_options[action].append((card.ID, card.card_suit))
+            for action in actions:
+                options.append((action, card.ID, card.card_suit))
 
-        return decree_options
+        return options
     
+    def remove_from_temp_decree(self, card_ID, action):
+        self.temp_decree[action] = [(ID, suit) for ID, suit in self.temp_decree[action] if ID != card_ID]
+
+
+    def refresh_temp_decree(self):
+        self.temp_decree = self.decree
+
     def get_resolve_recruit(self, map):
         recruit_options = []
 
-        for card_ID, card_suit in self.decree["recruit"]:
+        for card_ID, card_suit in self.temp_decree["recruit"]:
             matching_clearings = [place for place in map.places.values() if place.suit == card_suit or card_suit == "bird"]
 
             total_bird_soldiers = sum([place.soldiers["bird"] for place in map.places.values()])
@@ -364,7 +373,7 @@ class Eyrie(Actor):
     def get_resolve_move(self, map):
 
         move_options = []
-        for card_ID, card_suit in  self.decree["move"]:
+        for card_ID, card_suit in  self.temp_decree["move"]:
             matching_clearings = [place for place in map.places.values() if place.suit == card_suit or card_suit == "bird"]
 
             for source_clearing in matching_clearings:
@@ -376,10 +385,10 @@ class Eyrie(Actor):
                                 move_options.append(MoveDTO(source_clearing.name, dest_clearing.name, how_many=soldiers,card_ID=card_ID, who="bird"))
         return move_options
 
-    def get_resolve_battle(self, map, vagabond):
+    def get_resolve_battle(self, map):
         battle_options = []
 
-        for card_ID, card_suit in self.decree["battle"]:
+        for card_ID, card_suit in self.temp_decree["battle"]:
             matching_clearings = [place for place in map.places.values() if place.suit == card_suit or card_suit == "bird"]
 
             for clearing in matching_clearings:
@@ -417,7 +426,7 @@ class Eyrie(Actor):
     def get_resolve_building(self, map):
         building_option = []
 
-        for card_ID, card_suit in self.decree["battle"]:
+        for card_ID, card_suit in self.temp_decree["build"]:
             matching_clearings = [place for place in map.places.values() if place.suit == card_suit or card_suit == "bird"]
             total_roosts = sum([True in [slot[0] == 'roost' for slot in place.building_slots] for place in map.places.values()])
             if total_roosts <7:
