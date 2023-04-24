@@ -263,7 +263,7 @@ def test_mobilize_train_organize():
     assert len(game.alliance.deck.cards) == 3
     options = game.alliance.get_train_options(game.map)
     options.sort()
-    game.train(options[0])
+    game.train(options[0][0])
     assert game.alliance.deck.get_the_card(1) == "Card not in the deck"
     assert game.alliance.total_officers == 1
 
@@ -271,7 +271,7 @@ def test_mobilize_train_organize():
     game.map.places['D'].update_pieces(soldiers = {'cat': 1, 'bird': 1, 'alliance': 1})
     options = game.alliance.get_organize_options(game.map)
     options.sort()
-    game.organize(options[0])
+    game.organize(options[0][0])
     assert game.alliance.current_officers == 0
     assert game.map.places['D'].tokens == ['sympathy']
     assert game.map.places['D'].soldiers == {'cat': 1, 'bird': 1, 'alliance': 0}

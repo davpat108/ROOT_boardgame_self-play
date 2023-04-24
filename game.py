@@ -708,10 +708,10 @@ class Game():
         self.discard_deck.add_card(self.alliance.deck.get_the_card(card_ID))
         self.alliance.total_officers += 1
 
-    def organize(self, place):
+    def organize(self, placename):
         symp_count = self.map.count_on_map(("token", "sympathy"), per_suit=False)
-        place.soldiers["alliance"] -= 1
-        place.tokens += ["sympathy"]
+        self.map.places[placename].soldiers["alliance"] -= 1
+        self.map.places[placename].tokens += ["sympathy"]
         self.alliance.victory_points += sympathy_VPs[symp_count]
         self.alliance.current_officers -= 1
 
@@ -889,6 +889,23 @@ def battle_bird(game, option):
     dmg_attacker, dmg_defender = game.get_battle_damages('bird', option.against_whom, dice_rolls, option.where, sappers = get_sappers_usage(option.against_whom, game), armorers = option.armorer_usage, brutal_tactics = option.brutal_tactics_usage, card_ID = option.card_ID)
     game.resolve_battle(option.where, 'bird', option.against_whom, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces, card_to_give_if_sympathy)
 
+def battle_alliance(game, option):
+    # AMBUSH
+    ambush_options_defender = get_ambush_usage(option.against_whom, game, option.where)
+    ambush_option = random_choose(ambush_options_defender)
+    if ambush_option:
+        options_attacker = game.alliance.get_ambush_options(game.map.places[option.where])
+        game.ambush(place = option.where, attacker=game.alliance, defender=game.eyrie, bird_or_suit_defender=ambush_options_defender[1], bird_or_suit_attacker=options_attacker[0])
+    # BATTLE
+    if option.against_whom == 'vagabond':
+        game.vagabond.get_item_dmg_options()
+    dice_rolls = roll_dice()
+    card_to_give_if_sympathy = game.marquise.card_to_give_to_alliace_options(game.map.places[option.where].suit)
+    attacker_chosen_pieces = game.priority_to_list(get_loss_prios('alliance'), option.where, 'alliance')
+    defender_chosen_pieces = game.priority_to_list(get_loss_prios(option.against_whom), option.where, option.against_whom)
+    dmg_attacker, dmg_defender = game.get_battle_damages('alliance', option.against_whom, dice_rolls, option.where, sappers = get_sappers_usage(option.against_whom, game), armorers = option.armorer_usage, brutal_tactics = option.brutal_tactics_usage)
+    game.resolve_battle(option.where, 'alliance', option.against_whom, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces, card_to_give_if_sympathy)
+
 def get_all_daylight_option_cat(game, recruited_already=False):
     options = []
     options += game.marquise.get_battles(game.map)
@@ -897,6 +914,20 @@ def get_all_daylight_option_cat(game, recruited_already=False):
         options += game.marquise.get_can_recruit(game.map)
     options += game.marquise.get_build_options(game.map)
     options += game.marquise.get_overwork(game.map)
+    return options
+
+def get_all_daylight_option_alliance(game):
+    options = [False]
+    options += game.alliance.get_options_craft(game.map)
+    options += game.alliance.get_mobilize_options()
+    options += game.alliance.get_train_options(game.map)
+    return options
+
+def get_all_evening_option_alliance(game):
+    options = [False]
+    options += game.alliance.get_options_craft(game.map)
+    options += game.alliance.get_mobilize_options()
+    options += game.alliance.get_train_options(game.map)
     return options
 
 def move_and_account_to_sympathy(game, choice):
@@ -955,6 +986,7 @@ def eyrie_daylight_actions(game):
     game.eyrie.refresh_craft_activations(game.map)
     while choice:
         options = game.eyrie.get_options_craft(game.map)
+        options.append(False)
         choice = random_choose(options)
         if choice:
             game.craft(game.eyrie, choice)
@@ -1003,3 +1035,32 @@ def eyrie_daylight_actions(game):
         choice = random_choose(options)
         game.bird_turmoil(choice)
     
+
+def alliance_daylight_actions(game, choice):
+    # CRAFT
+    if isinstance(choice, CraftDTO):
+        game.craft(game.alliance, choice)
+    # MOBILIZE
+    elif isinstance(choice, int):
+        game.mobilize(choice)
+    # TRAIN
+    elif choice[1] == 'train':
+        game.train(choice[0])
+    else:
+        raise ValueError("Wrong choice in alliance daylight")
+    
+def alliance_evening_actions(game, choice):
+    # BATTLE
+    if isinstance(choice, Battle_DTO):
+        battle_alliance(game, choice)
+    # MOVE
+    elif isinstance(choice, MoveDTO):
+        game.move(choice)
+    # RECRUIT
+    elif choice[1] == 'recruit':
+        game.recruit(place = choice[0], actor = game.alliance)
+    # ORGANIZE
+    elif choice[1] == 'organize':
+        game.organize(placename = choice[0])
+    else:
+        raise ValueError("Wrong choice in alliance evening")

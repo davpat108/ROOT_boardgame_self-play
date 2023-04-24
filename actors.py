@@ -504,6 +504,9 @@ class Alliance(Actor):
         self.known_hands[player.name] = True
         return [card.ID for card in player.deck.cards]
 
+    def count_for_card_draw(self, map):
+        draws = map.count_on_map(("building", "base")) + 1
+        return draws
 
     def refresh_officers(self):
         self.current_officers = self.total_officers
@@ -658,11 +661,11 @@ class Alliance(Actor):
 
         for card in self.deck.cards:
             if card.card_suit in base_suits or card.card_suit == "bird":
-                train_options.append(card.ID)
+                train_options.append((card.ID, "train"))
 
         return list(set(train_options))
     
-    def get_battles(self, map, vagabond):
+    def get_battles(self, map):
         battle_options = []
         if self.current_officers == 0:
             return battle_options
@@ -720,7 +723,7 @@ class Alliance(Actor):
             return []
         for place in map.places.values():
             if True in [slot[0]=='base' for slot in place.building_slots]:
-                recruit_options.append(place.name)
+                recruit_options.append((place.name, "recruit"))
         return recruit_options   
 
     def get_organize_options(self, map):
@@ -730,7 +733,7 @@ class Alliance(Actor):
         
         for place in map.places.values():
             if place.soldiers['alliance']>0 and not 'sympathy' in place.tokens:
-                organize_options.append(place)
+                organize_options.append((place.name, "organize"))
 
         return organize_options
     

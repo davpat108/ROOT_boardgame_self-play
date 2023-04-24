@@ -354,7 +354,7 @@ def test_alliance_get_options_train():
     
     map.places['D'].update_pieces(tokens = ['sympathy'], buildings = [('base', 'alliance'), ('ruin', 'No one')])
     train_options = alliance.get_train_options(map)
-    assert train_options== [1, 52]
+    assert sorted(train_options) == sorted([(1, "train"), (52, "train")])
 
 def test_alliance_get_options_battle_recruit_and_organize():
     game = Game(debug=True)
@@ -365,17 +365,17 @@ def test_alliance_get_options_battle_recruit_and_organize():
     alliance.refresh_officers()
     map.places['D'].update_pieces(tokens = ['sympathy'], buildings = [('base', 'alliance'), ('ruin', 'No one')], soldiers = {'cat': 1, 'bird' : 1, 'alliance' : 1})
     map.update_owners()
-    battles = alliance.get_battles(map, vagabond)
+    battles = alliance.get_battles(map)
 
     assert battles == [Battle_DTO('D', 'cat'), Battle_DTO('D', 'bird')]
 
     organize = alliance.get_recruits(map)
-    assert organize == ['D']
-
+    assert organize == [('D', "recruit")]
+    
     map.places['K'].update_pieces(soldiers = {'cat': 1, 'bird' : 1, 'alliance' : 1})
     map.update_owners()
     organize = alliance.get_organize_options(map)
-    assert organize == [map.places['K']]
+    assert organize == [('K', "organize")]
 
 
 def test_alliance_move():
