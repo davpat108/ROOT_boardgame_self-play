@@ -493,7 +493,6 @@ class Alliance(Actor):
         super().__init__(map)
         self.supporter_deck = Deck(empty = True)
         self.items = []
-        self.current_officers = 0
         self.total_officers = 0
         self.name = "alliance"
     
@@ -507,9 +506,6 @@ class Alliance(Actor):
     def count_for_card_draw(self, map):
         draws = map.count_on_map(("building", "base")) + 1
         return draws
-
-    def refresh_officers(self):
-        self.current_officers = self.total_officers
 
     def get_options(self):
         return super().get_options()
@@ -667,8 +663,6 @@ class Alliance(Actor):
     
     def get_battles(self, map):
         battle_options = []
-        if self.current_officers == 0:
-            return battle_options
         for key in sorted(list(map.places.keys())):
             place = map.places[key]
             if place.soldiers['alliance'] > 0:
@@ -704,8 +698,6 @@ class Alliance(Actor):
     def get_moves(self, map):
         "Returns a list of MoveDTO objects"
         moves = []
-        if self.current_officers == 0:
-            return moves
         for key in sorted(list(map.places.keys())): # sort places by key
             place = map.places[key]
             for i in range(place.soldiers['alliance']):
@@ -716,8 +708,6 @@ class Alliance(Actor):
         return moves
 
     def get_recruits(self, map):
-        if self.current_officers == 0:
-            return []
         recruit_options = []
         if sum([place.soldiers["alliance"] for place in map.places.values()]) + self.total_officers >= 10:
             return []
@@ -728,8 +718,6 @@ class Alliance(Actor):
 
     def get_organize_options(self, map):
         organize_options = []
-        if self.current_officers == 0:
-            return organize_options
         
         for place in map.places.values():
             if place.soldiers['alliance']>0 and not 'sympathy' in place.tokens:

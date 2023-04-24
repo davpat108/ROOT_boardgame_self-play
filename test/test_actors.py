@@ -362,7 +362,6 @@ def test_alliance_get_options_battle_recruit_and_organize():
     vagabond = game.vagabond
     map = game.map
     alliance.total_officers = 1
-    alliance.refresh_officers()
     map.places['D'].update_pieces(tokens = ['sympathy'], buildings = [('base', 'alliance'), ('ruin', 'No one')], soldiers = {'cat': 1, 'bird' : 1, 'alliance' : 1})
     map.update_owners()
     battles = alliance.get_battles(map)
@@ -400,7 +399,6 @@ def test_alliance_move():
     game = Game(debug=True)
     alliance = game.alliance
     alliance.total_officers = 1
-    alliance.refresh_officers()
     move_options = alliance.get_moves(map)
     assert move_options == [MoveDTO('A', 'B', 1, who='alliance'),
                              MoveDTO('A', 'C', 1, who='alliance'),

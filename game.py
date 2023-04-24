@@ -329,8 +329,6 @@ class Game():
         :param discard_deck: DiscardDeck
         :param vagabond_items: list, items to damage
         """ 
-        if attacker == "alliance":
-            self.alliance.current_officers -= 1
         if attacker != "vagabond" and place.soldiers[attacker] == 0:
             return
         
@@ -713,7 +711,6 @@ class Game():
         self.map.places[placename].soldiers["alliance"] -= 1
         self.map.places[placename].tokens += ["sympathy"]
         self.alliance.victory_points += sympathy_VPs[symp_count]
-        self.alliance.current_officers -= 1
 
     # Vagabond
     def explore_ruin(self, placename):
@@ -924,16 +921,16 @@ def get_all_daylight_option_alliance(game):
     return options
 
 def get_all_evening_option_alliance(game):
-    options = [False]
-    options += game.alliance.get_options_craft(game.map)
-    options += game.alliance.get_mobilize_options()
-    options += game.alliance.get_train_options(game.map)
+    options = []
+    options += game.alliance.get_moves(game.map)
+    options += game.alliance.get_battles(game.map)
+    options += game.alliance.get_recruits(game.map)
+    options += game.alliance.get_organize_options(game.map)
     return options
 
 def move_and_account_to_sympathy(game, choice):
     card_to_give_if_sympathy = game.marquise.card_to_give_to_alliace_options(game.map.places[choice.where].suit)
     game.move(choice, card_to_give_if_sympathy)
-
 
 def cat_daylight_actions(game, choice, recruited_already=False):
     recruited = recruited_already

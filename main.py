@@ -3,7 +3,7 @@ from deck import Deck, QuestDeck
 from map import build_regular_forest
 from actors import Marquise, Eyrie, Alliance, Vagabond
 from actions import cat_birdsong_wood
-from game import Game, random_choose, cat_daylight_actions, get_all_daylight_option_alliance, move_and_account_to_sympathy, eyrie_birdsong_actions, eyrie_daylight_actions, alliance_daylight_actions, alliance_evening_actions
+from game import Game, random_choose, cat_daylight_actions, get_all_daylight_option_alliance, move_and_account_to_sympathy, eyrie_birdsong_actions, eyrie_daylight_actions, alliance_daylight_actions, alliance_evening_actions, get_all_evening_option_alliance
 if __name__ == "__main__":
     game = Game(debug=False)
     
@@ -62,7 +62,7 @@ if __name__ == "__main__":
                 game.discard_deck = Deck(empty=True)
 
         # ALLIANCE
-        #BIRDSONG
+        # BIRDSONG
         options = game.alliance.get_revolt_options(game.map)
         options.append(False)
         choice = random_choose(options)
@@ -85,6 +85,13 @@ if __name__ == "__main__":
                 alliance_daylight_actions(game, choice)
 
         # EVENING
-        alliance_evening_actions(game, choice)
+        for _ in range(game.alliance.total_officers):
+            options = get_all_evening_option_alliance(game)
+            if choice:
+                choice = random_choose(options)
+                alliance_evening_actions(game, choice)
+            else:
+                break
         draws = game.alliance.count_for_card_draw()
+
         #VAGABOND
