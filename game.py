@@ -315,7 +315,7 @@ class Game():
 
         return chosen_pieces
 
-    def resolve_battle(self, place, attacker, defender, dmg_attacker, dmg_defender, attacker_chosen_pieces=None, defender_chosen_pieces=None, card_to_give_if_sympathy=None, Card_ID=None):
+    def resolve_battle(self, place, attacker, defender, dmg_attacker, dmg_defender, attacker_chosen_pieces=None, defender_chosen_pieces=None, card_to_give_if_sympathy=None, card_ID=None):
         """
         :param self.map: Map
         :param place_name: str
@@ -444,7 +444,7 @@ class Game():
                         self.alliance.supporter_deck.add_card(self.vagabond.deck.get_the_card(card_id))
 
         if attacker == "bird":
-            self.eyrie.remove_from_temp_decree(Card_ID, "battle")
+            self.eyrie.remove_from_temp_decree(card_ID, "battle")
 
         place.update_owner()
         if len(self.deck.cards) <=0:
@@ -620,9 +620,9 @@ class Game():
             place.soldiers[attacker.name] = max(place.soldiers[attacker.name], 0)
         place.update_owner()
 
-    def build(self, place, actor, building, cost = 0, Card_ID=None):
+    def build(self, place, actor, building, cost = 0, card_ID=None):
         if actor.name == "bird":
-            actor.remove_from_temp_decree(Card_ID, "build")
+            actor.remove_from_temp_decree(card_ID, "build")
         if actor.name == "cat": #Choosing which woods to remove is too much work for now
             i = cost
             for _ in range(i):
@@ -861,7 +861,7 @@ def battle_cat(game, option):
     ambush_option = random_choose(ambush_options_defender)
     if ambush_option:
         options_attacker = game.marquise.get_ambush_options(game.map.places[option.where])
-        game.ambush(place = game.map.places['H'], attacker=game.marquise, defender=game.eyrie, bird_or_suit_defender=ambush_options_defender[1], bird_or_suit_attacker=options_attacker[0])
+        game.ambush(place = option.where, attacker=game.marquise, defender=game.eyrie, bird_or_suit_defender=ambush_options_defender[1], bird_or_suit_attacker=options_attacker[0])
     # BATTLE
     if option.against_whom == 'vagabond':
         game.vagabond.get_item_dmg_options()
@@ -871,6 +871,23 @@ def battle_cat(game, option):
     defender_chosen_pieces = game.priority_to_list(get_loss_prios(option.against_whom), option.where, option.against_whom)
     dmg_attacker, dmg_defender = game.get_battle_damages('cat', option.against_whom, dice_rolls, option.where, sappers = get_sappers_usage(option.against_whom, game), armorers = option.armorer_usage, brutal_tactics = option.brutal_tactics_usage)
     game.resolve_battle(option.where, 'cat', option.against_whom, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces, card_to_give_if_sympathy)
+
+def battle_bird(game, option):
+    # AMBUSH
+    ambush_options_defender = get_ambush_usage(option.against_whom, game, option.where)
+    ambush_option = random_choose(ambush_options_defender)
+    if ambush_option:
+        options_attacker = game.eyrie.get_ambush_options(game.map.places[option.where])
+        game.ambush(place = option.where, attacker=game.marquise, defender=game.eyrie, bird_or_suit_defender=ambush_options_defender[1], bird_or_suit_attacker=options_attacker[0])
+    # BATTLE
+    if option.against_whom == 'vagabond':
+        game.vagabond.get_item_dmg_options()
+    dice_rolls = roll_dice()
+    card_to_give_if_sympathy = game.marquise.card_to_give_to_alliace_options(game.map.places[option.where].suit)
+    attacker_chosen_pieces = game.priority_to_list(get_loss_prios('bird'), option.where, 'bird')
+    defender_chosen_pieces = game.priority_to_list(get_loss_prios(option.against_whom), option.where, option.against_whom)
+    dmg_attacker, dmg_defender = game.get_battle_damages('bird', option.against_whom, dice_rolls, option.where, sappers = get_sappers_usage(option.against_whom, game), armorers = option.armorer_usage, brutal_tactics = option.brutal_tactics_usage, card_ID = option.card_ID)
+    game.resolve_battle(option.where, 'bird', option.against_whom, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces, card_to_give_if_sympathy)
 
 def get_all_daylight_option_cat(game, recruited_already=False):
     options = []
@@ -943,16 +960,46 @@ def eyrie_daylight_actions(game):
             game.craft(game.eyrie, choice)
 
     game.eyrie.refresh_temp_decree()
+    turmoil = False
 
     for _ in range(len(game.eyrie.decrees['recruit'])):
         options = game.eyrie.get_resolve_recruit(game.map)
         if options:
             choice = random_choose(options)
             game.recruit(place = choice[0], actor = game.eyrie, card_ID=choice[1])
+        else:
+            turmoil = True
+            break
+    if not turmoil:
+        for _ in range(len(game.eyrie.decrees['move'])):
+            options = game.eyrie.get_resolve_move(game.map)
+            if options:
+                choice = random_choose(options)
+                move_and_account_to_sympathy(game, choice)
+            else:
+                turmoil = True
+                break
+    if not turmoil:  
+        for _ in range(len(game.eyrie.decrees['battle'])):
+            options = game.eyrie.get_resolve_battle(game.map)
+            if options:
+                choice = random_choose(options)
+                battle_bird(game, choice)
+            else:
+                turmoil = True
+                break
+    if not turmoil:
+        for _ in range(len(game.eyrie.decrees['build'])):
+            options = game.eyrie.get_resolve_build(game.map)
+            if options:
+                choice = random_choose(options)
+                game.build(place=choice[0], building="roost", actor=game.eyrie, card_ID = choice[1])
+            else:
+                turmoil = True
+                break
     
-    for _ in range(len(game.eyrie.decrees['move'])):
-        options = game.eyrie.get_resolve_move(game.map)
-        if options:
-            choice = random_choose(options)
-            move_and_account_to_sympathy(game, choice)
-        
+    if turmoil:
+        options = game.eyrie.get_turmoil_options()
+        choice = random_choose(options)
+        game.bird_turmoil(choice)
+    

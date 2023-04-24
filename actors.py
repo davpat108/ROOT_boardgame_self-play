@@ -151,9 +151,9 @@ class Marquise(Actor):
     def count_for_card_draw(self, map):
         draws = 1
         recruiter_count = map.count_on_map(("building", "recruiter"))
-        if recruiter_count > 3:
+        if recruiter_count > 2:
             draws += 1
-        if recruiter_count > 5:
+        if recruiter_count > 4:
             draws += 1
         return draws
 
@@ -319,6 +319,15 @@ class Eyrie(Actor):
         self.leader = role
         self.check_role()
 
+
+    def count_for_card_draw(self, map):
+        draws = 1
+        recruiter_count = map.count_on_map(("building", "roost"))
+        if recruiter_count > 2:
+            draws += 1
+        if recruiter_count > 5:
+            draws += 1
+        return draws
 
     def setup_based_on_leader(self):
         new_loyal_viziers = eyrie_leader_config[self.leader]
