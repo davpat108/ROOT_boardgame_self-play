@@ -3,7 +3,7 @@ from deck import Deck, QuestDeck
 from map import build_regular_forest
 from actors import Marquise, Eyrie, Alliance, Vagabond
 from actions import cat_birdsong_wood
-from game import Game, random_choose, vagabond_evening, cat_daylight_actions, get_all_daylight_option_alliance, move_and_account_to_sympathy, eyrie_birdsong_actions, eyrie_daylight_actions, alliance_daylight_actions, alliance_evening_actions, get_all_evening_option_alliance
+from game import Game, random_choose, vagabond_birdsong, vagabond_daylight, cat_daylight_actions, get_all_daylight_option_alliance, move_and_account_to_sympathy, eyrie_birdsong_actions, eyrie_daylight_actions, alliance_daylight_actions, alliance_evening_actions, get_all_evening_option_alliance
 if __name__ == "__main__":
     game = Game(debug=False)
     
@@ -135,5 +135,6 @@ if __name__ == "__main__":
 
         # VAGABOND
         # BIRDSONG
-
-        vagabond_evening(game)
+        vagabond_birdsong(game)
+        # DAYLIGHT
+        vagabond_daylight(game)

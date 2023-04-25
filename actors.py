@@ -923,8 +923,9 @@ class Vagabond(Actor):
 
         current_clearing = map.places[map.vagabond_position]
         has_ruin = any(slot[0] == 'ruin' for slot in current_clearing.building_slots)
-
-        return has_ruin
+        if has_ruin:
+            return (has_ruin, "explore")
+        return
 
     def get_strike_options(self, map):
         if not self.has_non_exhausted_item(Item("crossbow")):
