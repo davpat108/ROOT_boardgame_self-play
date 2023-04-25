@@ -3,7 +3,7 @@ from deck import Deck, QuestDeck
 from map import build_regular_forest
 from actors import Marquise, Eyrie, Alliance, Vagabond
 from actions import cat_birdsong_wood
-from game import Game, random_choose, cat_daylight_actions, get_all_daylight_option_alliance, move_and_account_to_sympathy, eyrie_birdsong_actions, eyrie_daylight_actions, alliance_daylight_actions, alliance_evening_actions, get_all_evening_option_alliance
+from game import Game, random_choose, vagabond_evening, cat_daylight_actions, get_all_daylight_option_alliance, move_and_account_to_sympathy, eyrie_birdsong_actions, eyrie_daylight_actions, alliance_daylight_actions, alliance_evening_actions, get_all_evening_option_alliance
 if __name__ == "__main__":
     game = Game(debug=False)
     
@@ -11,7 +11,7 @@ if __name__ == "__main__":
     while winner == "No one":
 
         # CAT
-        #BIRDSONG
+        # BIRDSONG
         game.cat_birdsong_wood()
         # DAYLIGHT
         # CRAFT
@@ -48,6 +48,13 @@ if __name__ == "__main__":
                 game.deck = game.discard_deck
                 game.deck.shuffle_deck()
                 game.discard_deck = Deck(empty=True)
+
+        discard_options = True
+        while discard_options:
+            discard_options = game.marquise.discard_down_to_five_options()
+            if discard_options:
+                choice = random_choose(discard_options)
+                game.discard_deck.add_card(game.marquise.deck.get_the_card(choice))
         
         # EYRIE
         eyrie_birdsong_actions(game)
@@ -60,6 +67,13 @@ if __name__ == "__main__":
                 game.deck = game.discard_deck
                 game.deck.shuffle_deck()
                 game.discard_deck = Deck(empty=True)
+
+        discard_options = True
+        while discard_options:
+            discard_options = game.eyrie.discard_down_to_five_options()
+            if discard_options:
+                choice = random_choose(discard_options)
+                game.discard_deck.add_card(game.eyrie.deck.get_the_card(choice))
 
         # ALLIANCE
         # BIRDSONG
@@ -92,6 +106,34 @@ if __name__ == "__main__":
                 alliance_evening_actions(game, choice)
             else:
                 break
-        draws = game.alliance.count_for_card_draw()
 
-        #VAGABOND
+        draws = game.alliance.count_for_card_draw()
+        for _ in range(draws):
+            game.alliance.deck.add_card(game.deck.draw_card())
+            if len(game.deck.cards) >= 0: # DECK ONE LINER
+                game.deck = game.discard_deck
+                game.deck.shuffle_deck()
+                game.discard_deck = Deck(empty=True)
+        
+        discard_options = True
+        while discard_options:
+            discard_options = game.alliance.discard_down_to_five_options()
+            if discard_options:
+                choice = random_choose(discard_options)
+                game.discard_deck.add_card(game.alliance.deck.get_the_card(choice))
+        
+        discard_options = True
+        while discard_options:
+            discard_options = game.alliance.discard_down_to_five_supporters_options()
+            if discard_options:
+                choice = random_choose(discard_options)
+                game.discard_deck.add_card(game.alliance.supporter_deck.get_the_card(choice))
+
+        
+
+        
+
+        # VAGABOND
+        # BIRDSONG
+
+        vagabond_evening(game)

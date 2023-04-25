@@ -85,9 +85,7 @@ class Actor():
         for card in self.deck.cards:
             card_IDs.append(card.ID)
 
-        for combination in list(combinations(card_IDs, len(card_IDs)-5)):
-            retlist.append(list(combination))
-        return retlist
+        return card_IDs
     
     def get_cards_by_suit_options(self, suit):
         matching_cards = []
@@ -519,9 +517,7 @@ class Alliance(Actor):
             for card in self.supporter_deck.cards:
                 card_IDs.append(card.ID)
 
-            for combination in list(combinations(card_IDs, len(card_IDs)-5)):
-                retlist.append(list(combination))
-            return retlist
+            return card_IDs
         return
 
 
@@ -807,10 +803,9 @@ class Vagabond(Actor):
         return move_options
     
     def get_refresh_options(self):
-        item_num = self.other_items.count(Item("root_tea"))*2 + 3
         all_items = self.satchel + self.other_items
         exhausted_items = [item for item in all_items if item.exhausted]
-        return list(combinations(exhausted_items, min(item_num, len(exhausted_items))))
+        return exhausted_items
     
     #def get_damage_options(self, num_dmged):
     #    all_items = self.satchel + self.other_items

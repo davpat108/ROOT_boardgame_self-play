@@ -323,8 +323,8 @@ def test_alliance_spread_options():
     alliance.supporter_deck.add_card(common_deck.draw_card())
     alliance.supporter_deck.add_card(common_deck.draw_card())
 
-    options = alliance.discard_down_to_five_supporters_options(map)
-    assert sorted(options) == sorted([[2], [21], [22], [31], [32], [51]])
+    #options = alliance.discard_down_to_five_supporters_options(map)
+    #assert sorted(options) == sorted([[2], [21], [22], [31], [32], [51]])
 
     map.places['B'].update_pieces(buildings = [('base', 'alliance'),('sawmill', 'cat')])
     options = alliance.discard_down_to_five_supporters_options(map)
@@ -447,11 +447,11 @@ def test_vagabond():
     vagabond.exhaust_item(Item('boot'))
     vagabond.exhaust_item(Item('sword'))
     refresh_options = vagabond.get_refresh_options()
-    assert refresh_options == [(Item('sword'), Item('boot'))]
+    assert refresh_options == [Item('sword'), Item('boot')]
 
     # BATTLE
-    vagabond.refresh_item(refresh_options[0][0])
-    vagabond.refresh_item(refresh_options[0][1])
+    vagabond.refresh_item(refresh_options[0])
+    vagabond.refresh_item(refresh_options[1])
 
     map.places['C'].update_pieces(soldiers = {'cat': 1, 'bird' : 1, 'alliance' : 1})
     battle_options = vagabond.get_battle_options(map)

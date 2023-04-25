@@ -202,14 +202,18 @@ class Game():
 
     def slip(self, place, card_to_give_if_sympathy):
         if 'sympathy' in self.map.places[place.name].tokens:
-            if card_to_give_if_sympathy and len(self.vagabond.deck.cards) > 0:
+            if not card_to_give_if_sympathy and len(self.vagabond.deck.cards) > 0:
                 options = self.alliance.take_card_from_a_player_options(self.vagabond)
                 card_id = alliance_choose_card(options)
                 self.alliance.supporter_deck.add_card(self.vagabond.deck.get_the_card(card_id))
-            if card_to_give_if_sympathy and len(self.vagabond.deck.cards) == 0:
+            if not card_to_give_if_sympathy and len(self.vagabond.deck.cards) == 0:
                 self.alliance.supporter_deck.add_card(self.deck.draw_card())
+                if len(self.deck.cards) == 0:
+                    self.deck = self.discard_deck
+                    self.deck.shuffle_deck()
+                    self.discard_deck = Deck(empty=True)
             else:
-                self.alliance.supporter_deck.add_card(self.vagabond.deck.get_the_card(card_to_give_if_sympathy))
+                self.alliance.supporter_deck.add_card(self.vagabond.deck.get_the_card(card_to_give_if_sympathy.ID))
         self.map.move_vagabond(place.name)
 
 
@@ -789,12 +793,16 @@ class Game():
             self.vagabond.victory_points += 1
             if target == "sympathy" and card_to_give_if_sympathy:
                 self.alliance.supporter_deck.add_card(self.vagabond.deck.get_the_card(card_to_give_if_sympathy))
-            if target == "sympathy" and not  card_to_give_if_sympathy:
+            if target == "sympathy" and not card_to_give_if_sympathy and len(self.vagabond.deck.cards) == 0:
                 self.alliance.supporter_deck.add_card(self.deck.draw_card())
                 if len(self.deck.cards) <= 0:
                     self.deck = self.discard_deck
                     self.deck.shuffle_deck()
                     self.discard_deck = Deck(empty=True)
+            if target == "sympathy" and not card_to_give_if_sympathy and len(self.vagabond.deck.cards) > 0:
+                options = self.alliance.take_card_from_a_player_options(self.vagabond)
+                card_id = alliance_choose_card(options)
+                self.alliance.supporter_deck.add_card(self.vagabond.deck.get_the_card(card_id))
             if target == "sympathy":
                 self.alliance.victory_points -= sympathy_VPs[self.map.count_on_map(("token", "sympathy"))+1]
 
@@ -822,7 +830,7 @@ def alliance_choose_card(options):
 def choose_card_prios(card_IDS):
     return random.shuffle(card_IDS)
 
-#BATTLE HELPER FUNCTIONS
+# BATTLE HELPER FUNCTIONS
 def get_loss_prios(actor_name):
     if actor_name == 'bird':
         return ['roost']
@@ -928,8 +936,8 @@ def get_all_evening_option_alliance(game):
     options += game.alliance.get_organize_options(game.map)
     return options
 
-def move_and_account_to_sympathy(game, choice):
-    card_to_give_if_sympathy = game.marquise.card_to_give_to_alliace_options(game.map.places[choice.where].suit)
+def move_and_account_to_sympathy(game, choice, actor):
+    card_to_give_if_sympathy = game.actor.card_to_give_to_alliace_options(game.map.places[choice.where].suit)
     game.move(choice, card_to_give_if_sympathy)
 
 def cat_daylight_actions(game, choice, recruited_already=False):
@@ -944,7 +952,7 @@ def cat_daylight_actions(game, choice, recruited_already=False):
         game.recruit_cat()
     # MOVE
     elif isinstance(choice, MoveDTO):
-        move_and_account_to_sympathy(game, choice)
+        move_and_account_to_sympathy(game, choice, game.marquise)
         moved = True
     # BUILD
     elif len(choice) == 3:
@@ -1004,7 +1012,7 @@ def eyrie_daylight_actions(game):
             options = game.eyrie.get_resolve_move(game.map)
             if options:
                 choice = random_choose(options)
-                move_and_account_to_sympathy(game, choice)
+                move_and_account_to_sympathy(game, choice, game.eyrie)
             else:
                 turmoil = True
                 break
@@ -1061,3 +1069,16 @@ def alliance_evening_actions(game, choice):
         game.organize(placename = choice[0])
     else:
         raise ValueError("Wrong choice in alliance evening")
+    
+def vagabond_evening(game):
+    for _ in range(game.vagabond.other_items.count(Item("root_tea"))*2 + 3):
+        options = game.vagabond.get_refresh_options()
+        if options:
+            choice = random_choose(options)
+            game.vagabond.refresh_item(choice)
+        else:
+            break
+    options = game.vagabond.get_slip_options(game.map)
+    choice = random_choose(options)
+    card_to_give_if_sympathy = game.vagabond.card_to_give_to_alliace_options(game.map.places[choice.where].suit)
+    game.slip(choice.where, card_to_give_if_sympathy)

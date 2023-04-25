@@ -400,4 +400,4 @@ def test_cards():
     assert game.marquise.royal_claim == True
     assert game.marquise.deck.cards == []
 
-test_recruit_and_add_to_resolve()
+test_movement_slip()
