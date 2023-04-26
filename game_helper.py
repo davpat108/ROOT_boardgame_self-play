@@ -251,6 +251,74 @@ def vagabond_daylight_actions(game, choice, consequitive_aids):
         raise ValueError("Wrong choice in vagabond daylight")
     return consequitive_aids
 
+def birdsong_card_actions(game, actor):
+    # Better burrow bank
+    options = actor.bbb_options((game.marquise, game.eyrie, game.alliance, game.vagabond))
+    if options:
+        choice = random_choose(options)
+        game.better_burrow_bank(actor, choice)
+    # Stand and deliver
+    options = actor.stand_and_deliver_options((game.marquise, game.eyrie, game.alliance, game.vagabond))
+    if options:
+        choice = random_choose(options)
+        game.stand_and_deliver(actor, choice)
+    # Royal claim
+    options = actor.get_royal_claim_options()
+    choice = random_choose(options)
+    if choice:
+        game.activate_royal_claim(actor)
+
+
+
+def daylight_card_actions(game, actor):
+    # Command warren
+    if actor.name == "cat" and actor.command_warren:
+        options = actor.get_battles(game.map)
+        options.append(False)
+        choice = random_choose(options)
+        if choice:
+            battle_cat(game, choice)
+    if actor.name == "bird" and actor.command_warren:
+        options = actor.get_command_warren_battle(game.map)
+        options.append(False)
+        choice = random_choose(options)
+        if choice:
+            battle_bird(game, choice)
+    if actor.name == "alliance" and actor.command_warren:
+        options = actor.get_battles(game.map)
+        options.append(False)
+        choice = random_choose(options)
+        if choice:
+            battle_alliance(game, choice)
+    if actor.name == "vagabond" and actor.command_warren:
+        options = actor.get_battle_options(game.map)
+        options.append(False)
+        choice = random_choose(options)
+        if choice:
+            battle_vagabond(game, choice)
+    
+    # Codebreakers
+    if actor.codebreakers:
+        options = actor.codebreakers_options(game.map)
+        choice = random_choose(options)
+        if choice:
+            actor.known_hands[choice] = True
+
+    # TAX COLLECTOR TODO anytime during daylight
+    if actor.tax_collector:
+        options = actor.get_tax_collector_options(game.map)
+        choice = random_choose(options)
+        if choice:
+            game.tax_collection(actor, choice)
+    
+
+def evening_card_actions(game, actor):
+    # COBBLER
+    if actor.cobbler and actor != 'bird':
+        options = actor.get_moves(game.map)
+        choice = random_choose(options)
+        if choice:
+            game.cobbler(actor, choice)
 
 
 def marquise_daylight(game):
@@ -297,7 +365,7 @@ def marquise_evening(game):
 
 
 def eyrie_birdsong(game):
-        # DRAW IF HAND EMPTY
+    # DRAW IF HAND EMPTY
     if len(game.eyrie.deck.cards) == 0:
         game.eyrie.deck.add_card(game.deck.draw_card())
         if len(game.deck.cards) >= 0: # DECK ONE LINER

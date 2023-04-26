@@ -61,8 +61,8 @@ class Actor():
 
     def stand_and_deliver_options(self, actors):
         if not self.stand_and_deliver:
-            return
-        options = ['No one'] # Maybe you can take from supporter deck but its not implemented
+            return [False]
+        options = [False] # Maybe you can take from supporter deck but its not implemented
         for actor in actors:
             if actor != self and len(actor.deck.cards) > 0:
                 options.append(actor)
@@ -123,7 +123,7 @@ class Actor():
         # Gets all places with soldiers on the map
         if not self.tax_collector:
             return
-        options = []
+        options = [False]
         for place in map.places.values():
             if place.soldiers[self.name] > 0:
                 options.append(place.name)
@@ -429,6 +429,43 @@ class Eyrie(Actor):
 
         return battle_options
     
+
+    def get_command_warren_battle(self, map):
+        battle_options = []
+
+        for clearing in map.places.values():
+            if clearing.soldiers["bird"] > 0:
+                    if clearing.soldiers['cat'] > 0 or True in [slot[1]=='cat' for slot in clearing.building_slots] or 'keep' in clearing.tokens or 'wood' in clearing.tokens:
+                        battle_options.append(Battle_DTO(clearing.name, "cat"))
+                    if clearing.soldiers['alliance'] > 0 or True in [slot[1]=='alliance' for slot in clearing.building_slots] or "sympathy" in clearing.tokens:
+                        battle_options.append(Battle_DTO(clearing.name, "alliance"))
+                    if clearing.vagabond_is_here:
+                        battle_options.append(Battle_DTO(clearing.name, "vagabond"))
+                    if self.armorers:
+                        if clearing.soldiers['cat'] > 0 or True in [slot[1]=='cat' for slot in clearing.building_slots] or 'keep' in clearing.tokens or 'wood' in clearing.tokens:
+                            battle_options.append(Battle_DTO(clearing.name, "cat", armorer_usage=True))
+                        if clearing.soldiers['alliance'] > 0 or True in [slot[1]=='alliance' for slot in clearing.building_slots] or "sympathy" in clearing.tokens:
+                            battle_options.append(Battle_DTO(clearing.name, "alliance", armorer_usage=True))
+                        if clearing.vagabond_is_here:
+                            battle_options.append(Battle_DTO(clearing.name, "vagabond", armorer_usage=True))
+                    if self.brutal_tactics:
+                        if clearing.soldiers['cat'] > 0 or True in [slot[1]=='cat' for slot in clearing.building_slots] or 'keep' in clearing.tokens or 'wood' in clearing.tokens:
+                            battle_options.append(Battle_DTO(clearing.name, "cat", brutal_tactics_usage=True))
+                        if clearing.soldiers['alliance'] > 0 or True in [slot[1]=='alliance' for slot in clearing.building_slots] or "sympathy" in clearing.tokens:
+                            battle_options.append(Battle_DTO(clearing.name, "alliance", brutal_tactics_usage=True))
+                        if clearing.vagabond_is_here:
+                            battle_options.append(Battle_DTO(clearing.name, "vagabond", brutal_tactics_usage=True))
+                    if self.brutal_tactics and self.armorers:
+                        if clearing.soldiers['cat'] > 0 or True in [slot[1]=='cat' for slot in clearing.building_slots] or 'keep' in clearing.tokens or 'wood' in clearing.tokens:
+                            battle_options.append(Battle_DTO(clearing.name, "cat", brutal_tactics_usage=True, armorer_usage=True))
+                        if clearing.soldiers['alliance'] > 0 or True in [slot[1]=='alliance' for slot in clearing.building_slots] or "sympathy" in clearing.tokens:
+                            battle_options.append(Battle_DTO(clearing.name, "alliance", brutal_tactics_usage=True, armorer_usage=True))
+                        if clearing.vagabond_is_here:
+                            battle_options.append(Battle_DTO(clearing.name, "vagabond", brutal_tactics_usage=True, armorer_usage=True))
+
+        return battle_options
+    
+
     def get_resolve_building(self, map):
         building_option = []
 

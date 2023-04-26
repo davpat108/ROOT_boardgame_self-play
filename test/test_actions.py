@@ -389,7 +389,7 @@ def test_cards():
 
     game.eyrie.tax_collector = True
     options = game.eyrie.get_tax_collector_options(game.map)
-    assert options == ['L']
+    assert options == [False, 'L']
 
     game.map.places['H'].update_pieces(buildings = [('workshop', 'cat'), ('workshop', 'cat'), ('workshop', 'cat')])
     game.marquise.deck.cards = []

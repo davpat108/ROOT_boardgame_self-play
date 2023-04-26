@@ -4,7 +4,7 @@ from dtos import CraftDTO
 from map import build_regular_forest
 from deck import Deck, QuestDeck
 from configs import sympathy_VPs, eyrie_roost_VPs, persistent_effects, Immediate_non_item_effects, eyrie_leader_config, buildings_list_marquise, vagabond_quest_card_info
-from game_helper import alliance_choose_card
+from game_helper import alliance_choose_card, choose_card_prios
 import random
 
 
@@ -92,7 +92,7 @@ class Game():
             self.vagabond.quest_deck.add_card(self.quest_deck.draw_card())
 
     def stand_and_deliver(self, taker, victim):
-        if victim == "No one":
+        if not victim:
             return
         victim.deck.shuffle_deck()
         taker.deck.add_card(victim.deck.draw_card())
@@ -105,17 +105,6 @@ class Game():
             self.deck.shuffle_deck()
             self.discard_deck = Deck(empty=True)
         other.deck.add_card(self.deck.draw_card())
-
-    def codebreakers(self, actor, other):
-        actor.known_hands[other.name] = True
-
-    def discard_down_to_five(self, actor):
-        card_options = actor.get_card_prios()
-        card_choices = choose_card_prios(card_options)
-        # pops the last card in the list, which is the lowest priority card
-        while len(actor.deck.cards) > 5:
-            self.discard_deck.add_card(actor.deck.get_the_card(card_choices.pop()))
-
 
     def tax_collection(self, actor, placename):
         self.map.places[placename].soldiers[actor.name] -= 1
@@ -131,6 +120,7 @@ class Game():
         for place in self.map.places.values():
             if place.owner == actor.name:
                 actor.victory_points += 1
+        actor.royal_claim = False
 
     def cat_birdsong_wood(self):
         for key in list(self.map.places.keys()):
