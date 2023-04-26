@@ -81,7 +81,6 @@ class Actor():
         if len(self.deck.cards) <= 5:
             return
         card_IDs = []
-        retlist = []
         for card in self.deck.cards:
             card_IDs.append(card.ID)
 
@@ -752,6 +751,9 @@ class Vagabond(Actor):
             if not status in ['indifferent', 'hostile', 'good', 'very good', 'friendly']:
                 return True
 
+    def count_for_card_draw(self):
+        return self.satchel.count(Item('money')) + 1
+
     def get_options(self):
         return super().get_options()
 
@@ -1068,4 +1070,7 @@ class Vagabond(Actor):
             self.exhaust_item(Item("hammer"))
 
     def get_discard_items_down_to_sack_options(self):
-        pass
+        max_items_satchtel = 6 + self.other_items.count(Item("sack")) * 2
+        if len(self.satchel) <= max_items_satchtel:
+            return
+        return self.satchtel
