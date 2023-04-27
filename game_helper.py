@@ -318,7 +318,14 @@ def evening_card_actions(game, actor):
         options = actor.get_moves(game.map)
         choice = random_choose(options)
         if choice:
-            game.cobbler(actor, choice)
+            move_and_account_to_sympathy(game, choice)
+            
+    elif actor.cobbler and actor == 'bird':
+        options = actor.get_cobbler_move_options
+        choice = random_choose(options)
+        if choice:
+            move_and_account_to_sympathy(game, choice)
+        
 
 
 def marquise_daylight(game):

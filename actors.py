@@ -35,6 +35,7 @@ class Actor():
         self.win_condition = "points" #None, rabbit, mouse, fox, bird, coalition
         self.refresh_craft_activations(map)
         self.card_prios = []
+        self.persistent_effect_deck = Deck(empty=True)
     
     def __lt__(self, other):
         return self.name < other.name
@@ -390,6 +391,16 @@ class Eyrie(Actor):
                             for soldiers in range(1, source_clearing.soldiers["bird"] + 1):
                                 move_options.append(MoveDTO(source_clearing.name, dest_clearing.name, how_many=soldiers,card_ID=card_ID, who="bird"))
         return move_options
+
+    def get_cobbler_move_options(self, map):
+        move_options = []
+        for source_clearing in map.clearing.values():
+            if source_clearing.soldiers["bird"] > 0:
+                for neighbor in source_clearing.neighbors:
+                    if not neighbor[1]:
+                        dest_clearing = map.places[neighbor[0]]
+                        for soldiers in range(1, source_clearing.soldiers["bird"] + 1):
+                            move_options.append(MoveDTO(source_clearing.name, dest_clearing.name, how_many=soldiers, who="bird"))
 
     def get_resolve_battle(self, map):
         battle_options = []
