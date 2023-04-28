@@ -58,6 +58,7 @@ class Game():
         else:
             vagabond_roles = ["Thief"] # ["Thief", "Ranger", "Tinkerer"]
             eyrie_leaders = ["Despot", "Commander", "Charismatic", "Builder"]
+            self.map = build_regular_forest()
 
             self.marquise = Marquise(map=self.map)
             self.eyrie = Eyrie(map=self.map, role=random.choice(eyrie_leaders))
@@ -253,8 +254,8 @@ class Game():
         self.check_victory_points()
 
 
-    def slip(self, place, card_to_give_if_sympathy):
-        if 'sympathy' in self.map.places[place.name].tokens:
+    def slip(self, placename, card_to_give_if_sympathy):
+        if 'sympathy' in self.map.places[placename].tokens:
             if not card_to_give_if_sympathy and len(self.vagabond.deck.cards) > 0:
                 options = self.alliance.take_card_from_a_player_options(self.vagabond)
                 card_id = alliance_choose_card(options)
@@ -267,7 +268,7 @@ class Game():
                     self.discard_deck = Deck(empty=True)
             else:
                 self.alliance.supporter_deck.add_card(self.vagabond.deck.get_the_card(card_to_give_if_sympathy.ID))
-        self.map.move_vagabond(place.name)
+        self.map.move_vagabond(placename)
 
 
     def remove_soldiers_from_vagabond_items(self, items, defender):
@@ -278,7 +279,7 @@ class Game():
         return new_items
 
 
-    def get_battle_damages(self, attacker, defender, dice_rolls, place_name, armorers: list[bool, bool] = False, sappers:bool = False, brutal_tactics:bool=False):
+    def get_battle_damages(self, attacker, defender, dice_rolls, place_name, armorers: list[bool, bool] = False, sappers:bool = False, brutal_tactics:bool=False, card_ID=None):
         """
         :param attacker: str
         :param defender: str
@@ -353,23 +354,24 @@ class Game():
             if brutal_tactics and actor.name == defender:
                 actor.victory_points += 1
 
-
+        if card_ID:
+            self.eyrie.remove_from_temp_decree(card_ID, 'battle')
 
         self.check_victory_points()
         return dmg_attacker, dmg_defender
 
 
-    def priority_to_list(self, priorities, place, owner):
+    def priority_to_list(self, priorities, placename, owner):
         """
         :param priority: str
         :return: list
         """
         chosen_pieces = []
         for piece in priorities:
-            for token in place.tokens:
+            for token in self.map.places[placename].tokens:
                 if token == piece:
                     chosen_pieces.append((token, 'token'))
-            for building_slot in place.building_slots:
+            for building_slot in self.map.places[placename].building_slots:
                 if building_slot[0] == piece and building_slot[1] == owner:
                     chosen_pieces.append((building_slot[0], 'building'))
 
@@ -747,7 +749,7 @@ class Game():
             self.discard_deck.add_card(self.marquise.deck.get_the_card(card_id))
 
     def eyrie_get_points(self):
-        roosts = self.map.count_on_self.map(("building", "roost"))
+        roosts = self.map.count_on_map(("building", "roost"))
         self.eyrie.victory_points += eyrie_roost_VPs[roosts]
         self.check_victory_points()
 

@@ -1,0 +1,47 @@
+DEBUG:root:cat used stand and deliver with False
+DEBUG:root:cat moved to A with 1 pieces
+DEBUG:root:cat moved to D with 1 pieces
+DEBUG:root:cat moved to B with 1 pieces
+DEBUG:root:cat moved to J with 1 pieces
+DEBUG:root:Cat built recruiter at H
+DEBUG:root:bird used stand and deliver with False
+DEBUG:root:bird added 9 to decree
+DEBUG:root:bird added 13 to decree
+DEBUG:root:bird moved to H with 5 pieces
+DEBUG:root:bird moved to K with 1 pieces
+DEBUG:root:Bird initiated a battler agaisntcat
+DEBUG:root:Rolls (3, {3})
+DEBUG:root:cat used stand and deliver with False
+DEBUG:root:Cat built recruiter at C
+DEBUG:root:Cat used bird card to gain a move
+DEBUG:root:cat moved to G with 1 pieces
+DEBUG:root:cat moved to A with 1 pieces
+DEBUG:root:Cat used bird card to gain a move
+DEBUG:root:cat moved to G with 1 pieces
+DEBUG:root:cat moved to D with 2 pieces
+DEBUG:root:bird used stand and deliver with False
+DEBUG:root:bird added 30 to decree
+DEBUG:root:bird added 9 to decree
+DEBUG:root:bird recruited at <map.Place object at 0x0000018FAF93ACD0>
+DEBUG:root:bird fell into turmoil
+DEBUG:root:bird chose Commander as its new leader
+DEBUG:root:alliance used stand and deliver with False
+DEBUG:root:alliance spread sympathy to E
+DEBUG:root:Alliance crafted sack
+DEBUG:root:Alliance mobilized with 29
+DEBUG:root:Alliance mobilized with 37
+DEBUG:root:vagabond used stand and deliver with False
+DEBUG:root:vagabond slipped to G
+DEBUG:root:cat used stand and deliver with False
+DEBUG:root:Cat built recruiter at E
+DEBUG:root:cat moved to L with 1 pieces
+DEBUG:root:cat moved to A with 1 pieces
+DEBUG:root:Cat used bird card to gain a move
+DEBUG:root:cat moved to C with 1 pieces
+DEBUG:root:cat moved to D with 1 pieces
+DEBUG:root:bird used stand and deliver with False
+DEBUG:root:bird added 35 to decree
+DEBUG:root:bird added 31 to decree
+DEBUG:root:bird moved to H with 3 pieces
+DEBUG:root:Bird initiated a battler agaisntcat
+DEBUG:root:Rolls (3, {1})

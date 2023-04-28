@@ -174,7 +174,7 @@ class Marquise(Actor):
                         craft_options.append(CraftDTO(card))
                 elif card.craft_suit == "dominance" and self.victory_points >= 10 and self.win_condition == "points":
                     craft_options.append(CraftDTO(card))
-                elif self.craft_activations[card.craft_suit] >= card.craft_cost:
+                elif card.craft_suit != "dominance" and card.craft_suit != "all" and card.craft_suit != "anything" and self.craft_activations[card.craft_suit] >= card.craft_cost:
                     craft_options.append(CraftDTO(card))
         return craft_options
     
@@ -525,7 +525,7 @@ class Eyrie(Actor):
             if card.craft in Immediate_non_item_effects or card.craft in map.craftables or card.craft in persistent_effects:
                 if card.craft_suit == "ambush":
                     pass
-                elif self.craft_activations[card.craft_suit] >= card.craft_cost:
+                elif card.craft_suit != "dominance" and card.craft_suit != "all" and card.craft_suit != "anything" and self.craft_activations[card.craft_suit] >= card.craft_cost:
                     craft_options.append(CraftDTO(card))
                 elif card.craft_suit == "anything":
                     if sum(self.craft_activations.values()) >= card.craft_cost:
@@ -687,7 +687,7 @@ class Alliance(Actor):
                         craft_options.append(CraftDTO(card))
                 elif card.craft_suit == "dominance" and self.victory_points >= 10 and self.win_condition == "points":
                     craft_options.append(CraftDTO(card))
-                elif self.craft_activations[card.craft_suit] >= card.craft_cost:
+                elif card.craft_suit != "dominance" and card.craft_suit != "all" and card.craft_suit != "anything" and self.craft_activations[card.craft_suit] >= card.craft_cost:
                    craft_options.append(CraftDTO(card))
         return craft_options
     

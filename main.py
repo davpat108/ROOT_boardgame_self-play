@@ -29,7 +29,8 @@ def play(player):
 
 if __name__ == "__main__":
     game = Game(debug=False)
-    turn_order = random.shuffle(['cat', 'bird', 'alliance', 'vagabond'])
+    turn_order = ['cat', 'bird', 'alliance', 'vagabond']
+    #random.shuffle(turn_order)
     winner = "No one"
     game_num = 0
     while winner == "No one":
