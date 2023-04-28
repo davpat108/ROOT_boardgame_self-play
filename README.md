@@ -30,6 +30,7 @@ alliance losing a base
 defender armorer
 bird -1 for some reason
 dominance card picking every daylight
+alliance only do stuff with base
 # TODO first gonna skip
 which woods to use to build, if you can build by the rule supply lines, you might be able to build unsupported wood
 which craft activations to use for royal claim
