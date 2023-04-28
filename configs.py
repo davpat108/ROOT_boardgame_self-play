@@ -54,7 +54,7 @@ total_common_card_info = [[0, "rabbit", "command_warren", 2, "rabbit"],
                [52, "bird", Item("crossbow"), 1, "fox"],
                [53, "bird", "royal_claim", 4, "anything"]]
 
-persistent_effects = ["command_warren", "cobbler", "scouting_party", "codebreakers", "stand_and_deliver", "tax_collector", "sappers", "brutal_tactics", "armorers", "dominance", "better_burrow_bank", "royal_claim"]
+persistent_effects = ["command_warren", "cobbler", "scouting_party", "codebreakers", "stand_and_deliver", "tax_collector", "sappers", "brutal_tactics", "armorers", "better_burrow_bank", "royal_claim"]
 Immediate_non_item_effects = ["ambush", "favor"]
 
 

@@ -47,8 +47,7 @@ royal claim XX
 
 maybe priority list for battle losses not that good and full list is necessery?
 tax collection
-craftables heading to discard pile
-domination cards heading to discard pile
+field hospital
 
 # TODO first gonna skip
 which woods to use to build, if you can build by the rule supply lines, you might be able to build unsupported wood

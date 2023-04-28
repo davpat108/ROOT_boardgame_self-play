@@ -351,6 +351,7 @@ def test_resolve_battle():
     game.map.places['H'].update_pieces(soldiers ={'cat': 3, 'bird': 1, 'alliance': 0}, buildings = [('sawmill', 'cat'), ('workshop', 'cat'), ('roost', 'bird'),], tokens = ['wood'])
     game.map.update_owners()
     game.marquise.armorers = True
+    game.marquise.persistent_effect_deck.add_card(Card(*total_common_card_info[50]))
     
     attacker_piece_lose_priorities = ['wood','sawmill', 'workshop', 'recruiter', 'keep']
     defender_piece_lose_priorities = ['roost']
@@ -373,6 +374,7 @@ def test_resolve_battle():
     game.map.places['H'].update_pieces(soldiers ={'cat': 3, 'bird': 1, 'alliance': 0}, buildings = [('sawmill', 'cat'), ('workshop', 'cat'), ('roost', 'bird'),], tokens = ['wood'])
     game.map.update_owners()
     game.eyrie.armorers = True
+    game.eyrie.persistent_effect_deck.add_card(Card(*total_common_card_info[50]))
     
     attacker_piece_lose_priorities = ['wood','sawmill', 'workshop', 'recruiter', 'keep']
     defender_piece_lose_priorities = ['roost']
@@ -418,6 +420,7 @@ def test_resolve_battle():
     game.map.places['H'].update_pieces(soldiers ={'cat': 3, 'bird': 1, 'alliance': 0}, buildings = [('sawmill', 'cat'), ('workshop', 'cat'), ('roost', 'bird'),], tokens = ['wood'])
     game.map.update_owners()
     game.eyrie.sappers = True
+    game.eyrie.persistent_effect_deck.add_card(Card(*total_common_card_info[41]))
     
     attacker_piece_lose_priorities = ['wood','sawmill', 'workshop', 'recruiter', 'keep']
     defender_piece_lose_priorities = ['roost']

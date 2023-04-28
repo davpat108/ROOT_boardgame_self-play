@@ -158,7 +158,7 @@ class Marquise(Actor):
     def get_options_craft(self, map):
         craft_options = []
         for card in self.deck.cards:
-            if card.craft in Immediate_non_item_effects or card.craft in map.craftables or card.craft in persistent_effects:
+            if card.craft in Immediate_non_item_effects or card.craft in map.craftables or card.craft in persistent_effects or card.craft == "dominance":
                 if card.craft_suit == "ambush":
                     pass
                 elif card.craft_suit == "anything":

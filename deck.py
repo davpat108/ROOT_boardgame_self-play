@@ -39,6 +39,13 @@ class Deck:
         except:
             return "Card not in the deck"
     
+    def get_a_card_like_it(self, card_craft):
+        for card in self.cards:
+            if card.craft == card_craft:
+                self.cards.remove(card)
+                return card
+        raise Exception("No card like that in the deck")
+
     def draw_card(self):
         if len(self.cards) == 0:
             return "Deck Empty"

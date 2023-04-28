@@ -326,10 +326,13 @@ def evening_card_actions(game, actor):
         if choice:
             move_and_account_to_sympathy(game, choice)
         
-
+def marquise_birdsong(game):
+    birdsong_card_actions(game, game.marquise)
+    game.cat_birdsong_wood()
 
 def marquise_daylight(game):
-        # CRAFT
+    daylight_card_actions(game, game.marquise)
+    # CRAFT
     game.marquise.refresh_craft_activations(game.map)
     craft_options = game.marquise.get_options_craft()
     choice = random_choose(craft_options)
@@ -356,6 +359,7 @@ def marquise_daylight(game):
             actions += 1
 
 def marquise_evening(game):
+    evening_card_actions(game, game.marquise)
     draws = game.marquise.count_for_card_draw()
     for _ in range(draws):
         game.marquise.deck.add_card(game.deck.draw_card())
@@ -372,6 +376,7 @@ def marquise_evening(game):
 
 
 def eyrie_birdsong(game):
+    birdsong_card_actions(game, game.eyrie)
     # DRAW IF HAND EMPTY
     if len(game.eyrie.deck.cards) == 0:
         game.eyrie.deck.add_card(game.deck.draw_card())
@@ -395,6 +400,7 @@ def eyrie_birdsong(game):
         game.place_roost_if_zero_roost(choice)
         
 def eyrie_daylight(game):
+    daylight_card_actions(game, game.eyrie)
     choice = True
     game.eyrie.refresh_craft_activations(game.map)
     while choice:
@@ -449,6 +455,7 @@ def eyrie_daylight(game):
         game.bird_turmoil(choice)
     
 def eyrie_eveing(game):
+    evening_card_actions(game, game.eyrie)
     game.eyrie_get_points()
     draws = game.eyrie.count_for_card_draw()
     for _ in range(draws):
@@ -465,6 +472,7 @@ def eyrie_eveing(game):
             game.discard_deck.add_card(game.eyrie.deck.get_the_card(choice))
 
 def alliance_birsong(game):
+    birdsong_card_actions(game, game.alliance)
     options = game.alliance.get_revolt_options(game.map)
     options.append(False)
     choice = random_choose(options)
@@ -477,6 +485,7 @@ def alliance_birsong(game):
         game.spread_sympathy(*choice)
 
 def alliance_daylight(game):
+    daylight_card_actions(game, game.alliance)
     game.alliance.refresh_craft_activations(game.map)
     choice = True
     while choice:
@@ -486,6 +495,7 @@ def alliance_daylight(game):
             alliance_daylight_actions(game, choice)
 
 def alliance_evening(game):
+    evening_card_actions(game, game.alliance)
     for _ in range(game.alliance.total_officers):
         options = get_all_evening_option_alliance(game)
         if choice:
@@ -517,6 +527,7 @@ def alliance_evening(game):
 
     
 def vagabond_birdsong(game):
+    birdsong_card_actions(game, game.vagabond)
     for _ in range(game.vagabond.other_items.count(Item("root_tea"))*2 + 3):
         options = game.vagabond.get_refresh_options()
         if options:
@@ -530,6 +541,7 @@ def vagabond_birdsong(game):
     game.slip(choice.where, card_to_give_if_sympathy)
 
 def vagabond_daylight(game):
+    daylight_card_actions(game, game.vagabond)
     choice = True
     consequitive_aids = 0
     while choice:
@@ -539,6 +551,7 @@ def vagabond_daylight(game):
             consequitive_aids = vagabond_daylight_actions(game, choice, consequitive_aids)
 
 def vagabond_evening(game):
+    evening_card_actions(game, game.vagabond)
     game.vagabond.repair_and_refresh_all()
     draws = game.vagabond.count_for_card_draw()
     for _ in range(draws):

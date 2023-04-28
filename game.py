@@ -3,7 +3,7 @@ from item import Item
 from dtos import CraftDTO
 from map import build_regular_forest
 from deck import Deck, QuestDeck
-from configs import sympathy_VPs, eyrie_roost_VPs, persistent_effects, Immediate_non_item_effects, eyrie_leader_config, buildings_list_marquise, vagabond_quest_card_info
+from configs import sympathy_VPs, eyrie_roost_VPs, persistent_effects, Immediate_non_item_effects, eyrie_leader_config, buildings_list_marquise, vagabond_quest_card_info, total_common_card_info
 from game_helper import alliance_choose_card, choose_card_prios
 import random
 
@@ -19,6 +19,7 @@ class Game():
             self.vagabond = Vagabond(map=self.map, role="Thief")
             self.deck = Deck()
             self.discard_deck = Deck(empty=True)
+            self.dominance_discard_deck = Deck(empty=True)
             self.quest_deck = QuestDeck()
             self.discard_quest_deck = QuestDeck(empty=True)
 
@@ -98,6 +99,15 @@ class Game():
         taker.deck.add_card(victim.deck.draw_card())
         victim.victory_points += 1
 
+    def field_hospital(self, dead_soldiers, card_ID):
+        keep_position = [place.name if 'keep' in place.tokens else None for place in self.map.places.values()]
+        self.map.places[keep_position].soldiers['cat'] += dead_soldiers
+        if total_common_card_info[card_ID][2] == "dominance":
+            self.dominance_discard_deck.add_card(self.marquise.deck.get_the_card(card_ID))
+        else:
+            self.discard_deck.add_card(self.marquise.deck.get_the_card(card_ID))
+
+
     def better_burrow_bank(self, actor, other):
         actor.deck.add_card(self.deck.draw_card())
         if len(self.deck.cards) >= 0: # DECK ONE LINER
@@ -143,11 +153,11 @@ class Game():
             raise ValueError("Error in get_no_roosts_left_options")
 
     def cat_use_bird_card_to_gain_move(self, cardID):
-        self.discard_deck.add_card(self.marquise.deck.get_the_card(cardID))
-        if len(self.deck.cards) >= 0: # DECK ONE LINER
-            self.deck = self.discard_deck
-            self.deck.shuffle_deck()
-            self.discard_deck = Deck(empty=True)
+        if total_common_card_info[cardID][2] == "dominance":
+            self.dominance_discard_deck.add_card(self.marquise.deck.get_the_card(cardID))
+        else:
+            self.discard_deck.add_card(self.marquise.deck.get_the_card(cardID))
+
 
     # Alliance
     def revolt(self, place, card_ID1, card_ID2, soldiers_to_gain):
@@ -164,9 +174,15 @@ class Game():
         if place.vagabond_is_here:
             for item in self.vagabond.items_to_damage[:3]:
                 self.vagabond.damage_item(item)
+        if total_common_card_info[card_ID1][2] == "dominance":
+            self.dominance_discard_deck.add_card(self.alliance.supporter_deck.get_the_card(card_ID1))
+        else:
+            self.discard_deck.add_card(self.alliance.supporter_deck.get_the_card(card_ID1))
 
-        self.discard_deck.add_card(self.alliance.supporter_deck.get_the_card(card_ID1))
-        self.discard_deck.add_card(self.alliance.supporter_deck.get_the_card(card_ID2))
+        if total_common_card_info[card_ID2][2] == "dominance":
+            self.dominance_discard_deck.add_card(self.alliance.supporter_deck.get_the_card(card_ID2))
+        else:
+            self.discard_deck.add_card(self.alliance.supporter_deck.get_the_card(card_ID2))
 
         for _ in range(soldiers_to_gain):
             if sum([place.soldiers["alliance"] for place in self.map.places.values()]) + self.alliance.total_officers >= 10:
@@ -184,8 +200,10 @@ class Game():
         self.map.places[place_name].update_pieces(tokens = self.map.places[place_name].tokens + ['sympathy'])
 
         for cardID in card_ids:
-            if self.discard_deck.add_card(self.alliance.supporter_deck.get_the_card(cardID)) is not None:
-                raise ValueError("Error in spread_sympathy: card not in supporter deck")
+            if total_common_card_info[cardID][2] == "dominance":
+                self.dominance_discard_deck.add_card(self.alliance.supporter_deck.get_the_card(cardID))
+            else:
+                self.discard_deck.add_card(self.alliance.supporter_deck.get_the_card(cardID))
 
         victory_points = sympathy_VPs[self.map.count_on_map(what_to_look_for=('token', 'sympathy'), per_suit = False)]
         self.alliance.victory_points += victory_points
@@ -259,12 +277,14 @@ class Game():
             for actor in [self.eyrie, self.vagabond, self.marquise, self.alliance]:
                 if actor.name == attacker:
                     actor.armorers = False
+                    self.discard_deck.add_card(actor.persistent_effect_deck.get_a_card_like_it("armorers"))
             dmg_defender = 0
 
         if armorers[1]:
             for actor in [self.eyrie, self.vagabond, self.marquise, self.alliance]:
                 if actor.name == defender:
                     actor.armorers = False
+                    self.discard_deck.add_card(actor.persistent_effect_deck.get_a_card_like_it("armorers"))
             dmg_attacker = 0        
 
         # No defender
@@ -275,6 +295,7 @@ class Game():
             for actor in [self.eyrie, self.vagabond, self.marquise, self.alliance]:
                 if actor.name == defender:
                     actor.sappers = False
+                    self.discard_deck.add_card(actor.persistent_effect_deck.get_a_card_like_it("sappers"))
             dmg_defender += 1
 
         if brutal_tactics:
@@ -487,14 +508,9 @@ class Game():
         self.map.update_owners()
 
     def craft(self, actor, costs: CraftDTO):
-
         if costs.card.craft == "ambush":
             raise ValueError("Ambush is not a craftable card")
 
-        if costs.card.craft == "dominance":
-            actor.deck.get_the_card(costs.card.ID)
-        else:
-            self.discard_deck.add_card(actor.deck.get_the_card(costs.card.ID))
         if costs.cost == "anything": # Royal claim card, Making the AI choose what to deactivate is too much work for now
             i = 4
             for _ in range(i):
@@ -517,7 +533,10 @@ class Game():
             else:
                 actor.victory_points += costs.card.craft.crafting_reward()
 
-        else:
+            self.discard_deck.add_card(actor.deck.get_the_card(costs.card.ID))
+
+
+        elif costs.card.craft in persistent_effects:
             # Persistent effects
             if costs.card.craft == "cobbler":
                 actor.cobbler = True
@@ -541,11 +560,14 @@ class Game():
                 actor.royal_claim = True
             if costs.card.craft == "brutal_tactics":
                 actor.brutal_tactics = True
-            # Immidiate effects
-            if costs.card.craft == "favor":
+            actor.persistent_effect_deck.add_card(actor.deck.get_the_card(costs.card.ID))
+        # special effects
+        elif costs.card.craft == "favor":
                 self.favor(actor, costs.card.craft_suit)
-            if costs.card.craft == "dominance":
+                self.discard_deck.add_card(actor.deck.get_the_card(costs.card.ID))
+        elif costs.card.craft == "dominance":
                 self.dominance(actor, costs.card.card_suit)
+                actor.deck.get_the_card(costs.card.ID) # remove from the game
 
 
     def favor(self, actor, suit):
@@ -577,8 +599,8 @@ class Game():
 
             for actor in [self.eyrie, self.marquise, self.alliance]:
                 if actor.name == min_point_actorname:
-                    actor.win_condition = "coalition"
-            user.win_condition = "coalition"
+                    actor.win_condition = "coalition_major"
+            user.win_condition = "coalition_minor"
         else:
             user.win_condition = suit
 
@@ -657,7 +679,10 @@ class Game():
 
     def overwork(self, place, card_id):
         place.tokens += ['wood']
-        self.discard_deck.add_card(self.marquise.deck.get_the_card(card_id))
+        if total_common_card_info[card_id][2] == "dominance":
+            self.dominance_discard_deck.add_card(self.marquise.deck.get_the_card(card_id))
+        else:
+            self.discard_deck.add_card(self.marquise.deck.get_the_card(card_id))
 
     def eyrie_get_points(self):
         roosts = self.map.count_on_self.map(("building", "roost"))
@@ -678,27 +703,22 @@ class Game():
         self.eyrie.setup_based_on_leader()
 
         # ALL cards to the discard_deck! Loyal viziers are not here.
-        for _ in range(len(self.eyrie.decree_deck.cards)):
-            self.discard_deck.add_card(self.eyrie.decree_deck.draw_card())
+        for card in self.eyrie.decree_deck.cards:
+            if card.craft == "dominance":
+                self.dominance_discard_deck.add_card(self.eyrie.decree_deck.get_the_card(card.ID)) 
+            else:
+                self.discard_deck.add_card(self.eyrie.decree_deck.get_the_card(card.ID))
         
-    
-
-
-    def spread_symp(self, place, cost):
-        symp_count = self.map.count_on_self.map(("token", "sympathy"), per_suit=False)
-        place.tokens.append("sympathy")
-        for i in range(len(cost)):
-            self.discard_deck.add_card(self.alliance.supporter_deck.get_the_card(cost[i]))
-
-        self.alliance.victory_points += sympathy_VPs[symp_count]
-        place.update_owner()
 
 
     def mobilize(self, card_ID):
         self.alliance.supporter_deck.add_card(self.alliance.deck.get_the_card(card_ID))
 
     def train(self, card_ID):
-        self.discard_deck.add_card(self.alliance.deck.get_the_card(card_ID))
+        if total_common_card_info[card_ID][2] == "dominance":
+            self.dominance_discard_deck.add_card(self.alliance.deck.get_the_card(card_ID))
+        else:
+            self.discard_deck.add_card(self.alliance.deck.get_the_card(card_ID))
         self.alliance.total_officers += 1
 
     def organize(self, placename):
