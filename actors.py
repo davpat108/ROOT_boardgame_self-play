@@ -155,6 +155,11 @@ class Marquise(Actor):
             draws += 1
         return draws
 
+    def get_field_hospital_options(self, place):
+        options = set([True if card.card_suit == place.suit else False for card in self.deck.cards].append(False))
+        return options
+
+
     def get_options_craft(self, map):
         craft_options = []
         for card in self.deck.cards:

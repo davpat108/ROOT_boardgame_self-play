@@ -47,8 +47,8 @@ royal claim XX
 
 maybe priority list for battle losses not that good and full list is necessery?
 tax collection
-field hospital
-
+field hospital update stuff
+alliance losing a base
 # TODO first gonna skip
 which woods to use to build, if you can build by the rule supply lines, you might be able to build unsupported wood
 which craft activations to use for royal claim
