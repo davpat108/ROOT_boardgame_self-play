@@ -13,9 +13,10 @@ def play(player):
         marquise_evening(game)
 
     elif player == "bird":
-        eyrie_birdsong(game)
-        eyrie_daylight(game)
-        eyrie_eveing(game)
+        if not game.eyrie_dead:
+            eyrie_birdsong(game)
+            eyrie_daylight(game)
+            eyrie_eveing(game)
 
     elif player == "alliance":
         alliance_birsong(game)

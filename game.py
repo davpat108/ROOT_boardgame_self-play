@@ -22,7 +22,7 @@ class Game():
             self.dominance_discard_deck = Deck(empty=True)
             self.quest_deck = QuestDeck()
             self.discard_quest_deck = QuestDeck(empty=True)
-
+            self.eyrie_dead = False
             self.winner = None
 
             self.marquise.deck.add_card(self.deck.get_the_card(5))
@@ -65,6 +65,7 @@ class Game():
             self.alliance = Alliance(map=self.map)
             self.vagabond = Vagabond(map=self.map, role=random.choice(vagabond_roles))
             self.winner = None
+            self.eyrie_dead = False
 
             self.deck = Deck()
             self.discard_deck = Deck(empty=True)
@@ -156,7 +157,7 @@ class Game():
 
     def better_burrow_bank(self, actor, other):
         actor.deck.add_card(self.deck.draw_card())
-        if len(self.deck.cards) >= 0: # DECK ONE LINER
+        if len(self.deck.cards) <= 0: # DECK ONE LINER
             self.deck = self.discard_deck
             self.deck.shuffle_deck()
             self.discard_deck = Deck(empty=True)
@@ -166,7 +167,7 @@ class Game():
         self.map.places[placename].soldiers[actor.name] -= 1
         actor.deck.add_card(self.deck.draw_card())
         self.map.places[placename].update_owner()
-        if len(self.deck.cards) >= 0: # DECK ONE LINER
+        if len(self.deck.cards) <= 0: # DECK ONE LINER
             self.deck = self.discard_deck
             self.deck.shuffle_deck()
             self.discard_deck = Deck(empty=True)
@@ -272,7 +273,7 @@ class Game():
                     self.deck.shuffle_deck()
                     self.discard_deck = Deck(empty=True)
             else:
-                self.alliance.supporter_deck.add_card(self.vagabond.deck.get_the_card(card_to_give_if_sympathy.ID))
+                self.alliance.supporter_deck.add_card(self.vagabond.deck.get_the_card(card_to_give_if_sympathy))
         self.map.move_vagabond(placename)
 
 
@@ -499,7 +500,7 @@ class Game():
                 if actor.name != "alliance":
                     if sympathy_killed and card_to_give_if_sympathy:
                         logging.debug(f"alliance is getting {card_to_give_if_sympathy}")
-                        self.alliance.supporter_deck.add_card(actor.deck.get_the_card(card_to_give_if_sympathy.ID)) # CORRECT ASSUMING card_to_give_if_no_sympathy is correct
+                        self.alliance.supporter_deck.add_card(actor.deck.get_the_card(card_to_give_if_sympathy)) # CORRECT ASSUMING card_to_give_if_no_sympathy is correct
                     if sympathy_killed and not card_to_give_if_sympathy:
                         if len(actor.deck.cards) == 0:
                             logging.debug(f"alliance drew a card from the deck")
@@ -515,7 +516,7 @@ class Game():
                 actor.victory_points += victory_points_defender
                 if actor.name != "alliance":
                     if sympathy_killed and card_to_give_if_sympathy:
-                        self.alliance.supporter_deck.add_card(actor.deck.get_the_card(card_to_give_if_sympathy.ID)) # CORRECT ASSUMING card_to_give_if_no_sympathy is correct
+                        self.alliance.supporter_deck.add_card(actor.deck.get_the_card(card_to_give_if_sympathy)) # CORRECT ASSUMING card_to_give_if_no_sympathy is correct
                     if sympathy_killed and not card_to_give_if_sympathy:
                         if len(actor.deck.cards) == 0:
                             self.alliance.supporter_deck.add_card(self.deck.draw_card())
@@ -541,7 +542,7 @@ class Game():
         if move_action.who != 'alliance' and self.map.places[move_action.end].tokens.count("sympathy") > 0:
             for actor in [self.eyrie, self.vagabond, self.marquise]:
                 if actor.name == move_action.who and card_to_give_if_sympathy:
-                    self.alliance.supporter_deck.add_card(actor.deck.get_the_card(card_to_give_if_sympathy.ID))
+                    self.alliance.supporter_deck.add_card(actor.deck.get_the_card(card_to_give_if_sympathy))
                 elif actor.name == move_action.who and not card_to_give_if_sympathy and len(actor.deck.cards) == 0:
                     self.alliance.supporter_deck.add_card(self.deck.draw_card())
                 elif actor.name == move_action.who and not card_to_give_if_sympathy and len(actor.deck.cards) > 0:
@@ -698,10 +699,27 @@ class Game():
             user.win_condition = suit
 
 
-    def ambush(self, place, attacker, defender, bird_or_suit_defender, bird_or_suit_attacker):
+    def ambush(self, placename, attacker, defender, bird_or_suit_defender, bird_or_suit_attacker):
+        if isinstance(defender, str):
+            defender_conv = {
+                "cat": self.marquise,
+                "bird": self.eyrie,
+                "alliance": self.alliance,
+                "vagabond": self.vagabond
+            }
+            defender = defender_conv[defender]
+        if isinstance(attacker, str):
+            attacker_conv = {
+                "cat": self.marquise,
+                "bird": self.eyrie,
+                "alliance": self.alliance,
+                "vagabond": self.vagabond
+            }
+            attacker = attacker_conv[attacker]
+
         if bird_or_suit_defender == "suit":
             for card in defender.deck.cards:
-                if card.craft == "ambush" and card.card_suit == place.suit:
+                if card.craft == "ambush" and card.card_suit ==  self.map.places[placename].suit:
                     self.discard_deck.add_card(defender.deck.get_the_card(card.ID))
         if bird_or_suit_defender == "bird":
             for card in defender.deck.cards:
@@ -711,7 +729,7 @@ class Game():
         if bird_or_suit_attacker or attacker.scouting_party:
             if not attacker.scouting_party and bird_or_suit_attacker == "suit":
                 for card in attacker.deck.cards:
-                    if card.craft == "ambush" and card.card_suit == place.suit:
+                    if card.craft == "ambush" and card.card_suit ==  self.map.places[placename].suit:
                         self.discard_deck.add_card(attacker.deck.get_the_card(card.ID))
             if not attacker.scouting_party and bird_or_suit_attacker == "bird":
                 for card in attacker.deck.cards:
@@ -724,9 +742,9 @@ class Game():
                 self.vagabond.damage_item(item)
 
         else:
-            place.soldiers[attacker.name] -= 2 
-            place.soldiers[attacker.name] = max(place.soldiers[attacker.name], 0)
-        place.update_owner()
+            self.map.places[placename].soldiers[attacker.name] -= 2 
+            self.map.places[placename].soldiers[attacker.name] = max(self.map.places[placename].soldiers[attacker.name], 0)
+        self.map.places[placename].update_owner()
 
     def build(self, place, actor, building, cost = 0, card_ID=None):
         if actor.name == "bird":
@@ -757,16 +775,13 @@ class Game():
                 place.soldiers["cat"] += 1
         self.map.update_owners()
 
-    def recruit(self, place, actor, card_ID = None):
+    def recruit(self, placename, actor, card_ID = None):
         if actor.name == "bird" and actor.leader == "Charismatic":
-            place.soldiers[actor.name] += 2
-            place.update_owner()   
+            self.map.places[placename].soldiers[actor.name] += 2
+            self.map.places[placename].update_owner()   
         else:
-            place.soldiers[actor.name] += 1
-            place.update_owner()
-        
-        if actor.name == "alliance":
-            self.alliance.current_officers -= 1
+            self.map.places[placename].soldiers[actor.name] += 1
+            self.map.places[placename].update_owner()
         
         if actor.name == "bird":
             self.eyrie.remove_from_temp_decree(card_ID, 'recruit')
@@ -794,7 +809,10 @@ class Game():
         self.eyrie.victory_points -= vp_loss
         self.eyrie.victory_points = max(self.eyrie.victory_points, 0)
 
-        self.eyrie.change_role(new_commander)
+        success = self.eyrie.change_role(new_commander)
+        if success == 'Eyrie dead.':
+            self.eyrie_dead = True
+            return
         self.eyrie.setup_based_on_leader()
 
         # ALL cards to the discard_deck! Loyal viziers are not here.

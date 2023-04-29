@@ -47,7 +47,7 @@ def test_resolve_battle():
     options_defender = game.eyrie.get_ambush_options(game.map.places['H'])
     if options_defender[1]:
         options_attacker = game.marquise.get_ambush_options(game.map.places['H'])
-        game.ambush(place = game.map.places['H'], attacker=game.marquise, defender=game.eyrie, bird_or_suit_defender=options_defender[1], bird_or_suit_attacker=options_attacker[0])
+        game.ambush(placename = 'H', attacker=game.marquise, defender=game.eyrie, bird_or_suit_defender=options_defender[1], bird_or_suit_attacker=options_attacker[0])
     dmg_attacker, dmg_defender = game.get_battle_damages(attacker, defender, dice_rolls, place_name, armorers = [False, False])
     game.resolve_battle(game.map.places['H'], attacker, defender, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces)
     assert game.map.places['H'].soldiers['cat'] == 0
@@ -72,7 +72,7 @@ def test_resolve_battle():
     options_defender = game.eyrie.get_ambush_options(game.map.places['H'])
     if options_defender[1]:
         options_attacker = game.marquise.get_ambush_options(game.map.places['H'])
-        game.ambush(place = game.map.places['H'], attacker=game.marquise, defender=game.eyrie, bird_or_suit_defender=options_defender[1], bird_or_suit_attacker=options_attacker[0])
+        game.ambush(placename = 'H', attacker=game.marquise, defender=game.eyrie, bird_or_suit_defender=options_defender[1], bird_or_suit_attacker=options_attacker[0])
     dmg_attacker, dmg_defender = game.get_battle_damages(attacker, defender, dice_rolls, place_name, armorers = [False, False])
     game.resolve_battle(game.map.places['H'], attacker, defender, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces)
     assert game.map.places['H'].soldiers['cat'] == 2
@@ -98,7 +98,7 @@ def test_resolve_battle():
     options_defender = game.eyrie.get_ambush_options(game.map.places['H'])
     if options_defender[1]:
         options_attacker = game.marquise.get_ambush_options(game.map.places['H'])
-        game.ambush(place = game.map.places['H'], attacker=game.marquise, defender=game.eyrie, bird_or_suit_defender=options_defender[1], bird_or_suit_attacker=options_attacker[1])
+        game.ambush(placename = 'H', attacker=game.marquise, defender=game.eyrie, bird_or_suit_defender=options_defender[1], bird_or_suit_attacker=options_attacker[1])
     dmg_attacker, dmg_defender = game.get_battle_damages(attacker, defender, dice_rolls, place_name, armorers = [False, False])
     game.resolve_battle(game.map.places['H'], attacker, defender, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces)
     assert game.map.places['H'].soldiers['cat'] == 2
@@ -230,7 +230,7 @@ def test_resolve_battle():
     game.vagabond.add_item(Item('money'))
     game.vagabond.items_to_damage = [Item('boot'), Item('root_tea'), Item('hammer'), Item('crossbow'), Item('torch'), Item('money'), Item('sword'), Item('sword'), Item('sword')]
     game.vagabond.deck.add_card(Card(*total_common_card_info[17]))
-    card_to_give_if_no_sympathy = Card(*total_common_card_info[17])
+    card_to_give_if_no_sympathy = 17
 
     assert game.vagabond.other_items[game.vagabond.other_items.index(Item('money'))].damaged == False
     attacker_chosen_pieces = game.priority_to_list(attacker_piece_lose_priorities, 'H', attacker)
@@ -259,7 +259,7 @@ def test_resolve_battle():
     game.vagabond.add_item(Item('money'))
     game.vagabond.items_to_damage = [Item('boot'), Item('root_tea'), Item('hammer'), Item('crossbow'), Item('torch'), Item('money'), Item('sword'), Item('sword'), Item('sword')]
     game.vagabond.deck.add_card(Card(*total_common_card_info[17]))
-    card_to_give_if_no_sympathy = Card(*total_common_card_info[17])
+    card_to_give_if_no_sympathy = 17
 
     assert game.vagabond.other_items[game.vagabond.other_items.index(Item('money'))].damaged == False
     attacker_chosen_pieces = game.priority_to_list(attacker_piece_lose_priorities, 'H', attacker)
@@ -433,3 +433,5 @@ def test_resolve_battle():
     assert game.map.places['H'].soldiers['bird'] == 0
     assert game.map.places['H'].building_slots == [('sawmill', 'cat'), ('workshop', 'cat'), ('empty', 'No one')]
     assert game.eyrie.sappers == False
+
+test_resolve_battle()

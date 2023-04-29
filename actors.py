@@ -234,7 +234,7 @@ class Marquise(Actor):
     def get_can_recruit(self, map):
         if sum([place.soldiers["cat"] for place in map.places.values()]) >= 25:
             return (False, 'recruit')
-        return (map.count_on_map(("building", "recruiter")) > 0, 'recruit')
+        return [(map.count_on_map(("building", "recruiter")) > 0, 'recruit')]
     
     def get_wood_tokens_to_build(self, map, place):
         """
@@ -322,13 +322,17 @@ class Eyrie(Actor):
         if self.leader in self.avaible_leaders:
             self.avaible_leaders.remove(self.leader)
             return
+        elif self.avaible_leaders == []:
+            return "Eyrie dead."
         else:
             raise ValueError("Invalid role for Eyrie")
 
     def change_role(self, role):
         self.leader = role
-        self.check_role()
-
+        if self.check_role() != 'Eyrie dead.':
+            self.setup_based_on_leader()
+        else:
+            return 'Eyrie dead.'
 
     def count_for_card_draw(self, map):
         draws = 1
@@ -381,11 +385,11 @@ class Eyrie(Actor):
             if self.leader != "Charismatic" and total_bird_soldiers < 20:
                 for clearing in matching_clearings:
                     if True in [building[0] == 'roost' for building in clearing.building_slots]:
-                        recruit_options.append((clearing, card_ID))
+                        recruit_options.append((clearing.name, card_ID))
             if self.leader == "Charismatic" and total_bird_soldiers < 19:
                 for clearing in matching_clearings:
                     if True in [building[0] == 'roost' for building in clearing.building_slots]:
-                        recruit_options.append((clearing, card_ID))
+                        recruit_options.append((clearing.name, card_ID))
 
         return recruit_options
 
@@ -579,7 +583,6 @@ class Alliance(Actor):
             if len(self.supporter_deck.cards) <= 5:
                 return
             card_IDs = []
-            retlist = []
             for card in self.supporter_deck.cards:
                 card_IDs.append(card.ID)
 

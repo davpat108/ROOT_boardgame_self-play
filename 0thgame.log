@@ -1,47 +1,252 @@
-DEBUG:root:cat used stand and deliver with False
+DEBUG:root:Cat recruited
+DEBUG:root:cat moved to D with 1 pieces
+DEBUG:root:cat moved to A with 1 pieces
+DEBUG:root:cat moved to F with 1 pieces
+DEBUG:root:cat moved to A with 1 pieces
+DEBUG:root:bird added 22 to decree
+DEBUG:root:bird added 3 to decree
+DEBUG:root:bird moved to H with 6 pieces
+DEBUG:root:bird moved to I with 3 pieces
+DEBUG:root:Bird initiated a battler agaisntcat
+DEBUG:root:Rolls (2, {3})
+DEBUG:root:bird built at H
+DEBUG:root:alliance spread sympathy to B
+DEBUG:root:Alliance mobilized with 21
+DEBUG:root:vagabond slipped to C
+DEBUG:root:vagabond moved to I with 0 pieces
+DEBUG:root:cat moved to B with 1 pieces
+DEBUG:root:cat moved to B with 1 pieces
+DEBUG:root:Cat recruited
+DEBUG:root:Cat built workshop at C
+DEBUG:root:bird added 30 to decree
+DEBUG:root:bird crafted sack
+DEBUG:root:bird fell into turmoil
+DEBUG:root:bird chose Despot as its new leader
+DEBUG:root:alliance revolted at B
+DEBUG:root:Marquise lost 0 points
+DEBUG:root:alliance spread sympathy to C
+DEBUG:root:Alliance organized at K
+DEBUG:root:vagabond slipped to S
+DEBUG:root:vagabond moved to I with 0 pieces
+DEBUG:root:Vagabond stole from bird
+DEBUG:root:Vagabond initiated a battler agaisntbird
+DEBUG:root:Rolls (2, {3})
+DEBUG:root:vagabond is getting 1 points
+DEBUG:root:vagabond became hostile with bird
+DEBUG:root:bird lost 1 soldiers
+DEBUG:root:Vagabond initiated a battler agaisntbird
+DEBUG:root:Rolls (0, {3})
+DEBUG:root:vagabond is getting 0 points
+DEBUG:root:bird lost 0 soldiers
+DEBUG:root:cat moved to E with 1 pieces
+DEBUG:root:cat moved to A with 4 pieces
+DEBUG:root:cat moved to B with 3 pieces
+DEBUG:root:cat moved to K with 3 pieces
+DEBUG:root:cat moved to J with 1 pieces
+DEBUG:root:cat moved to C with 1 pieces
+DEBUG:root:bird added 40 to decree
+DEBUG:root:bird moved to L with 2 pieces
+DEBUG:root:Bird initiated a battler agaisntvagabond
+DEBUG:root:Rolls (3, {0})
+DEBUG:root:Vagabond getting {self.vagabond.items_to_damage[:dmg_attacker} damaged
+DEBUG:root:bird built at I
+DEBUG:root:alliance revolted at C
+DEBUG:root:Marquise lost 0 points
+DEBUG:root:alliance spread sympathy to L
+DEBUG:root:Alliance moved to I with 1 pieces
+DEBUG:root:vagabond slipped to S
+DEBUG:root:cat crafted boot
+DEBUG:root:Cat built workshop at E
+DEBUG:root:cat moved to B with 1 pieces
+DEBUG:root:cat moved to D with 1 pieces
+DEBUG:root:cat moved to D with 1 pieces
+DEBUG:root:cat moved to C with 1 pieces
+DEBUG:root:bird added 4 to decree
+DEBUG:root:bird added 37 to decree
+DEBUG:root:bird recruited at I
+DEBUG:root:bird fell into turmoil
+DEBUG:root:bird chose Charismatic as its new leader
+DEBUG:root:alliance spread sympathy to H
+DEBUG:root:Alliance recruited at B
+DEBUG:root:vagabond slipped to H
+DEBUG:root:Vagabond stole from bird
+DEBUG:root:Vagabond initiated a battler agaisntalliance
+DEBUG:root:Rolls (1, {3})
+DEBUG:root:vagabond is getting 0 points
+DEBUG:root:alliance lost sympathy
+DEBUG:root:alliance choose a card
+DEBUG:root:vagabond moved to G with 0 pieces
+DEBUG:root:cat crafted boot
+DEBUG:root:cat moved to G with 2 pieces
+DEBUG:root:cat moved to E with 2 pieces
+DEBUG:root:Cat battled alliance at J
+DEBUG:root:Cat initiated a battler agaisntalliance
+DEBUG:root:alliance has ambushed!
+DEBUG:root:Cat counterambushed? False
+DEBUG:root:Rolls (1, {0})
+DEBUG:root:Cat dmg: 0,alliance dmg 1
+DEBUG:root:No attacker because no soldiers
+DEBUG:root:cat moved to F with 1 pieces
+DEBUG:root:cat moved to G with 1 pieces
+DEBUG:root:bird added 31 to decree
+DEBUG:root:bird recruited at L
+DEBUG:root:Bird initiated a battler agaisntalliance
+DEBUG:root:Rolls (1, {0})
+DEBUG:root:alliance lost 0 soldiers
+DEBUG:root:Bird initiated a battler agaisntalliance
+DEBUG:root:Rolls (0, {0})
+DEBUG:root:alliance lost 0 soldiers
+DEBUG:root:alliance spread sympathy to J
+DEBUG:root:Alliance crafted sappers
+DEBUG:root:Alliance moved to B with 1 pieces
+DEBUG:root:vagabond slipped to Q
+DEBUG:root:cat swapped dominance card
+DEBUG:root:cat moved to H with 1 pieces
+DEBUG:root:cat moved to E with 1 pieces
+DEBUG:root:Cat recruited
+DEBUG:root:Cat used bird card to gain a move
+DEBUG:root:cat moved to F with 1 pieces
+DEBUG:root:cat moved to G with 1 pieces
+DEBUG:root:bird added 34 to decree
+DEBUG:root:bird swapped dominance card
+DEBUG:root:bird fell into turmoil
+DEBUG:root:bird chose Builder as its new leader
+DEBUG:root:Alliance mobilized with 17
+DEBUG:root:Alliance crafted command_warren
+DEBUG:root:Alliance mobilized with 5
+DEBUG:root:Alliance mobilized with 33
+DEBUG:root:Alliance moved to D with 2 pieces
+DEBUG:root:vagabond slipped to J
+DEBUG:root:Vagabond initiated a battler agaisntalliance
+DEBUG:root:Rolls (1, {0})
+DEBUG:root:vagabond is getting 0 points
+DEBUG:root:alliance lost 0 soldiers
+DEBUG:root:vagabond moved to F with 0 pieces
+DEBUG:root:cat swapped dominance card
 DEBUG:root:cat moved to A with 1 pieces
 DEBUG:root:cat moved to D with 1 pieces
-DEBUG:root:cat moved to B with 1 pieces
-DEBUG:root:cat moved to J with 1 pieces
-DEBUG:root:Cat built recruiter at H
-DEBUG:root:bird used stand and deliver with False
-DEBUG:root:bird added 9 to decree
-DEBUG:root:bird added 13 to decree
-DEBUG:root:bird moved to H with 5 pieces
-DEBUG:root:bird moved to K with 1 pieces
-DEBUG:root:Bird initiated a battler agaisntcat
-DEBUG:root:Rolls (3, {3})
-DEBUG:root:cat used stand and deliver with False
-DEBUG:root:Cat built recruiter at C
-DEBUG:root:Cat used bird card to gain a move
-DEBUG:root:cat moved to G with 1 pieces
-DEBUG:root:cat moved to A with 1 pieces
-DEBUG:root:Cat used bird card to gain a move
-DEBUG:root:cat moved to G with 1 pieces
-DEBUG:root:cat moved to D with 2 pieces
-DEBUG:root:bird used stand and deliver with False
-DEBUG:root:bird added 30 to decree
-DEBUG:root:bird added 9 to decree
-DEBUG:root:bird recruited at <map.Place object at 0x0000018FAF93ACD0>
-DEBUG:root:bird fell into turmoil
-DEBUG:root:bird chose Commander as its new leader
-DEBUG:root:alliance used stand and deliver with False
-DEBUG:root:alliance spread sympathy to E
-DEBUG:root:Alliance crafted sack
-DEBUG:root:Alliance mobilized with 29
-DEBUG:root:Alliance mobilized with 37
-DEBUG:root:vagabond used stand and deliver with False
-DEBUG:root:vagabond slipped to G
-DEBUG:root:cat used stand and deliver with False
+DEBUG:root:Cat built sawmill at E
 DEBUG:root:Cat built recruiter at E
-DEBUG:root:cat moved to L with 1 pieces
+DEBUG:root:bird added 49 to decree
+DEBUG:root:bird added 15 to decree
+DEBUG:root:bird swapped dominance card
+DEBUG:root:bird recruited at I
+DEBUG:root:bird moved to C with 3 pieces
+DEBUG:root:bird moved to G with 2 pieces
+DEBUG:root:bird built at K
+DEBUG:root:alliance revolted at J
+DEBUG:root:Marquise lost 0 points
+DEBUG:root:alliance spread sympathy to D
+DEBUG:root:Alliance crafted crossbow
+DEBUG:root:Alliance mobilized with 42
+DEBUG:root:Alliance mobilized with 44
+DEBUG:root:Alliance mobilized with 45
+DEBUG:root:Alliance moved to J with 1 pieces
+DEBUG:root:Alliance organized at I
+DEBUG:root:vagabond slipped to E
+DEBUG:root:Vagabond aided at <actors.Marquise object at 0x0000018E1847FD50>
+DEBUG:root:Vagabond initiated a battler agaisntcat
+DEBUG:root:Rolls (1, {1})
+DEBUG:root:vagabond is getting 0 points
+DEBUG:root:Marquise lost 1 VPs, as it lost a recruiter
+DEBUG:root:vagabond moved to F with 0 pieces
+DEBUG:root:vagabond moved to E with 0 pieces
+DEBUG:root:cat swapped dominance card
+DEBUG:root:cat moved to E with 1 pieces
+DEBUG:root:cat moved to G with 1 pieces
 DEBUG:root:cat moved to A with 1 pieces
-DEBUG:root:Cat used bird card to gain a move
+DEBUG:root:cat moved to D with 1 pieces
+DEBUG:root:Cat battled bird at G
+DEBUG:root:Cat initiated a battler agaisntbird
+DEBUG:root:Rolls (2, {3})
+DEBUG:root:Cat dmg: 1,bird dmg 2
+DEBUG:root:bird lost 1 soldiers
+DEBUG:root:bird added 29 to decree
+DEBUG:root:bird added 6 to decree
+DEBUG:root:bird fell into turmoil
+DEBUG:root:bird chose None as its new leader
+DEBUG:root:alliance spread sympathy to H
+DEBUG:root:alliance used command warren
+DEBUG:root:Alliance initiated a battler agaisntbird
+DEBUG:root:Rolls (1, {3})
+DEBUG:root:Alliance trained with 4
+DEBUG:root:Alliance mobilized with 43
+DEBUG:root:Alliance crafted favor
+DEBUG:root:Marquise lost 0 points
+DEBUG:root:Marquise lost 0 points
+DEBUG:root:Marquise lost 0 points
+DEBUG:root:Marquise lost 0 points
+DEBUG:root:Alliance mobilized with 30
+DEBUG:root:Alliance moved to J with 1 pieces
+DEBUG:root:Alliance moved to C with 2 pieces
+DEBUG:root:Alliance moved to F with 3 pieces
+DEBUG:root:vagabond slipped to P
+DEBUG:root:cat swapped dominance card
+DEBUG:root:cat crafted money
 DEBUG:root:cat moved to C with 1 pieces
 DEBUG:root:cat moved to D with 1 pieces
-DEBUG:root:bird used stand and deliver with False
-DEBUG:root:bird added 35 to decree
+DEBUG:root:Cat recruited
+DEBUG:root:Cat overworked A with 27
+DEBUG:root:bird added 12 to decree
+DEBUG:root:bird added 28 to decree
+DEBUG:root:bird recruited at L
+DEBUG:root:bird recruited at I
+DEBUG:root:Bird initiated a battler agaisntalliance
+DEBUG:root:Rolls (3, {0})
+DEBUG:root:alliance lost 0 soldiers
+DEBUG:root:bird fell into turmoil
+DEBUG:root:bird chose None as its new leader
+DEBUG:root:alliance spread sympathy to G
+DEBUG:root:Alliance crafted sword
+DEBUG:root:Alliance crafted money
+DEBUG:root:Alliance moved to G with 1 pieces
+DEBUG:root:Alliance moved to D with 1 pieces
+DEBUG:root:Alliance moved to B with 1 pieces
+DEBUG:root:vagabond slipped to E
+DEBUG:root:vagabond moved to F with 0 pieces
+DEBUG:root:vagabond moved to J with 0 pieces
+DEBUG:root:Vagabond initiated a battler agaisntalliance
+DEBUG:root:alliance has ambushed!
+DEBUG:root:Vagabond counterambushed? False
+DEBUG:root:Rolls (0, {3})
+DEBUG:root:vagabond is getting 0 points
+DEBUG:root:alliance lost 0 soldiers
+DEBUG:root:Vagabond stole from alliance
+DEBUG:root:cat swapped dominance card
+DEBUG:root:cat moved to C with 1 pieces
+DEBUG:root:cat moved to A with 1 pieces
+DEBUG:root:cat moved to B with 1 pieces
+DEBUG:root:cat moved to A with 1 pieces
+DEBUG:root:Cat recruited
+DEBUG:root:bird added 11 to decree
+DEBUG:root:Bird initiated a battler agaisntalliance
+DEBUG:root:Rolls (2, {3})
+DEBUG:root:alliance lost sympathy
+DEBUG:root:alliance drew a card from the deck
+DEBUG:root:bird fell into turmoil
+DEBUG:root:bird chose None as its new leader
+DEBUG:root:alliance spread sympathy to E
+DEBUG:root:alliance used command warren
+DEBUG:root:Alliance initiated a battler agaisntcat
+DEBUG:root:Rolls (0, {3})
+DEBUG:root:cat lost 0 soldiers
+DEBUG:root:Alliance moved to B with 1 pieces
+DEBUG:root:Alliance moved to C with 1 pieces
+DEBUG:root:Alliance moved to C with 1 pieces
+DEBUG:root:vagabond slipped to T
+DEBUG:root:vagabond moved to L with 0 pieces
+DEBUG:root:cat swapped dominance card
+DEBUG:root:cat crafted cobbler
+DEBUG:root:cat moved to B with 1 pieces
+DEBUG:root:cat moved to D with 1 pieces
+DEBUG:root:cat moved to C with 1 pieces
+DEBUG:root:cat moved to A with 1 pieces
+DEBUG:root:cat moved to B with 1 pieces
+DEBUG:root:cat moved to D with 1 pieces
+DEBUG:root:cat used cobbler
+DEBUG:root:cat moved to C with 1 pieces
 DEBUG:root:bird added 31 to decree
-DEBUG:root:bird moved to H with 3 pieces
-DEBUG:root:Bird initiated a battler agaisntcat
-DEBUG:root:Rolls (3, {1})
+DEBUG:root:bird recruited at I
+DEBUG:root:bird fell into turmoil
+DEBUG:root:bird chose None as its new leader
+DEBUG:root:alliance spread sympathy to F

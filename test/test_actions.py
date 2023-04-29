@@ -12,7 +12,7 @@ def test_movement_slip():
     game = Game()
 
     game.vagabond.deck.add_card(Card(*total_common_card_info[17]))
-    card_to_give_if_no_sympathy = Card(*total_common_card_info[17])
+    card_to_give_if_no_sympathy = 17
 
 
     game.slip('D', card_to_give_if_no_sympathy)
@@ -32,7 +32,7 @@ def test_movement_slip():
 
     game.vagabond = Vagabond(game.map)
     game.vagabond.deck.add_card(Card(*total_common_card_info[17]))
-    card_to_give_if_no_sympathy = Card(*total_common_card_info[17])
+    card_to_give_if_no_sympathy = 17
     game.map.move_vagabond('C')
     move_action = MoveDTO(start = 'C', end = 'D', how_many = 0, who = 'vagabond')
     game.move(move_action, card_to_give_if_no_sympathy)
@@ -400,4 +400,4 @@ def test_cards():
     assert game.marquise.royal_claim == True
     assert game.marquise.deck.cards == []
 
-test_movement_slip()
+test_recruit_and_add_to_resolve()

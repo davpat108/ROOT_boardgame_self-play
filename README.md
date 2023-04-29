@@ -27,7 +27,8 @@ The bigger constats are located here.
 tax collection
 field hospital update stuff
 defender armorer
-bird -1 for some reason
+winner
+
 
 # TODO first gonna skip
 which woods to use to build, if you can build by the rule supply lines, you might be able to build unsupported wood
