@@ -34,14 +34,14 @@ if __name__ == "__main__":
     #random.shuffle(turn_order)
     winner = "No one"
     game_num = 0
-    while winner == "No one":
+    while 1:
         logging.basicConfig(filename=f'{game_num}thgame.log', encoding='utf-8', level=logging.DEBUG)
         play(turn_order[0])
         play(turn_order[1])
         play(turn_order[2])
         play(turn_order[3])
 
-        if winner != "No one":
+        if game.winner:
             game_num += 1
-            logging.debug(f"Game {game_num} winner is {winner}")
+            logging.debug(f"Game {game_num} winner is {game.winner[0]}, they won with a {game.winner[1]} victory")
             break

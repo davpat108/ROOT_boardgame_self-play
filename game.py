@@ -108,22 +108,22 @@ class Game():
     def check_victory_points(self):
         if self.marquise.victory_points >= 30 and not self.winner:
             if self.marquise.win_condition == "points":
-                self.winner = "marquise"
+                self.winner = ("marquise", "points")
             elif self.marquise.win_condition == "coalition_major":
-                self.winner = "marquise and vagabond"
+                self.winner = ("marquise", "coalition")
         elif self.eyrie.victory_points >= 30 and not self.winner:
             if self.eyrie.win_condition == "points":
-                self.winner = "eyrie"
+                self.winner = ("eyrie", "points")
             elif self.eyrie.win_condition == "coalition_major":
-                self.winner = "eyrie and vagabond"
+                self.winner = ("eyrie", "coalition")
         elif self.alliance.victory_points >= 30 and not self.winner:
             if self.alliance.win_condition == "points":
-                self.winner = "alliance"
+                self.winner = ("alliance", "points")
             elif self.alliance.win_condition == "coalition_major":
-                self.winner = "alliance and vagabond"
+                self.winner = ("alliance", "coalition")
         elif self.vagabond.victory_points >= 30 and not self.winner:
             if self.vagabond.win_condition == "points":
-                self.winner = "vagabond"
+                self.winner = ("vagabond", "points")
 
     def swap_discarded_dominance_card(self, actor, card_id1, card_id2):
         actor.deck.add_card(self.dominance_discard_deck.get_the_card(card_id1))
@@ -133,18 +133,18 @@ class Game():
         if not self.winner:
             if actor.win_condition == "bird":
                 if self.map.places['F'].owner == actor.name and self.map.places['C'].owner == actor.name:
-                    self.winner = actor.name
+                    self.winner = (actor.name, "bird dominance")
                 elif self.map.places['A'].owner == actor.name and self.map.places['L'].owner == actor.name:
-                    self.winner = actor.name
+                    self.winner = (actor.name, "bird dominance")
             if actor.win_condition == "fox":
                 if [True if place.owner == actor.name and place.suit == "fox" else False for place in self.map.places.values()].count(True) >= 3:
-                    self.winner = actor.name
+                    self.winner = (actor.name, "fox dominance")
             if actor.win_condition == "mouse":
                 if [True if place.owner == actor.name and place.suit == "mouse" else False for place in self.map.places.values()].count(True) >= 3:
-                    self.winner = actor.name
+                    self.winner = (actor.name, "mouse dominance")
             if actor.win_condition == "rabbit":
                 if [True if place.owner == actor.name and place.suit == "rabbit" else False for place in self.map.places.values()].count(True) >= 3:
-                    self.winner = actor.name
+                    self.winner = (actor.name, "rabbit dominance")
 
     def field_hospital(self, dead_soldiers, card_ID):
         keep_position = [place.name if 'keep' in place.tokens else None for place in self.map.places.values()]

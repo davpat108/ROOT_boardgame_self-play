@@ -637,7 +637,7 @@ class Alliance(Actor):
 
     def get_spread_sympathy_options(self, map):
         spread_sympathy_options = []
-        sympathies_on_map = sum(place.tokens.count("sympathy") for place in map.places.values())
+        sympathies_on_map = map.count_on_map(("token", "sympathy"))
         if sympathies_on_map > 9:
             return spread_sympathy_options
         
@@ -783,6 +783,9 @@ class Alliance(Actor):
 
     def get_organize_options(self, map):
         organize_options = []
+        sympathies_on_map = map.count_on_map(("token", "sympathy"))
+        if sympathies_on_map > 9:
+            return organize_options
         
         for place in map.places.values():
             if place.soldiers['alliance']>0 and not 'sympathy' in place.tokens:

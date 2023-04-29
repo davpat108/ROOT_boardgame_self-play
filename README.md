@@ -27,7 +27,7 @@ The bigger constats are located here.
 tax collection
 field hospital update stuff
 defender armorer
-winner
+bird debug
 
 
 # TODO first gonna skip

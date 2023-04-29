@@ -406,7 +406,8 @@ def marquise_daylight(game):
         # MAIN MOVES
         options = get_all_daylight_option_cat(game, recruited_already)
         choice = random_choose(options)
-        recruited_already, moved = cat_daylight_actions(game, choice, recruited_already)
+        if choice:
+            recruited_already, moved = cat_daylight_actions(game, choice, recruited_already)
         # IF MARCH, MOVE AGAIN
         if moved == True:
             move_options = game.marquise.get_moves(game.map)
