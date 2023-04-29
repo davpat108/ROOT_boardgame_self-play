@@ -129,7 +129,14 @@ class Actor():
             if place.soldiers[self.name] > 0:
                 options.append(place.name)
         return options
-    
+
+    def swap_discarded_dominance_card_options(self, dominance_deck):
+        options = []
+        for dcard in dominance_deck.cards:
+            for card in self.deck.cards:
+                if card.card_suit == dcard.card_suit:
+                    options.append((card.ID, dcard.ID))
+        return options
 
 
 class Marquise(Actor):
@@ -556,6 +563,13 @@ class Alliance(Actor):
     def count_for_card_draw(self, map):
         draws = map.count_on_map(("building", "base")) + 1
         return draws
+
+    def losing_a_base(self, place_suit, discard_deck):
+        for card in self.supporter_deck.cards:
+            if card.card_suit == place_suit or card.card_suit == "bird":
+                discard_deck.add_card(card)
+                return
+        return False
 
     def get_options(self):
         return super().get_options()

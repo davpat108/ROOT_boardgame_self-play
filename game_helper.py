@@ -377,11 +377,15 @@ def evening_card_actions(game, actor):
             move_and_account_to_sympathy(game, choice)
         
 def marquise_birdsong(game):
+    game.check_dominance(game.marquise)
     birdsong_card_actions(game, game.marquise)
     game.cat_birdsong_wood()
 
 def marquise_daylight(game):
-    game.check_dominance(game.marquise)
+    options = game.marquise.swap_discarded_dominance_card_options(game.dominance_discard_deck)
+    choice = random_choose(options)
+    if choice:
+        game.swap_discarded_dominance_card(game.marquise, choice[0], choice[1])
     daylight_card_actions(game, game.marquise)
     # CRAFT
     game.marquise.refresh_craft_activations(game.map)
@@ -430,6 +434,7 @@ def marquise_evening(game):
 
 
 def eyrie_birdsong(game):
+    game.check_dominance(game.eyrie)
     birdsong_card_actions(game, game.eyrie)
     # DRAW IF HAND EMPTY
     if len(game.eyrie.deck.cards) == 0:
@@ -457,7 +462,10 @@ def eyrie_birdsong(game):
         game.place_roost_if_zero_roost(choice)
         
 def eyrie_daylight(game):
-    game.check_dominance(game.eyrie)
+    options = game.eyrie.swap_discarded_dominance_card_options(game.dominance_discard_deck)
+    choice = random_choose(options)
+    if choice:
+        game.swap_discarded_dominance_card(game.eyrie, choice[0], choice[1])
     daylight_card_actions(game, game.eyrie)
     choice = True
     game.eyrie.refresh_craft_activations(game.map)
@@ -537,6 +545,7 @@ def eyrie_eveing(game):
             game.discard_deck.add_card(game.eyrie.deck.get_the_card(choice))
 
 def alliance_birsong(game):
+    game.check_dominance(game.alliance)
     birdsong_card_actions(game, game.alliance)
     options = game.alliance.get_revolt_options(game.map)
     options.append(False)
@@ -552,7 +561,10 @@ def alliance_birsong(game):
         game.spread_sympathy(*choice)
 
 def alliance_daylight(game):
-    game.check_dominance(game.alliance)
+    options = game.alliance.swap_discarded_dominance_card_options(game.dominance_discard_deck)
+    choice = random_choose(options)
+    if choice:
+        game.swap_discarded_dominance_card(game.alliance, choice[0], choice[1])
     daylight_card_actions(game, game.alliance)
     game.alliance.refresh_craft_activations(game.map)
     choice = True
@@ -611,6 +623,10 @@ def vagabond_birdsong(game):
     game.slip(choice.end, card_to_give_if_sympathy)
 
 def vagabond_daylight(game):
+    options = game.vagabond.swap_discarded_dominance_card_options(game.dominance_discard_deck)
+    choice = random_choose(options)
+    if choice:
+        game.swap_discarded_dominance_card(game.vagabond, choice[0], choice[1])
     daylight_card_actions(game, game.vagabond)
     choice = True
     consequitive_aids = 0

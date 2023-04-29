@@ -15,19 +15,19 @@ def test_movement_slip():
     card_to_give_if_no_sympathy = Card(*total_common_card_info[17])
 
 
-    game.slip(game.map.places['D'], card_to_give_if_no_sympathy)
+    game.slip('D', card_to_give_if_no_sympathy)
     game.map.check_vagabond()
     assert game.map.places['D'].vagabond_is_here == True
     assert len(game.vagabond.deck.cards) == 5
 
     game.map.places['C'].update_pieces(tokens = ['sympathy'])
-    game.slip(game.map.places['C'], card_to_give_if_no_sympathy)
+    game.slip('C', card_to_give_if_no_sympathy)
     game.map.check_vagabond()
     assert game.map.places['C'].vagabond_is_here == True
     assert len(game.vagabond.deck.cards) == 4
     assert len(game.alliance.supporter_deck.cards) == 5
 
-    game.slip(game.map.places['M'], card_to_give_if_no_sympathy)
+    game.slip('M', card_to_give_if_no_sympathy)
     assert game.map.places['M'].vagabond_is_here == True
 
     game.vagabond = Vagabond(game.map)

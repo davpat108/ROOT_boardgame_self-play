@@ -124,6 +124,10 @@ class Game():
             if self.vagabond.win_condition == "points":
                 self.winner = "vagabond"
 
+    def swap_discarded_dominance_card(self, actor, card_id1, card_id2):
+        actor.deck.add_card(self.dominance_discard_deck.get_the_card(card_id1))
+        self.discard_deck.add_card(actor.deck.get_the_card(card_id2))
+
     def check_dominance(self, actor):
         if not self.winner:
             if actor.win_condition == "bird":
@@ -207,6 +211,7 @@ class Game():
         # Clear all buildings
         victory_points = 0
         victory_points += place.clear_buildings()
+        self.count_lost_points_marquise(place=place)
         victory_points += place.clear_tokens(exception_faction = "alliance")
         place.clear_soldiers(exception_faction="alliance")
 
@@ -434,6 +439,8 @@ class Game():
                         victory_points_attacker += 1
                         if attacker == "vagabond" and self.vagabond.relations[defender] == "hostile":
                             victory_points_attacker += 1
+                        if piece[0] == 'base':
+                            self.alliance.losing_a_base(place_suit=place.suit, discard_deck=self.discard_deck)
                         if piece[0] == 'sawmill' or piece[0] == 'workshop' or piece[0] == 'recruiter':
                             logging.debug(f"Marquise lost {buildings_list_marquise[piece[0]]['VictoryPoints'][self.map.count_on_map(('building', piece[0]))+1]} VPs, as it lost a {piece[0]}")
                             self.marquise.victory_points -= buildings_list_marquise[piece[0]]["VictoryPoints"][self.map.count_on_map(("building", piece[0]))+1] # +1 because we already removed the building
@@ -631,7 +638,29 @@ class Game():
                 self.dominance(actor, costs.card.card_suit)
                 actor.deck.get_the_card(costs.card.ID) # remove from the game
 
+    def count_lost_points_marquise(self, place):
+        lost_points = 0
+        lost_sawmills = 0
+        lost_workshops = 0
+        lost_recruiters = 0
+        for slot in place.building_slots:
+            if slot[0] == "sawmill":
+                lost_sawmills += 1
+            elif slot[0] == "workshop":
+                lost_workshops += 1
+            elif slot[0] == "recruiter":
+                lost_recruiters += 1
 
+        for i in range(lost_sawmills):
+            lost_points += buildings_list_marquise['sawmill']["VictoryPoints"][self.map.count_on_map(("building", 'sawmill'))-i]
+        for i in range(lost_workshops):
+            lost_points += buildings_list_marquise['workshop']["VictoryPoints"][self.map.count_on_map(("building", 'workshop'))-i]
+        for i in range(lost_recruiters):
+            lost_points += buildings_list_marquise['recruiter']["VictoryPoints"][self.map.count_on_map(("building", 'recruiter'))-i]
+        logging.debug(f"Marquise lost {lost_points} points")
+        self.marquise.victory_points -= lost_points
+    
+        
     def favor(self, actor, suit):
         victory_points = 0
         for place in self.map.places.values():
@@ -639,6 +668,10 @@ class Game():
                 for key in place.soldiers.keys():
                     if key != actor.name and key != "vagabond":
                         place.soldiers[key] = 0
+                if ('base', 'alliance') in place.building_slots and actor.name != "alliance":
+                    self.alliance.losing_a_base(place_suit=place.suit, discard_deck=self.discard_deck)
+                if actor.name != 'marquise':
+                    self.count_lost_points_marquise(place)
                 if actor.name != "vagabond" and place.vagabond_is_here:
                     for item in self.vagabond.items_to_damage[:3]:
                         self.vagabond.damage_item(item)
@@ -902,6 +935,8 @@ class Game():
                     self.check_victory_points()
                     if target == 'sawmill' or target == 'workshop' or target == 'recruiter':
                         self.marquise.victory_points -= buildings_list_marquise[target]["VictoryPoints"][self.map.count_on_map(("building", target))+1] # +1 because we already removed the building
+                    if target == 'base':
+                        self.alliance.losing_a_base(place_suit=self.map.places[placename].suit, discard_deck=self.discard_deck)
                     break
         self.map.places[placename].update_owner()
         
