@@ -401,8 +401,8 @@ def marquise_daylight(game):
         game.craft(game.marquise, choice)
     # ACTIONS
     recruited_already = False
-    actions = 3
-    for _ in range(actions):
+    actions = [1, 1, 1]
+    for _ in actions:
         # MAIN MOVES
         options = get_all_daylight_option_cat(game, recruited_already)
         choice = random_choose(options)
@@ -420,7 +420,7 @@ def marquise_daylight(game):
         if more_moves_choice:
             logging.debug(f"Cat used bird card to gain a move")
             game.cat_use_bird_card_to_gain_move(more_moves_choice)
-            actions += 1
+            actions.append(1)
 
 def marquise_evening(game):
     evening_card_actions(game, game.marquise)
