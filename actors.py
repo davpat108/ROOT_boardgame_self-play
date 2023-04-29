@@ -423,32 +423,32 @@ class Eyrie(Actor):
             for clearing in matching_clearings:
                 if clearing.soldiers["bird"] > 0:
                     if clearing.soldiers['cat'] > 0 or True in [slot[1]=='cat' for slot in clearing.building_slots] or 'keep' in clearing.tokens or 'wood' in clearing.tokens:
-                        battle_options.append(Battle_DTO(clearing.name, "cat", card_ID))
+                        battle_options.append(Battle_DTO(clearing.name, "cat", card_ID=card_ID))
                     if clearing.soldiers['alliance'] > 0 or True in [slot[1]=='alliance' for slot in clearing.building_slots] or "sympathy" in clearing.tokens:
-                        battle_options.append(Battle_DTO(clearing.name, "alliance", card_ID))
+                        battle_options.append(Battle_DTO(clearing.name, "alliance", card_ID=card_ID))
                     if clearing.vagabond_is_here:
-                        battle_options.append(Battle_DTO(clearing.name, "vagabond", card_ID))
+                        battle_options.append(Battle_DTO(clearing.name, "vagabond", card_ID=card_ID))
                     if self.armorers:
                         if clearing.soldiers['cat'] > 0 or True in [slot[1]=='cat' for slot in clearing.building_slots] or 'keep' in clearing.tokens or 'wood' in clearing.tokens:
-                            battle_options.append(Battle_DTO(clearing.name, "cat", card_ID, armorer_usage=True))
+                            battle_options.append(Battle_DTO(clearing.name, "cat", card_ID=card_ID, armorer_usage=True))
                         if clearing.soldiers['alliance'] > 0 or True in [slot[1]=='alliance' for slot in clearing.building_slots] or "sympathy" in clearing.tokens:
-                            battle_options.append(Battle_DTO(clearing.name, "alliance", card_ID, armorer_usage=True))
+                            battle_options.append(Battle_DTO(clearing.name, "alliance", card_ID=card_ID, armorer_usage=True))
                         if clearing.vagabond_is_here:
-                            battle_options.append(Battle_DTO(clearing.name, "vagabond", card_ID, armorer_usage=True))
+                            battle_options.append(Battle_DTO(clearing.name, "vagabond", card_ID=card_ID, armorer_usage=True))
                     if self.brutal_tactics:
                         if clearing.soldiers['cat'] > 0 or True in [slot[1]=='cat' for slot in clearing.building_slots] or 'keep' in clearing.tokens or 'wood' in clearing.tokens:
-                            battle_options.append(Battle_DTO(clearing.name, "cat", card_ID, brutal_tactics_usage=True))
+                            battle_options.append(Battle_DTO(clearing.name, "cat", card_ID=card_ID, brutal_tactics_usage=True))
                         if clearing.soldiers['alliance'] > 0 or True in [slot[1]=='alliance' for slot in clearing.building_slots] or "sympathy" in clearing.tokens:
-                            battle_options.append(Battle_DTO(clearing.name, "alliance", card_ID, brutal_tactics_usage=True))
+                            battle_options.append(Battle_DTO(clearing.name, "alliance", card_ID=card_ID, brutal_tactics_usage=True))
                         if clearing.vagabond_is_here:
-                            battle_options.append(Battle_DTO(clearing.name, "vagabond", card_ID, brutal_tactics_usage=True))
+                            battle_options.append(Battle_DTO(clearing.name, "vagabond", card_ID=card_ID, brutal_tactics_usage=True))
                     if self.brutal_tactics and self.armorers:
                         if clearing.soldiers['cat'] > 0 or True in [slot[1]=='cat' for slot in clearing.building_slots] or 'keep' in clearing.tokens or 'wood' in clearing.tokens:
-                            battle_options.append(Battle_DTO(clearing.name, "cat", card_ID, brutal_tactics_usage=True, armorer_usage=True))
+                            battle_options.append(Battle_DTO(clearing.name, "cat", card_ID=card_ID, brutal_tactics_usage=True, armorer_usage=True))
                         if clearing.soldiers['alliance'] > 0 or True in [slot[1]=='alliance' for slot in clearing.building_slots] or "sympathy" in clearing.tokens:
-                            battle_options.append(Battle_DTO(clearing.name, "alliance", card_ID, brutal_tactics_usage=True, armorer_usage=True))
+                            battle_options.append(Battle_DTO(clearing.name, "alliance", card_ID=card_ID, brutal_tactics_usage=True, armorer_usage=True))
                         if clearing.vagabond_is_here:
-                            battle_options.append(Battle_DTO(clearing.name, "vagabond", card_ID, brutal_tactics_usage=True, armorer_usage=True))
+                            battle_options.append(Battle_DTO(clearing.name, "vagabond", card_ID=card_ID, brutal_tactics_usage=True, armorer_usage=True))
 
         return battle_options
     
@@ -801,7 +801,8 @@ class Vagabond(Actor):
             self.relations = {
 			"cat" : 'indifferent',
 			"bird" : 'indifferent',
-			"alliance" : 'indifferent'
+			"alliance" : 'indifferent',
+            "No one": 'indifferent',
 		}
             self.refresh_items_to_damage()
         else:
@@ -854,7 +855,7 @@ class Vagabond(Actor):
         move_options = []
         for neighbor in map.places[map.vagabond_position].neighbors:
             if not neighbor[1]:
-                if self.relations[map.places[neighbor[0]].owner] == 'hostile':
+                if map.places[neighbor[0]].owner != "No one" and self.relations[map.places[neighbor[0]].owner] == 'hostile':
                     boot_cost = 2
                 else:
                     boot_cost = 1
@@ -905,7 +906,7 @@ class Vagabond(Actor):
                         battle_options.append(Battle_DTO(map.vagabond_position, army, brutal_tactics_usage=True, armorer_usage=True))
 
             for building_slots in map.places[map.vagabond_position].building_slots:
-                if building_slots[1] != "No one":
+                if building_slots[1] != "No one" and not isinstance(building_slots[1], Item):
                     battle_options.append(Battle_DTO(map.vagabond_position, building_slots[1]))
                     if self.brutal_tactics:
                         battle_options.append(Battle_DTO(map.vagabond_position, building_slots[1], brutal_tactics_usage=True))
@@ -988,13 +989,13 @@ class Vagabond(Actor):
         
     def get_ruin_explore_options(self, map):
         if not self.has_non_exhausted_item(Item('torch')):
-            return False
+            return []
 
         current_clearing = map.places[map.vagabond_position]
         has_ruin = any(slot[0] == 'ruin' for slot in current_clearing.building_slots)
         if has_ruin:
-            return (has_ruin, "explore")
-        return
+            return [(has_ruin, "explore")]
+        return []
 
     def get_strike_options(self, map):
         if not self.has_non_exhausted_item(Item("crossbow")):
@@ -1053,13 +1054,13 @@ class Vagabond(Actor):
                 for _ in range(current_clearing.soldiers[opponent]):
                     self.allied_soldiers += opponent
 
-    def get_item_dmg_options(self):
+    def get_item_dmg_options(self, map):
         """Returns a list of items that can be damaged"""
         item_dmg_options = []
         for item in self.satchel + self.other_items:
             if not item.damaged:
                 item_dmg_options.append(item)
-        self.refresh_allied_soldiers()
+        self.refresh_allied_soldiers(map)
         for soldier in self.allied_soldiers:
             item_dmg_options.append(soldier)
 

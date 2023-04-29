@@ -382,7 +382,7 @@ class Game():
 
         return chosen_pieces
 
-    def resolve_battle(self, place, attacker, defender, dmg_attacker, dmg_defender, attacker_chosen_pieces=None, defender_chosen_pieces=None, card_to_give_if_sympathy=None, card_ID=None):
+    def resolve_battle(self, place, attacker, defender, dmg_attacker, dmg_defender, attacker_chosen_pieces=None, defender_chosen_pieces=None, card_to_give_if_sympathy=None):
         """
         :param self.map: Map
         :param place_name: str
@@ -524,9 +524,6 @@ class Game():
                             card_id = alliance_choose_card(options)
                             self.alliance.supporter_deck.add_card(self.vagabond.deck.get_the_card(card_id))
 
-        if attacker == "bird":
-            logging.debug(f"bird is removing {card_ID} from temp decree")
-            self.eyrie.remove_from_temp_decree(card_ID, "battle")
 
         place.update_owner()
         if len(self.deck.cards) <=0:
@@ -774,8 +771,8 @@ class Game():
         if actor.name == "bird":
             self.eyrie.remove_from_temp_decree(card_ID, 'recruit')
 
-    def overwork(self, place, card_id):
-        place.tokens += ['wood']
+    def overwork(self, placename, card_id):
+        self.map.places[placename].tokens += ['wood']
         if total_common_card_info[card_id][2] == "dominance":
             self.dominance_discard_deck.add_card(self.marquise.deck.get_the_card(card_id))
         else:

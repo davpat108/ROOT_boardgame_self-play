@@ -498,16 +498,16 @@ def test_vagabond():
     # RUIN
     vagabond.repair_and_refresh_all()
     ruin_option = vagabond.get_ruin_explore_options(map)
-    assert ruin_option == None
+    assert ruin_option == []
 
     map.move_vagabond('D')
     ruin_option = vagabond.get_ruin_explore_options(map)
-    assert ruin_option == (True, 'explore')
+    assert ruin_option == [(True, 'explore')]
 
     map.places['D'].building_slots[0] = ('empty', 'No one')
     map.places['D'].building_slots[1] = ('empty', 'No one') # RUIN cleared
     ruin_option = vagabond.get_ruin_explore_options(map)
-    assert ruin_option == None
+    assert ruin_option == []
 
     # STRIKE
     vagabond.repair_and_refresh_all()

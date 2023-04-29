@@ -213,7 +213,7 @@ def test_overwork():
     game = Game()
     assert game.map.count_on_map(('token', 'wood')) == 0
     game.marquise.deck.add_card(Card(*total_common_card_info[49]))
-    game.overwork(game.map.places['A'], 49)
+    game.overwork('A', 49)
     assert game.map.count_on_map(('token', 'wood')) == 1
     assert game.marquise.deck.get_the_card(49) == "Card not in the deck"
 
@@ -400,4 +400,4 @@ def test_cards():
     assert game.marquise.royal_claim == True
     assert game.marquise.deck.cards == []
 
-test_craft()
+test_movement_slip()

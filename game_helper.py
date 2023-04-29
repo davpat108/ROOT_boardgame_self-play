@@ -59,7 +59,7 @@ def battle_cat(game, option):
         game.ambush(place = option.where, attacker=game.marquise, defender=option.against_whom, bird_or_suit_defender=ambush_option, bird_or_suit_attacker=counterambush_choice)
     # BATTLE
     if option.against_whom == 'vagabond':
-        game.vagabond.get_item_dmg_options()
+        game.vagabond.get_item_dmg_options(game.map)
     dice_rolls = roll_dice()
     logging.debug(f"Rolls {dice_rolls[0], {dice_rolls[1]}}")
     card_to_give_if_sympathy = game.marquise.card_to_give_to_alliace_options(game.map.places[option.where].suit)
@@ -67,7 +67,7 @@ def battle_cat(game, option):
     defender_chosen_pieces = game.priority_to_list(get_loss_prios(option.against_whom), option.where, option.against_whom)
     dmg_attacker, dmg_defender = game.get_battle_damages('cat', option.against_whom, dice_rolls, option.where, sappers = get_sappers_usage(option.against_whom, game), armorers = [option.armorer_usage, False], brutal_tactics = option.brutal_tactics_usage)
     logging.debug(f"Cat dmg: {dmg_attacker},{option.against_whom} dmg {dmg_defender}")
-    game.resolve_battle(option.where, 'cat', option.against_whom, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces, card_to_give_if_sympathy)
+    game.resolve_battle(game.map.places[option.where], 'cat', option.against_whom, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces, card_to_give_if_sympathy)
 
 def battle_bird(game, option):
     # AMBUSH
@@ -82,14 +82,14 @@ def battle_bird(game, option):
         game.ambush(place = option.where, attacker=game.eyrie, defender=option.against_whom, bird_or_suit_defender=ambush_option, bird_or_suit_attacker=counterambush_choice)
     # BATTLE
     if option.against_whom == 'vagabond':
-        game.vagabond.get_item_dmg_options()
+        game.vagabond.get_item_dmg_options(game.map)
     dice_rolls = roll_dice()
     logging.debug(f"Rolls {dice_rolls[0], {dice_rolls[1]}}")
     card_to_give_if_sympathy = game.eyrie.card_to_give_to_alliace_options(game.map.places[option.where].suit)
     attacker_chosen_pieces = game.priority_to_list(get_loss_prios('bird'), option.where, 'bird')
     defender_chosen_pieces = game.priority_to_list(get_loss_prios(option.against_whom), option.where, option.against_whom)
     dmg_attacker, dmg_defender = game.get_battle_damages('bird', option.against_whom, dice_rolls, option.where, sappers = get_sappers_usage(option.against_whom, game), armorers = [option.armorer_usage, False], brutal_tactics = option.brutal_tactics_usage, card_ID = option.card_ID)
-    game.resolve_battle(option.where, 'bird', option.against_whom, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces, card_to_give_if_sympathy)
+    game.resolve_battle(game.map.places[option.where], 'bird', option.against_whom, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces, card_to_give_if_sympathy)
 
 def battle_alliance(game, option):
     # AMBUSH
@@ -104,14 +104,14 @@ def battle_alliance(game, option):
         game.ambush(place = option.where, attacker=game.alliance, defender=option.against_whom, bird_or_suit_defender=ambush_option, bird_or_suit_attacker=counterambush_choice)
     # BATTLE
     if option.against_whom == 'vagabond':
-        game.vagabond.get_item_dmg_options()
+        game.vagabond.get_item_dmg_options(game.map)
     dice_rolls = roll_dice()
     logging.debug(f"Rolls {dice_rolls[0], {dice_rolls[1]}}")
     card_to_give_if_sympathy = None
     attacker_chosen_pieces = game.priority_to_list(get_loss_prios('alliance'), option.where, 'alliance')
     defender_chosen_pieces = game.priority_to_list(get_loss_prios(option.against_whom), option.where, option.against_whom)
     dmg_attacker, dmg_defender = game.get_battle_damages('alliance', option.against_whom, dice_rolls, option.where, sappers = get_sappers_usage(option.against_whom, game), armorers = [option.armorer_usage, False], brutal_tactics = option.brutal_tactics_usage)
-    game.resolve_battle(option.where, 'alliance', option.against_whom, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces, card_to_give_if_sympathy)
+    game.resolve_battle(game.map.places[option.where], 'alliance', option.against_whom, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces, card_to_give_if_sympathy)
 
 def battle_vagabond(game, option):
     # AMBUSH
@@ -131,7 +131,7 @@ def battle_vagabond(game, option):
     attacker_chosen_pieces = game.priority_to_list(get_loss_prios('vagabond'), option.where, 'vagabond')
     defender_chosen_pieces = game.priority_to_list(get_loss_prios(option.against_whom), option.where, option.against_whom)
     dmg_attacker, dmg_defender = game.get_battle_damages('vagabond', option.against_whom, dice_rolls, option.where, sappers = get_sappers_usage(option.against_whom, game), armorers = [option.armorer_usage, False], brutal_tactics = option.brutal_tactics_usage)
-    game.resolve_battle(option.where, 'vagabond', option.against_whom, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces, card_to_give_if_sympathy)
+    game.resolve_battle(game.map.places[option.where], 'vagabond', option.against_whom, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces, card_to_give_if_sympathy)
 
 def get_all_daylight_option_cat(game, recruited_already=False):
     options = []
@@ -160,7 +160,7 @@ def get_all_daylight_actions_vagabond(game):
         raise ValueError("Wrong role")
     options += game.vagabond.get_ruin_explore_options(game.map)
     options += game.vagabond.get_strike_options(game.map)
-    options += game.vagabond.get_aid_options()
+    options += game.vagabond.get_aid_options(game.map, [game.marquise, game.eyrie, game.alliance])
     return options
 
 
@@ -184,7 +184,8 @@ def move_and_account_to_sympathy(game, choice):
     for actor in [game.marquise, game.eyrie, game.vagabond]:
         if actor.name == choice.who: 
             card_to_give_if_sympathy = actor.card_to_give_to_alliace_options(game.map.places[choice.end].suit)
-    game.move(choice, card_to_give_if_sympathy)
+    card_choice = random_choose(card_to_give_if_sympathy)
+    game.move(choice, card_choice)
 
 def cat_daylight_actions(game, choice, recruited_already=False):
     recruited = recruited_already
@@ -198,8 +199,8 @@ def cat_daylight_actions(game, choice, recruited_already=False):
         move_and_account_to_sympathy(game, choice)
         moved = True
     elif isinstance(choice, OverworkDTO):
-        logging.debug(f"Cat overworked {choice.place.name} with {choice.cardID}")
-        game.overwork(choice.place.name, choice.cardID)
+        logging.debug(f"Cat overworked {choice.place} with {choice.cardID}")
+        game.overwork(choice.place, choice.cardID)
     # RECRUIT
     elif choice[1] == 'recruit' and not recruited_already:
         recruited = True
@@ -208,7 +209,7 @@ def cat_daylight_actions(game, choice, recruited_already=False):
     # BUILD
     elif len(choice) == 3:
         logging.debug(f"Cat built {choice[1]} at {choice[0]}")
-        game.build(place=choice[0], building=choice[1], actor=game.marquise, cost = choice[2])
+        game.build(place=game.map.places[choice[0]], building=choice[1], actor=game.marquise, cost = choice[2])
     # OVERWORK
 
     return recruited, moved
@@ -385,6 +386,7 @@ def marquise_daylight(game):
     options = game.marquise.swap_discarded_dominance_card_options(game.dominance_discard_deck)
     choice = random_choose(options)
     if choice:
+        logging.debug(f"{game.marquise.name} swapped dominance card")
         game.swap_discarded_dominance_card(game.marquise, choice[0], choice[1])
     daylight_card_actions(game, game.marquise)
     # CRAFT
@@ -465,6 +467,7 @@ def eyrie_daylight(game):
     options = game.eyrie.swap_discarded_dominance_card_options(game.dominance_discard_deck)
     choice = random_choose(options)
     if choice:
+        logging.debug(f"{game.eyrie.name} swapped dominance card")
         game.swap_discarded_dominance_card(game.eyrie, choice[0], choice[1])
     daylight_card_actions(game, game.eyrie)
     choice = True
@@ -474,6 +477,7 @@ def eyrie_daylight(game):
         options.append(False)
         choice = random_choose(options)
         if choice:
+            logging.debug(f"{game.eyrie.name} crafted {choice.card.craft}")
             game.craft(game.eyrie, choice)
 
     game.eyrie.refresh_temp_decree()
@@ -511,11 +515,11 @@ def eyrie_daylight(game):
                 break
     if not turmoil:
         for _ in range(len(game.eyrie.decree['build'])):
-            options = game.eyrie.get_resolve_build(game.map)
+            options = game.eyrie.get_resolve_building(game.map)
             if options:
                 choice = random_choose(options)
                 logging.debug(f"{game.eyrie.name} built at {choice[0]}")
-                game.build(place=choice[0], building="roost", actor=game.eyrie, card_ID = choice[1])
+                game.build(place=game.map.places[choice[0]], building="roost", actor=game.eyrie, card_ID = choice[1])
             else:
                 logging.debug(f"{game.eyrie.name} fell into turmoil")
                 turmoil = True
@@ -652,7 +656,7 @@ def vagabond_evening(game):
         discard_options = game.vagabond.discard_down_to_five_options()
         if discard_options:
             choice = random_choose(discard_options)
-            game.discard_deck.add_card(game.alliance.deck.get_the_card(choice))
+            game.discard_deck.add_card(game.vagabond.deck.get_the_card(choice))
     
     discard_options = True
     while discard_options:

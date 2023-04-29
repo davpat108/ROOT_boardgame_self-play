@@ -40,7 +40,7 @@ if __name__ == "__main__":
         play(turn_order[2])
         play(turn_order[3])
 
-        if winner:
+        if winner != "No one":
             game_num += 1
             logging.debug(f"Game {game_num} winner is {winner}")
             break
