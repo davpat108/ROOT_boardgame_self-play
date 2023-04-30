@@ -25,6 +25,7 @@ The bigger constats are located here.
 ## TODO
 
 tax collection
+In case of battle with 0 soldiers at least 1 dmg
 
 
 # TODO first gonna skip
