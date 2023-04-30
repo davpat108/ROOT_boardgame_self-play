@@ -433,5 +433,3 @@ def test_resolve_battle():
     assert game.map.places['H'].soldiers['bird'] == 0
     assert game.map.places['H'].building_slots == [('sawmill', 'cat'), ('workshop', 'cat'), ('empty', 'No one')]
     assert game.eyrie.sappers == False
-
-test_resolve_battle()

@@ -98,42 +98,7 @@ def test_marquise_get_connected_wood_tokens():
 
     tokens = marquise.get_wood_tokens_to_build(map, map.places['G'])
     assert tokens == 1
-
-
-#def test_marquise_get_build_options():
-#    game = Game(debug=True)
-#    marquise = game.marquise
-#    map = game.map
-#
-#    build_options = marquise.get_build_options(map)
-#    assert build_options == []
-#    
-#    game.cat_birdsong_wood()
-#    build_options = marquise.get_build_options(map)
-#    assert build_options == {'sawmill': {'where': ['B', 'C', 'E', 'F', 'G', 'H', 'I', 'J', 'K'], 'cost': 1},
-#                              'workshop': {'where': ['B', 'C', 'E', 'F', 'G', 'H', 'I', 'J', 'K'], 'cost': 1},
-#                                'recruiter': {'where': ['B', 'C', 'E', 'F', 'G', 'H', 'I', 'J', 'K'], 'cost': 1}}
-#    
-#    piece_setup =[('B', {'soldiers' : {'cat': 1, 'bird' : 0, 'alliance' : 0}, 'buildings': [('sawmill', 'cat'), ('empty', 'No one')], 'tokens' : []}),# Cats
-#                ('C', {'soldiers' : {'cat': 1, 'bird' : 3, 'alliance' : 0}, 'buildings': [('sawmill', 'cat'),('recruiter', 'cat')], 'tokens' : []}), # Birds
-#                ('D', {'soldiers' : {'cat': 2, 'bird' : 2, 'alliance' : 0}, 'buildings': [('empty', 'No one'), ('empty', 'No one')], 'tokens' : []}), # Birds
-#                ('E', {'soldiers' : {'cat': 2, 'bird' : 2, 'alliance' : 0}, 'buildings': [('empty', 'No one'), ('empty', 'No one')], 'tokens' : []}), # Birds
-#                ('F', {'soldiers' : {'cat': 2, 'bird' : 0, 'alliance' : 0}, 'buildings': [('sawmill', 'cat')], 'tokens' : []}), # Cats
-#                ('G', {'soldiers' : {'cat': 2, 'bird' : 0, 'alliance' : 0}, 'buildings': [('empty', 'No one'), ('empty', 'No one')], 'tokens' : []})] # Cats
-#
-#    i=0
-#    for key in sorted(list(map.places.keys())):
-#        if i >= len(piece_setup):
-#            break
-#        if map.places[key].name == piece_setup[i][0]:
-#            map.places[key].update_pieces(**piece_setup[i][1])
-#            i += 1
-#    map.update_owners()
-#    game.cat_birdsong_wood()
-#    build_options = marquise.get_build_options(map)
-#    assert build_options == {'sawmill': {'where': ['B'], 'cost': 3},
-#                            'workshop': {'where': ['B', 'G', 'H', 'I', 'J', 'K'], 'cost': 0},
-#                            'recruiter': {'where': ['B', 'G', 'H', 'I', 'J', 'K'], 'cost': 1}}
+               'recruiter': {'where': ['B', 'G', 'H', 'I', 'J', 'K'], 'cost': 1}}
 
 def test_marquise_overwork():
     game = Game(debug=True)
@@ -171,72 +136,6 @@ def test_marquise_overwork():
     map.update_owners()
     overworks = marquise.get_overwork(map)
     assert overworks == [OverworkDTO('A', 27), OverworkDTO('A', 28), OverworkDTO('A', 53), OverworkDTO('B', 53), OverworkDTO('F', 53),]
-
-#def test_eyrie_get_decree_options():
-#    game = Game(debug=True)
-#    eyrie = game.eyrie
-#    map = game.map
-#    eyrie.deck = Deck(empty=True)
-#
-#    # Give Eyrie some cards
-#    common_deck = Deck(empty=True)
-#    common_deck.add_card(Card(*total_common_card_info[27])) # 2x fox
-#    common_deck.add_card(Card(*total_common_card_info[28]))
-#    common_deck.add_card(Card(*total_common_card_info[53])) # 1x bird
-#
-#    eyrie.deck.add_card(common_deck.draw_card())
-#    eyrie.deck.add_card(common_deck.draw_card())
-#    eyrie.deck.add_card(common_deck.draw_card())
-#
-#    decree_options = eyrie.get_decree_options()
-#
-#    assert len(decree_options) == 4
-#
-#    # Check if the decree options include the correct cards with the right suits
-#    assert decree_options ==  {
-#            "recruit": [(27, 'fox'), (28, 'fox'), (53, 'bird')],
-#            "move": [(27, 'fox'), (28, 'fox'), (53, 'bird')],
-#            "battle": [(27, 'fox'), (28, 'fox'), (53, 'bird')],
-#            "build": [(27, 'fox'), (28, 'fox'), (53, 'bird')],
-#        }
-    
-    
-#def test_resolves():
-#    game = Game(debug=True)
-#    eyrie = game.eyrie
-#    map = game.map
-#    eyrie.deck = Deck(empty=True)
-#    map.places['L'].update_pieces(vagabond_is_here = True) # This creates 2 vagabonds but its ok for now
-#    
-#    # Give Eyrie some cards
-#    common_deck = Deck(empty=True)
-#    common_deck.add_card(Card(*total_common_card_info[0])) # rabbit
-#    common_deck.add_card(Card(*total_common_card_info[27])) # 2x fox
-#    common_deck.add_card(Card(*total_common_card_info[28]))
-#    common_deck.add_card(Card(*total_common_card_info[53])) # 1x bird
-#
-#    eyrie.deck.add_card(common_deck.draw_card())
-#    eyrie.deck.add_card(common_deck.draw_card())
-#    eyrie.deck.add_card(common_deck.draw_card())
-#    eyrie.deck.add_card(common_deck.draw_card())
-#
-#    decree_options = eyrie.get_decree_options()
-#    eyrie.decree = decree_options # Not how your supposed to do it, but it works for testing
-#    move_options = eyrie.get_resolve_move(map)
-#    assert move_options[0] == MoveDTO('L', 'H', 1, card_ID=0, who='bird')
-#    assert move_options[-1] == MoveDTO('L', 'K', 6, card_ID=53, who='bird')
-#
-#    recruit_options = eyrie.get_resolve_recruit(map)
-#    assert recruit_options == [(map.places['L'], 0), (map.places['L'], 53)]
-#
-#    battle_option = eyrie.get_resolve_battle(map, game.vagabond)
-#    assert battle_option == [Battle_DTO('L', 'vagabond', 0), Battle_DTO('L', 'vagabond', 53)]
-#
-#    map.places['I'].update_pieces(soldiers = {'cat' : 0, 'bird' : 4, 'alliance' : 0})
-#    map.places['A'].update_pieces(buildings = [('empty', 'No one')], soldiers = {'cat' : 0, 'bird' : 4, 'alliance' : 0})
-#    map.update_owners()
-#    build_option = eyrie.get_resolve_building(map)
-#    assert build_option == [('I', 27),('I', 28),('I', 53)]
 
 
 def test_eyrie_no_roosts_left():
