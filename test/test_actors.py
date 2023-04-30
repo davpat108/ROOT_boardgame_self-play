@@ -98,7 +98,7 @@ def test_marquise_get_connected_wood_tokens():
 
     tokens = marquise.get_wood_tokens_to_build(map, map.places['G'])
     assert tokens == 1
-               'recruiter': {'where': ['B', 'G', 'H', 'I', 'J', 'K'], 'cost': 1}}
+
 
 def test_marquise_overwork():
     game = Game(debug=True)
