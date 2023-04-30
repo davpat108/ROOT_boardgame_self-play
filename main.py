@@ -17,6 +17,8 @@ def play(player):
             eyrie_birdsong(game)
             eyrie_daylight(game)
             eyrie_eveing(game)
+        else:
+            logging.debug("Eyrie is dead, skipping their turn")
 
     elif player == "alliance":
         alliance_birsong(game)
@@ -29,19 +31,20 @@ def play(player):
         vagabond_evening(game)
 
 if __name__ == "__main__":
-    game = Game(debug=False)
-    turn_order = ['cat', 'bird', 'alliance', 'vagabond']
-    #random.shuffle(turn_order)
-    winner = "No one"
     game_num = 0
+    turn_order = ['cat', 'bird', 'alliance', 'vagabond']
     while 1:
-        logging.basicConfig(filename=f'{game_num}thgame.log', encoding='utf-8', level=logging.DEBUG)
-        play(turn_order[0])
-        play(turn_order[1])
-        play(turn_order[2])
-        play(turn_order[3])
+        game = Game(debug=False)
+        random.shuffle(turn_order)
+        print(game_num)
+        while 1:
+            logging.basicConfig(filename=f'{game_num}thgame.log', encoding='utf-8', level=logging.DEBUG)
+            play(turn_order[0])
+            play(turn_order[1])
+            play(turn_order[2])
+            play(turn_order[3])
 
-        if game.winner:
-            game_num += 1
-            logging.debug(f"Game {game_num} winner is {game.winner[0]}, they won with a {game.winner[1]} victory")
-            break
+            if game.winner:
+                game_num += 1
+                logging.debug(f"Game {game_num} winner is {game.winner[0]}, they won with a {game.winner[1]} victory")
+                break

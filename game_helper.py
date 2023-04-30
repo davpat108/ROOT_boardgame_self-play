@@ -1,6 +1,7 @@
 import random
 from dtos import Battle_DTO, OverworkDTO, MoveDTO, CraftDTO, Item
 from deck import Deck
+from copy import copy
 import logging
 def random_choose(options):
     if options is None:
@@ -455,15 +456,15 @@ def daylight_card_actions(game, actor):
 
 def evening_card_actions(game, actor):
     # COBBLER
-    if actor.cobbler and actor != 'bird':
+    if actor.cobbler and actor.name != 'bird':
         options = actor.get_moves(game.map)
         choice = random_choose(options)
         if choice:
             logging.debug(f"{actor.name} used cobbler")
             move_and_account_to_sympathy(game, choice)
             
-    elif actor.cobbler and actor == 'bird':
-        options = actor.get_cobbler_move_options
+    elif actor.cobbler and actor.name == 'bird':
+        options = actor.get_cobbler_move_options(game.map)
         choice = random_choose(options)
         if choice:
             logging.debug(f"{actor.name} used cobbler")
@@ -518,7 +519,7 @@ def marquise_evening(game):
     for _ in range(draws):
         game.marquise.deck.add_card(game.deck.draw_card())
         if len(game.deck.cards) <= 0: # DECK ONE LINER
-            game.deck = game.discard_deck
+            game.deck = copy(game.discard_deck)
             game.deck.shuffle_deck()
             game.discard_deck = Deck(empty=True)
     discard_options = True
@@ -536,15 +537,18 @@ def eyrie_birdsong(game):
     if len(game.eyrie.deck.cards) == 0:
         game.eyrie.deck.add_card(game.deck.draw_card())
         if len(game.deck.cards) <= 0: # DECK ONE LINER
-            game.deck = game.discard_deck
+            game.deck = copy(game.discard_deck)
             game.deck.shuffle_deck()
             game.discard_deck = Deck(empty=True)
     
     # ADD UP TO TWO CARDS TO DECREE
     options = game.eyrie.get_decree_options()
     choice = random_choose(options)
-    logging.debug(f"{game.eyrie.name} added {choice[1]} to the {choice[0]} decree")
-    game.add_card_to_decree(*choice)
+    if choice:
+        logging.debug(f"{game.eyrie.name} added {choice[1]} to the {choice[0]} decree")
+        game.add_card_to_decree(*choice)
+    else:
+        logging.debug(f"{game.eyrie.name} did not add a card to the decree")
     options = game.eyrie.get_decree_options()
     options.append(False)
     choice = random_choose(options)
@@ -629,8 +633,7 @@ def eyrie_daylight(game):
         options = game.eyrie.get_turmoil_options()
         choice = random_choose(options)
         logging.debug(f"{game.eyrie.name} chose {choice} as its new leader")
-        if choice:
-            game.bird_turmoil(choice)
+        game.bird_turmoil(choice)
     
 def eyrie_eveing(game):
     evening_card_actions(game, game.eyrie)
@@ -639,7 +642,7 @@ def eyrie_eveing(game):
     for _ in range(draws):
         game.eyrie.deck.add_card(game.deck.draw_card())
         if len(game.deck.cards) <= 0: # DECK ONE LINER
-            game.deck = game.discard_deck
+            game.deck = copy(game.discard_deck)
             game.deck.shuffle_deck()
             game.discard_deck = Deck(empty=True)
     discard_options = True
@@ -697,7 +700,7 @@ def alliance_evening(game):
     for _ in range(draws):
         game.alliance.deck.add_card(game.deck.draw_card())
         if len(game.deck.cards) <= 0: # DECK ONE LINER
-            game.deck = game.discard_deck
+            game.deck = copy(game.discard_deck)
             game.deck.shuffle_deck()
             game.discard_deck = Deck(empty=True)
     
@@ -754,7 +757,7 @@ def vagabond_evening(game):
     for _ in range(draws):
         game.vagabond.deck.add_card(game.deck.draw_card())
         if len(game.deck.cards) <= 0: # DECK ONE LINER
-            game.deck = game.discard_deck
+            game.deck = copy(game.discard_deck)
             game.deck.shuffle_deck()
             game.discard_deck = Deck(empty=True)
 
@@ -770,4 +773,4 @@ def vagabond_evening(game):
         discard_options = game.vagabond.get_discard_items_down_to_sack_options()
         if discard_options:
             choice = random_choose(discard_options)
-            game.vagabond.satchtel.remove(choice)
+            game.vagabond.satchel.remove(choice)

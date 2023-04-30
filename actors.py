@@ -340,7 +340,7 @@ class Eyrie(Actor):
         if self.leader in self.avaible_leaders:
             self.avaible_leaders.remove(self.leader)
             return
-        elif self.avaible_leaders == []:
+        elif len(self.avaible_leaders) == 0:
             return "Eyrie dead."
         else:
             raise ValueError("Invalid role for Eyrie")
@@ -428,7 +428,7 @@ class Eyrie(Actor):
 
     def get_cobbler_move_options(self, map):
         move_options = []
-        for source_clearing in map.clearing.values():
+        for source_clearing in map.places.values():
             if source_clearing.soldiers["bird"] > 0:
                 for neighbor in source_clearing.neighbors:
                     if not neighbor[1]:
@@ -513,7 +513,8 @@ class Eyrie(Actor):
 
     def get_resolve_building(self, map):
         building_option = []
-
+        if map.count_on_map(("building", "roost")) > 6:
+            return building_option
         for card_ID, card_suit in self.temp_decree["build"]:
             matching_clearings = [place for place in map.places.values() if place.suit == card_suit or card_suit == "bird"]
             total_roosts = sum([True in [slot[0] == 'roost' for slot in place.building_slots] for place in map.places.values()])
@@ -879,10 +880,7 @@ class Vagabond(Actor):
         move_options = []
         for neighbor in map.places[map.vagabond_position].neighbors:
             if not neighbor[1]:
-                if map.places[neighbor[0]].owner != "No one" and self.relations[map.places[neighbor[0]].owner] == 'hostile':
-                    boot_cost = 2
-                else:
-                    boot_cost = 1
+                boot_cost = 2 if self.relations[map.places[neighbor[0]].owner] == 'hostile' else 1
                 if [item for item in self.satchel if item.exhausted == False and item.damaged == False].count(Item("boot")) >= boot_cost:
                     move_options.append(MoveDTO(map.vagabond_position, map.places[neighbor[0]].name, how_many=0, who='vagabond'))
                     if self.relations['cat'] == 'friendly' and map.places[map.vagabond_position].soldiers['cat'] > 0:
@@ -1048,7 +1046,6 @@ class Vagabond(Actor):
         aid_options = []
         current_clearing = map.places[map.vagabond_position]
         # Iterates through name
-        i = 0
         for opponent in opponents:
             if current_clearing.has_opponent_pieces(opponent.name):
                 relation = self.relations[opponent.name]
@@ -1056,7 +1053,7 @@ class Vagabond(Actor):
                     continue
 
                 item_choices = []  # Get items from the opponent
-                for item in opponents[i].items: #Iterates through opponent objects from arquments
+                for item in opponent.items: #Iterates through opponent objects from arquments
                     item_choices.append(Item(item.name))
                 item_choices = set(item_choices)
 
@@ -1067,7 +1064,6 @@ class Vagabond(Actor):
                                 aid_options.append((opponent, card.ID, item))
                         else:
                             aid_options.append((opponent, card.ID, None))
-            i += 1
 
         return aid_options
 
@@ -1076,7 +1072,7 @@ class Vagabond(Actor):
         for opponent in ['cat', 'bird', 'alliance']:
             if self.relations[opponent] == 'friendly':
                 for _ in range(current_clearing.soldiers[opponent]):
-                    self.allied_soldiers += opponent
+                    self.allied_soldiers.append(opponent)
 
     def get_item_dmg_options(self, map):
         """Returns a list of items that can be damaged"""
@@ -1165,4 +1161,4 @@ class Vagabond(Actor):
         max_items_satchtel = 6 + self.other_items.count(Item("sack")) * 2
         if len(self.satchel) <= max_items_satchtel:
             return
-        return self.sachtel
+        return self.satchel

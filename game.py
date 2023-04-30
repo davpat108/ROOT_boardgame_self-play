@@ -5,6 +5,7 @@ from map import build_regular_forest
 from deck import Deck, QuestDeck
 from configs import sympathy_VPs, eyrie_roost_VPs, persistent_effects, Immediate_non_item_effects, eyrie_leader_config, buildings_list_marquise, vagabond_quest_card_info, total_common_card_info
 from game_helper import alliance_choose_card, choose_card_prios
+from copy import copy
 import random
 import logging
 
@@ -160,7 +161,7 @@ class Game():
     def better_burrow_bank(self, actor, other):
         actor.deck.add_card(self.deck.draw_card())
         if len(self.deck.cards) <= 0: # DECK ONE LINER
-            self.deck = self.discard_deck
+            self.deck = copy(self.discard_deck)
             self.deck.shuffle_deck()
             self.discard_deck = Deck(empty=True)
         other.deck.add_card(self.deck.draw_card())
@@ -170,7 +171,7 @@ class Game():
         actor.deck.add_card(self.deck.draw_card())
         self.map.places[placename].update_owner()
         if len(self.deck.cards) <= 0: # DECK ONE LINER
-            self.deck = self.discard_deck
+            self.deck = copy(self.discard_deck)
             self.deck.shuffle_deck()
             self.discard_deck = Deck(empty=True)
 
@@ -259,7 +260,7 @@ class Game():
             else:
                 self.discard_deck.add_card(self.alliance.supporter_deck.get_the_card(cardID))
 
-        victory_points = sympathy_VPs[self.map.count_on_map(what_to_look_for=('token', 'sympathy'), per_suit = False)]
+        victory_points = sympathy_VPs[self.map.count_on_map(what_to_look_for=('token', 'sympathy'), per_suit = False)-1]
         self.alliance.victory_points += victory_points
         self.check_victory_points()
 
@@ -272,8 +273,8 @@ class Game():
                 self.alliance.supporter_deck.add_card(self.vagabond.deck.get_the_card(card_id))
             if not card_to_give_if_sympathy and len(self.vagabond.deck.cards) == 0:
                 self.alliance.supporter_deck.add_card(self.deck.draw_card())
-                if len(self.deck.cards) == 0:
-                    self.deck = self.discard_deck
+                if len(self.deck.cards) <= 0:
+                    self.deck = copy(self.discard_deck)
                     self.deck.shuffle_deck()
                     self.discard_deck = Deck(empty=True)
             else:
@@ -452,8 +453,8 @@ class Game():
                         if piece[0] == 'base':
                             self.alliance.losing_a_base(place_suit=place.suit, discard_deck=self.discard_deck)
                         if piece[0] == 'sawmill' or piece[0] == 'workshop' or piece[0] == 'recruiter':
-                            logging.debug(f"Marquise lost {buildings_list_marquise[piece[0]]['VictoryPoints'][self.map.count_on_map(('building', piece[0]))+1]} VPs, as it lost a {piece[0]}")
-                            self.marquise.victory_points -= buildings_list_marquise[piece[0]]["VictoryPoints"][self.map.count_on_map(("building", piece[0]))+1] # +1 because we already removed the building
+                            logging.debug(f"Marquise lost {buildings_list_marquise[piece[0]]['VictoryPoints'][self.map.count_on_map(('building', piece[0]))]} VPs, as it lost a {piece[0]}")
+                            self.marquise.victory_points -= buildings_list_marquise[piece[0]]["VictoryPoints"][self.map.count_on_map(("building", piece[0]))] # +1 because we already removed the building
                     elif piece[1] == "token":
                         logging.debug(f"{defender} lost {piece[0]}")
                         place.tokens.remove(piece[0])
@@ -462,7 +463,7 @@ class Game():
                             victory_points_attacker += 1
                         if piece[0] == "sympathy":
                             sympathy_killed = True
-                            self.alliance.victory_points -= sympathy_VPs[self.map.count_on_map(("token", "sympathy"))+1]
+                            self.alliance.victory_points -= sympathy_VPs[self.map.count_on_map(("token", "sympathy"))]
 
 
         # Process defender's damage
@@ -498,15 +499,15 @@ class Game():
                         place.remove_building(piece[0])
                         victory_points_defender += 1
                         if piece[0] == 'sawmill' or piece[0] == 'workshop' or piece[0] == 'recruiter':
-                            logging.debug(f"Marquise lost {buildings_list_marquise[piece[0]]['VictoryPoints'][self.map.count_on_map(('building', piece[0]))+1]} VPs, as it lost a {piece[0]}")
-                            self.marquise.victory_points -= buildings_list_marquise[piece[0]]["VictoryPoints"][self.map.count_on_map(("building", piece[0]))+1] # +1 because we already removed the building
+                            logging.debug(f"Marquise lost {buildings_list_marquise[piece[0]]['VictoryPoints'][self.map.count_on_map(('building', piece[0]))]} VPs, as it lost a {piece[0]}")
+                            self.marquise.victory_points -= buildings_list_marquise[piece[0]]["VictoryPoints"][self.map.count_on_map(("building", piece[0]))] # +1 because we already removed the building
                     elif piece[1] == "token":
                         logging.debug(f"{attacker} lost {piece[0]}")
                         place.tokens.remove(piece[0])
                         victory_points_defender += 1
                         if piece[0] == "sympathy":
                             sympathy_killed = True
-                            self.alliance.victory_points -= sympathy_VPs[self.map.count_on_map(("token", "sympathy"))+1]
+                            self.alliance.victory_points -= sympathy_VPs[self.map.count_on_map(("token", "sympathy"))]
 
         for actor in [self.eyrie, self.vagabond, self.marquise, self.alliance]:
             if actor.name == attacker:
@@ -542,7 +543,7 @@ class Game():
 
         place.update_owner()
         if len(self.deck.cards) <=0:
-            self.deck = self.discard_deck
+            self.deck = copy(self.discard_deck)
             self.deck.shuffle_deck()
             self.discard_deck = Deck(empty=True)
         self.check_victory_points()
@@ -570,7 +571,7 @@ class Game():
                     self.alliance.supporter_deck.add_card(self.vagabond.deck.get_the_card(card_id))
 
         if len(self.deck.cards) <= 0:
-            self.deck = self.discard_deck
+            self.deck = copy(self.discard_deck)
             self.deck.shuffle_deck()
             self.discard_deck = Deck(empty=True)
 
@@ -818,7 +819,7 @@ class Game():
 
     def eyrie_get_points(self):
         roosts = self.map.count_on_map(("building", "roost"))
-        self.eyrie.victory_points += eyrie_roost_VPs[roosts]
+        self.eyrie.victory_points += eyrie_roost_VPs[roosts-1]
         self.check_victory_points()
 
 
@@ -942,6 +943,7 @@ class Game():
 
 
     def strike(self, placename, opponent, target, card_to_give_if_sympathy):
+        self.vagabond.exhaust_item(Item("crossbow"))
         if target == "wood" or target == "keep" or target == "sympathy":
             self.map.places[placename].tokens.remove(target)
             self.vagabond.victory_points += 1
@@ -951,7 +953,7 @@ class Game():
             if target == "sympathy" and not card_to_give_if_sympathy and len(self.vagabond.deck.cards) == 0:
                 self.alliance.supporter_deck.add_card(self.deck.draw_card())
                 if len(self.deck.cards) <= 0:
-                    self.deck = self.discard_deck
+                    self.deck = copy(self.discard_deck)
                     self.deck.shuffle_deck()
                     self.discard_deck = Deck(empty=True)
             if target == "sympathy" and not card_to_give_if_sympathy and len(self.vagabond.deck.cards) > 0:
@@ -959,7 +961,7 @@ class Game():
                 card_id = alliance_choose_card(options)
                 self.alliance.supporter_deck.add_card(self.vagabond.deck.get_the_card(card_id))
             if target == "sympathy":
-                self.alliance.victory_points -= sympathy_VPs[self.map.count_on_map(("token", "sympathy"))+1]
+                self.alliance.victory_points -= sympathy_VPs[self.map.count_on_map(("token", "sympathy"))]
 
         elif target == "soldier":
             self.map.places[placename].soldiers[opponent] -= 1
@@ -969,7 +971,7 @@ class Game():
             for i in range(len(self.map.places[placename].building_slots)):
                 if self.map.places[placename].building_slots[i][0] == target:
                     self.map.places[placename].building_slots[i] = ("empty", "No one")
-                    victory_points += 1
+                    self.vagabond.victory_points += 1
                     self.check_victory_points()
                     if target == 'sawmill' or target == 'workshop' or target == 'recruiter':
                         self.marquise.victory_points -= buildings_list_marquise[target]["VictoryPoints"][self.map.count_on_map(("building", target))+1] # +1 because we already removed the building
