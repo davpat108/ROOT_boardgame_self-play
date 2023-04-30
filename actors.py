@@ -1069,6 +1069,7 @@ class Vagabond(Actor):
 
     def refresh_allied_soldiers(self, map):
         current_clearing = map.places[map.vagabond_position]
+        self.allied_soldiers = []
         for opponent in ['cat', 'bird', 'alliance']:
             if self.relations[opponent] == 'friendly':
                 for _ in range(current_clearing.soldiers[opponent]):

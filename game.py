@@ -897,18 +897,21 @@ class Game():
             self.vagabond.victory_points += 1
             self.check_victory_points()
             self.vagabond.relations[other_player.name] = "good"
+            logging.debug(f"Vagabond relations with {other_player.name} is now good")
             return 0
 
         if self.vagabond.relations[other_player.name] == "good" and consequitive_aids == 1:
             self.vagabond.victory_points += 2
             self.check_victory_points()
             self.vagabond.relations[other_player.name] = "very good"
+            logging.debug(f"Vagabond relations with {other_player.name} is now very good")
             return 0
 
         if self.vagabond.relations[other_player.name] == "very good" and consequitive_aids == 2:
             self.vagabond.victory_points += 2
             self.check_victory_points()
             self.vagabond.relations[other_player.name] = "friendly"
+            logging.debug(f"Vagabond relations with {other_player.name} is now friendly")
             return 0
         
         return consequitive_aids + 1 # Reset at the end of every vagabond turn

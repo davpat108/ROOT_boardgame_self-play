@@ -10,24 +10,24 @@ The common deck and the vagabonds quest deck is implemented here.
 ## Actors
 The 4 actors and the actions they can take from the state of the map, their board and their hand.
 
-## Utils
-Stuff that doesn't fit into the map nor the actors
 
-## Actions
-Action data transfer objects and the functions that change the gamestate can be found here.
+## Game
+Functions that carry out the options from actors are located here
 
 ## Tests
-I wrote pytests to ensure ther game and its elements work strictly according to the rules.
+Pytests to ensure ther game and its elements work strictly according to the rules.
 
 ## Configs
-The bigger constats are located here.
+The bigger constants are located here.
 
+## DTOS
+Data transfer objects between options in the game state and functions that carry out the options.
 ## TODO
 
 tax collection
-In case of battle with 0 soldiers at least 1 dmg
+something with alliance soldiers
 
 
 # TODO first gonna skip
-which woods to use to build, if you can build by the rule supply lines, you might be able to build unsupported wood
+which woods to use when building, if you can build by the rule supply lines, you might be able to build unsupported wood
 which craft activations to use for royal claim
