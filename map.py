@@ -56,9 +56,13 @@ class Place:
 		return removed_tokens
 	
 	def clear_soldiers(self, exception_faction=None):
+		wounded_cat_soldiers = None
 		for faction in self.soldiers:
-			if faction != exception_faction:
+			if faction != exception_faction and faction != "vagabond":
+				if faction == "cat":
+					wounded_cat_soldiers = self.soldiers[faction]
 				self.soldiers[faction] = 0
+		return wounded_cat_soldiers
 
 	def add_building(self, building_type, owner):
 		# building type: (name, owner)

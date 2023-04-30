@@ -4,6 +4,7 @@ from configs import buildings_list_marquise, Immediate_non_item_effects, persist
 from itertools import combinations
 from item import Item
 from copy import copy
+import logging
 import random
 class Actor():
 
@@ -163,9 +164,20 @@ class Marquise(Actor):
             draws += 1
         return draws
 
-    def get_field_hospital_options(self, place):
-        options = set([True if card.card_suit == place.suit else False for card in self.deck.cards].append(False))
-        return options
+    def get_field_hospital_options(self, map, placename=None,suit=None):
+        if map.count_on_map(("token", "keep")) != 1:
+            return [False]
+        options = [False]
+        if placename:
+            for card in self.deck.cards:
+                if card.card_suit == map.places[placename].suit or card.card_suit == "bird":
+                    options.append(card.ID)
+            return options
+        if suit:
+            for card in self.deck.cards:
+                if card.card_suit == suit or card.card_suit == "bird":
+                    options.append(card.ID)
+            return options
 
 
     def get_options_craft(self, map):
@@ -570,14 +582,14 @@ class Alliance(Actor):
         return draws
 
     def losing_a_base(self, place_suit, discard_deck):
+        card_ids_to_remove = []
         for card in self.supporter_deck.cards:
             if card.card_suit == place_suit or card.card_suit == "bird":
-                discard_deck.add_card(card)
-                return
-        return False
-
-    def get_options(self):
-        return super().get_options()
+                card_ids_to_remove.append(card.ID)
+    
+        logging.debug(f"Removing {card_ids_to_remove} from the Alliance's supporter deck because of a base loss")
+        for card_id in card_ids_to_remove:
+            discard_deck.add_card(self.supporter_deck.get_the_card(card_id))
     
     def discard_down_to_five_supporters_options(self, map):
         if map.count_on_map(("building", "base")) == 0:

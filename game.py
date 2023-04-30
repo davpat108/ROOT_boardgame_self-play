@@ -146,9 +146,11 @@ class Game():
                 if [True if place.owner == actor.name and place.suit == "rabbit" else False for place in self.map.places.values()].count(True) >= 3:
                     self.winner = (actor.name, "rabbit dominance")
 
-    def field_hospital(self, dead_soldiers, card_ID):
-        keep_position = [place.name if 'keep' in place.tokens else None for place in self.map.places.values()]
-        self.map.places[keep_position].soldiers['cat'] += dead_soldiers
+    def field_hospital(self, wounded_soldiers, card_ID):
+        logging.debug(f"Cat used field_hospital saving {wounded_soldiers} soldiers ")
+        not_none_if_keep = [place.name if 'keep' in place.tokens else None for place in self.map.places.values()]
+        keep_position  = next(item for item in not_none_if_keep if item is not None)
+        self.map.places[keep_position].soldiers['cat'] += wounded_soldiers
         if total_common_card_info[card_ID][2] == "dominance":
             self.dominance_discard_deck.add_card(self.marquise.deck.get_the_card(card_ID))
         else:
@@ -212,9 +214,9 @@ class Game():
         # Clear all buildings
         victory_points = 0
         victory_points += place.clear_buildings()
-        self.count_lost_points_marquise(place=place)
+        self.account_lost_points_marquise(place=place)
         victory_points += place.clear_tokens(exception_faction = "alliance")
-        place.clear_soldiers(exception_faction="alliance")
+        wounded_cat_soldiers = place.clear_soldiers(exception_faction="alliance")
 
         # Add a base for the alliance
         place.add_building('base', 'alliance')
@@ -244,6 +246,7 @@ class Game():
         place.update_owner()
         self.alliance.victory_points += victory_points
         self.check_victory_points()
+        return wounded_cat_soldiers
 
 
     def spread_sympathy(self, place_name, card_ids):
@@ -385,17 +388,15 @@ class Game():
 
     def resolve_battle(self, place, attacker, defender, dmg_attacker, dmg_defender, attacker_chosen_pieces=None, defender_chosen_pieces=None, card_to_give_if_sympathy=None):
         """
-        :param self.map: Map
-        :param place_name: str
+        :param place: Map
         :param attacker: str
         :param defender: str
-        :param dice_rolls: list, 2 0-3 nums descending order
-        :param marquise: Marquise
-        :param eyrie: Eyrie
-        :param alliance: Alliance
-        :param vagabond: Vagabond
-        :param discard_deck: DiscardDeck
-        :param vagabond_items: list, items to damage
+        :param dmg_attacker int dmges from get battle damages
+        :param dmg_defender int 
+        :param attacker_chosen_pieces: if more dmg than soldiers, what buildings to destroy (owner chooses)
+        :param defender_chosen_pieces: if more dmg than soldiers, what buildings to destroy (owner chooses)
+        :param card_to_give_if_sympathy: if sympathy is removed, what card to give to alliance
+        :return: wounded cat soldiers if there's any, None if no cat is present
         """ 
         if attacker != "vagabond" and place.soldiers[attacker] == 0:
             logging.debug("No attacker because no soldiers")
@@ -407,6 +408,8 @@ class Game():
                 self.vagabond.allied_soldiers = self.remove_soldiers_from_vagabond_items(self.vagabond.allied_soldiers, defender)
                 self.vagabond.items_to_damage = self.remove_soldiers_from_vagabond_items(self.vagabond.items_to_damage, defender)
 
+        total_lost_soldiers_attacker = 0 # For field hospital
+        total_lost_soldiers_defender = 0 # For field hospital
         victory_points_attacker = 0
         victory_points_defender = 0
         sympathy_killed = False
@@ -431,8 +434,11 @@ class Game():
                 victory_points_attacker-=1 # THAT one soldier doesn't count as VP
             if extra_dmg_attacker <=0:
                 logging.debug(f"{defender} lost {dmg_attacker} soldiers")
+                total_lost_soldiers_defender = dmg_attacker
                 place.soldiers[defender] -= dmg_attacker
             else:
+                logging.debug(f"{defender} lost {place.soldiers[defender]} soldiers")
+                total_lost_soldiers_defender = place.soldiers[defender]
                 place.soldiers[defender] = 0
                 for piece in defender_chosen_pieces[:extra_dmg_attacker]:
                     if piece[1] == "building":
@@ -477,7 +483,11 @@ class Game():
 
             if extra_dmg_defender <=0:
                 place.soldiers[attacker] -= dmg_defender
+                total_lost_soldiers_attacker = dmg_defender
+                logging.debug(f"{attacker} lost {dmg_defender} soldiers")
             else:
+                total_lost_soldiers_attacker = place.soldiers[attacker]
+                logging.debug(f"{attacker} lost {place.soldiers[attacker]} soldiers")
                 place.soldiers[attacker] = 0
                 for piece in attacker_chosen_pieces[:extra_dmg_defender]:
                     if piece[1] == "building":
@@ -533,6 +543,11 @@ class Game():
             self.discard_deck = Deck(empty=True)
         self.check_victory_points()
 
+        if attacker == "cat":
+            return total_lost_soldiers_attacker
+        if defender == "cat":
+            return total_lost_soldiers_defender
+
 
     def move(self, move_action, card_to_give_if_sympathy):
         if move_action.who != 'vagabond':
@@ -575,6 +590,7 @@ class Game():
         self.map.update_owners()
 
     def craft(self, actor, costs: CraftDTO):
+        wounded_cat_soldiers = None
         if costs.card.craft == "ambush":
             raise ValueError("Ambush is not a craftable card")
 
@@ -630,13 +646,17 @@ class Game():
             actor.persistent_effect_deck.add_card(actor.deck.get_the_card(costs.card.ID))
         # special effects
         elif costs.card.craft == "favor":
-                self.favor(actor, costs.card.craft_suit)
+                wounded_cat_soldiers = self.favor(actor, costs.card.craft_suit)
                 self.discard_deck.add_card(actor.deck.get_the_card(costs.card.ID))
         elif costs.card.craft == "dominance":
                 self.dominance(actor, costs.card.card_suit)
                 actor.deck.get_the_card(costs.card.ID) # remove from the game
 
-    def count_lost_points_marquise(self, place):
+        if wounded_cat_soldiers:
+            return wounded_cat_soldiers
+        
+
+    def account_lost_points_marquise(self, place):
         lost_points = 0
         lost_sawmills = 0
         lost_workshops = 0
@@ -663,13 +683,11 @@ class Game():
         victory_points = 0
         for place in self.map.places.values():
             if place.suit == suit:
-                for key in place.soldiers.keys():
-                    if key != actor.name and key != "vagabond":
-                        place.soldiers[key] = 0
+                wounded_cats = place.clear_soldiers(exception_faction=actor.name)
                 if ('base', 'alliance') in place.building_slots and actor.name != "alliance":
                     self.alliance.losing_a_base(place_suit=place.suit, discard_deck=self.discard_deck)
                 if actor.name != 'marquise':
-                    self.count_lost_points_marquise(place)
+                    self.account_lost_points_marquise(place)
                 if actor.name != "vagabond" and place.vagabond_is_here:
                     for item in self.vagabond.items_to_damage[:3]:
                         self.vagabond.damage_item(item)
@@ -678,6 +696,7 @@ class Game():
         actor.victory_points += victory_points
         self.check_victory_points()
         self.map.update_owners()
+        return wounded_cats
 
 
 
@@ -954,4 +973,7 @@ class Game():
                         self.alliance.losing_a_base(place_suit=self.map.places[placename].suit, discard_deck=self.discard_deck)
                     break
         self.map.places[placename].update_owner()
+
+        if opponent == 'cat' and target == "soldier":
+            return 1 # Wounded cat soldier
         

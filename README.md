@@ -25,7 +25,6 @@ The bigger constats are located here.
 ## TODO
 
 tax collection
-field hospital update stuff
 defender armorer
 
 
