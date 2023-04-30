@@ -3,6 +3,7 @@ from dtos import Battle_DTO, CraftDTO, MoveDTO, OverworkDTO
 from configs import buildings_list_marquise, Immediate_non_item_effects, persistent_effects, eyrie_leader_config
 from itertools import combinations
 from item import Item
+from copy import copy
 import random
 class Actor():
 
@@ -373,7 +374,7 @@ class Eyrie(Actor):
 
 
     def refresh_temp_decree(self):
-        self.temp_decree = self.decree
+        self.temp_decree = copy(self.decree)
 
     def get_resolve_recruit(self, map):
         recruit_options = []
@@ -1112,7 +1113,7 @@ class Vagabond(Actor):
                 item.damaged = False
                 return
         for item in self.other_items:
-            if item.name == other_item and item.damaged:
+            if item.name == other_item.name and item.damaged:
                 item.damaged = False
                 return
         raise ValueError("Item not found or not damaged")
@@ -1147,4 +1148,4 @@ class Vagabond(Actor):
         max_items_satchtel = 6 + self.other_items.count(Item("sack")) * 2
         if len(self.satchel) <= max_items_satchtel:
             return
-        return self.satchtel
+        return self.sachtel

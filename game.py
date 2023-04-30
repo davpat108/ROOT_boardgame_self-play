@@ -413,7 +413,7 @@ class Game():
 
         # Process attacker's damage
         if defender == "vagabond":
-            logging.debug("Vagabond getting {self.vagabond.items_to_damage[:dmg_attacker} damaged")
+            logging.debug(f"Vagabond getting {self.vagabond.items_to_damage[:dmg_attacker]} damaged")
             for item in self.vagabond.items_to_damage[:dmg_attacker]:
                 self.vagabond.damage_item(item)
         else:

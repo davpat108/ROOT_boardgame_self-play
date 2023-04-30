@@ -182,7 +182,8 @@ def get_all_evening_option_alliance(game):
     return options
 
 def move_and_account_to_sympathy(game, choice):
-    logging.debug(f"{choice.who} moved to {choice.end} with {choice.how_many} pieces")
+    logging.debug(f"{choice.who} moved from {choice.start} to {choice.end} with {choice.how_many} pieces")
+    card_to_give_if_sympathy = None
     for actor in [game.marquise, game.eyrie, game.vagabond]:
         if actor.name == choice.who: 
             card_to_give_if_sympathy = actor.card_to_give_to_alliace_options(game.map.places[choice.end].suit)
@@ -299,13 +300,13 @@ def birdsong_card_actions(game, actor):
     options = actor.bbb_options((game.marquise, game.eyrie, game.alliance, game.vagabond))
     choice = random_choose(options)
     if choice:
-        logging.debug(f"{actor.name} used Better burrow bank with {choice}")
+        logging.debug(f"{actor.name} used Better burrow bank with {choice.name}")
         game.better_burrow_bank(actor, choice)
     # Stand and deliver
     options = actor.stand_and_deliver_options((game.marquise, game.eyrie, game.alliance, game.vagabond))
     choice = random_choose(options)
     if choice:
-        logging.debug(f"{actor.name} used stand and deliver with {choice}")
+        logging.debug(f"{actor.name} used stand and deliver with {choice.name}")
         game.stand_and_deliver(actor, choice)
     # Royal claim
     options = actor.get_royal_claim_options()
@@ -349,7 +350,7 @@ def daylight_card_actions(game, actor):
     
     # Codebreakers
     if actor.codebreakers:
-        options = actor.codebreakers_options(game.map, (game.marquise, game.eyrie, game.alliance, game.vagabond))
+        options = actor.codebreakers_options((game.marquise, game.eyrie, game.alliance, game.vagabond))
         choice = random_choose(options)
         if choice:
             logging.debug(f"{actor.name} used Codebreakers")
@@ -412,7 +413,8 @@ def marquise_daylight(game):
         if moved == True:
             move_options = game.marquise.get_moves(game.map)
             move_choice = random_choose(move_options)
-            move_and_account_to_sympathy(game, move_choice)
+            if move_choice:
+                move_and_account_to_sympathy(game, move_choice)
         
         # IF BIRD CARD, 1 MORE ACTION
         more_move_options = game.marquise.get_use_bird_card_to_gain_moves()
@@ -453,7 +455,7 @@ def eyrie_birdsong(game):
     # ADD UP TO TWO CARDS TO DECREE
     options = game.eyrie.get_decree_options()
     choice = random_choose(options)
-    logging.debug(f"{game.eyrie.name} added {choice[1]} to decree")
+    logging.debug(f"{game.eyrie.name} added {choice[1]} to the {choice[0]} decree")
     game.add_card_to_decree(*choice)
     options = game.eyrie.get_decree_options()
     options.append(False)

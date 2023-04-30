@@ -46,10 +46,13 @@ class Place:
 		else:
 			exception_tokens = []
 		removed_tokens = 0
+		new_tokens = []
 		for i in range(len(self.tokens)):
-			if self.tokens[i] not in exception_tokens:
-				self.tokens.pop(i)
+			if self.tokens[i] in exception_tokens:
+				new_tokens.append(self.tokens[i])
+			else:
 				removed_tokens += 1
+		self.tokens = new_tokens
 		return removed_tokens
 	
 	def clear_soldiers(self, exception_faction=None):
