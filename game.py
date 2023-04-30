@@ -224,6 +224,7 @@ class Game():
         # If the vagabond is present, damage 3 vagabond items
         if place.vagabond_is_here:
             for item in self.vagabond.items_to_damage[:3]:
+                logging.debug(f"Revolt damaged vagabonds {item}")
                 self.vagabond.damage_item(item)
         if total_common_card_info[card_ID1][2] == "dominance":
             self.dominance_discard_deck.add_card(self.alliance.supporter_deck.get_the_card(card_ID1))
@@ -367,6 +368,7 @@ class Game():
             self.eyrie.remove_from_temp_decree(card_ID, 'battle')
 
         self.check_victory_points()
+        logging.debug(f"Battle damages: attacker {dmg_attacker}, defender {dmg_defender}")
         return dmg_attacker, dmg_defender
 
 
@@ -443,6 +445,7 @@ class Game():
                 for piece in defender_chosen_pieces[:extra_dmg_attacker]:
                     if piece[1] == "building":
                         place.remove_building(piece[0])
+                        logging.debug(f"{defender} lost a {piece[0]}")
                         victory_points_attacker += 1
                         if attacker == "vagabond" and self.vagabond.relations[defender] == "hostile":
                             victory_points_attacker += 1
@@ -491,6 +494,7 @@ class Game():
                 place.soldiers[attacker] = 0
                 for piece in attacker_chosen_pieces[:extra_dmg_defender]:
                     if piece[1] == "building":
+                        logging.debug(f"{attacker} lost a {piece[0]}")
                         place.remove_building(piece[0])
                         victory_points_defender += 1
                         if piece[0] == 'sawmill' or piece[0] == 'workshop' or piece[0] == 'recruiter':
@@ -510,7 +514,7 @@ class Game():
                 if actor.name != "alliance":
                     if sympathy_killed and card_to_give_if_sympathy:
                         logging.debug(f"alliance is getting {card_to_give_if_sympathy}")
-                        self.alliance.supporter_deck.add_card(actor.deck.get_the_card(card_to_give_if_sympathy)) # CORRECT ASSUMING card_to_give_if_no_sympathy is correct
+                        self.alliance.supporter_deck.add_card(actor.deck.get_the_card(card_to_give_if_sympathy))
                     if sympathy_killed and not card_to_give_if_sympathy:
                         if len(actor.deck.cards) == 0:
                             logging.debug(f"alliance drew a card from the deck")
@@ -526,7 +530,7 @@ class Game():
                 actor.victory_points += victory_points_defender
                 if actor.name != "alliance":
                     if sympathy_killed and card_to_give_if_sympathy:
-                        self.alliance.supporter_deck.add_card(actor.deck.get_the_card(card_to_give_if_sympathy)) # CORRECT ASSUMING card_to_give_if_no_sympathy is correct
+                        self.alliance.supporter_deck.add_card(actor.deck.get_the_card(card_to_give_if_sympathy))
                     if sympathy_killed and not card_to_give_if_sympathy:
                         if len(actor.deck.cards) == 0:
                             self.alliance.supporter_deck.add_card(self.deck.draw_card())

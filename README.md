@@ -25,7 +25,6 @@ The bigger constats are located here.
 ## TODO
 
 tax collection
-defender armorer
 
 
 # TODO first gonna skip

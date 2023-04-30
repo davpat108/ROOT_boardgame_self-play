@@ -38,6 +38,11 @@ def get_sappers_usage(defender_name, game):
     for actor in [game.marquise, game.alliance, game.eyrie, game.vagabond]:
         if actor.name == defender_name:
             return actor.get_sappers_options()
+        
+def get_armorers_usage(defender_name, game):
+    for actor in [game.marquise, game.alliance, game.eyrie, game.vagabond]:
+        if actor.name == defender_name:
+            return actor.get_armorers_options()
     
 def get_ambush_usage(defender_name, game, placename):
     for actor in [game.marquise, game.alliance, game.eyrie, game.vagabond]:
@@ -57,7 +62,7 @@ def battle_cat(game, option):
         counterambush_choice = random_choose(options_attacker)
         logging.debug(f"Cat counterambushed? {counterambush_choice}")
         game.ambush(placename = option.where, attacker=game.marquise, defender=option.against_whom, bird_or_suit_defender=ambush_option, bird_or_suit_attacker=counterambush_choice)
-    # BATTLE
+    # BATTLE INFO
     if option.against_whom == 'vagabond':
         game.vagabond.get_item_dmg_options(game.map)
     dice_rolls = roll_dice()
@@ -66,7 +71,19 @@ def battle_cat(game, option):
     card = random_choose(card_to_give_if_sympathy)
     attacker_chosen_pieces = game.priority_to_list(get_loss_prios('cat'), option.where, 'cat')
     defender_chosen_pieces = game.priority_to_list(get_loss_prios(option.against_whom), option.where, option.against_whom)
-    dmg_attacker, dmg_defender = game.get_battle_damages('cat', option.against_whom, dice_rolls, option.where, sappers = get_sappers_usage(option.against_whom, game), armorers = [option.armorer_usage, False], brutal_tactics = option.brutal_tactics_usage)
+
+    # Sappers
+    sappers_option_defender = get_sappers_usage(option.against_whom, game)
+    sappers_choice = random_choose(sappers_option_defender)
+    logging.debug(f"{option.against_whom} Sappers choice: {sappers_choice}")
+
+    # Armorers
+    armorers_option_defender = get_armorers_usage(option.against_whom, game)
+    armorers_choice_defender = random_choose(armorers_option_defender)
+    logging.debug(f"Attaccker Cat Armorers choice: {option.armorer_usage}")
+    logging.debug(f"Defender {option.against_whom} Armorers choice: {armorers_choice_defender}")
+
+    dmg_attacker, dmg_defender = game.get_battle_damages('cat', option.against_whom, dice_rolls, option.where, sappers =sappers_choice, armorers = [option.armorer_usage, armorers_choice_defender], brutal_tactics = option.brutal_tactics_usage)
     logging.debug(f"Cat dmg: {dmg_attacker},{option.against_whom} dmg {dmg_defender}")
     wounded_cat_soldiers = game.resolve_battle(game.map.places[option.where], 'cat', option.against_whom, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces, card_to_give_if_sympathy=card)
     if wounded_cat_soldiers:
@@ -87,7 +104,7 @@ def battle_bird(game, option):
         counterambush_choice = random_choose(options_attacker)
         logging.debug(f"Bird counterambushed? {counterambush_choice}")
         game.ambush(placename = option.where, attacker=game.eyrie, defender=option.against_whom, bird_or_suit_defender=ambush_option, bird_or_suit_attacker=counterambush_choice)
-    # BATTLE
+    # BATTLE INFO
     if option.against_whom == 'vagabond':
         game.vagabond.get_item_dmg_options(game.map)
     dice_rolls = roll_dice()
@@ -96,7 +113,18 @@ def battle_bird(game, option):
     card = random_choose(card_to_give_if_sympathy)
     attacker_chosen_pieces = game.priority_to_list(get_loss_prios('bird'), option.where, 'bird')
     defender_chosen_pieces = game.priority_to_list(get_loss_prios(option.against_whom), option.where, option.against_whom)
-    dmg_attacker, dmg_defender = game.get_battle_damages('bird', option.against_whom, dice_rolls, option.where, sappers = get_sappers_usage(option.against_whom, game), armorers = [option.armorer_usage, False], brutal_tactics = option.brutal_tactics_usage, card_ID = option.card_ID)
+    # Sappers
+    sappers_option_defender = get_sappers_usage(option.against_whom, game)
+    sappers_choice = random_choose(sappers_option_defender)
+    logging.debug(f"{option.against_whom} Sappers choice: {sappers_choice}")
+
+    # Armorers
+    armorers_option_defender = get_armorers_usage(option.against_whom, game)
+    armorers_choice_defender = random_choose(armorers_option_defender)
+    logging.debug(f"Attaccker Bird Armorers choice: {option.armorer_usage}")
+    logging.debug(f"Defender {option.against_whom} Armorers choice: {armorers_choice_defender}")
+
+    dmg_attacker, dmg_defender = game.get_battle_damages('bird', option.against_whom, dice_rolls, option.where, sappers = sappers_choice, armorers = [option.armorer_usage, armorers_choice_defender], brutal_tactics = option.brutal_tactics_usage, card_ID = option.card_ID)
     wounded_cat_soldiers = game.resolve_battle(game.map.places[option.where], 'bird', option.against_whom, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces, card_to_give_if_sympathy=card)
     if wounded_cat_soldiers:
         option = game.marquise.get_field_hospital_options(placename=option.where, map=game.map)
@@ -116,14 +144,25 @@ def battle_alliance(game, option):
         counterambush_choice = random_choose(options_attacker)
         logging.debug(f"Alliance counterambushed? {counterambush_choice}")
         game.ambush(placename = option.where, attacker=game.alliance, defender=option.against_whom, bird_or_suit_defender=ambush_option, bird_or_suit_attacker=counterambush_choice)
-    # BATTLE
+    # BATTLE INFO
     if option.against_whom == 'vagabond':
         game.vagabond.get_item_dmg_options(game.map)
     dice_rolls = roll_dice()
     logging.debug(f"Rolls {dice_rolls[0], {dice_rolls[1]}}")
     attacker_chosen_pieces = game.priority_to_list(get_loss_prios('alliance'), option.where, 'alliance')
     defender_chosen_pieces = game.priority_to_list(get_loss_prios(option.against_whom), option.where, option.against_whom)
-    dmg_attacker, dmg_defender = game.get_battle_damages('alliance', option.against_whom, dice_rolls, option.where, sappers = get_sappers_usage(option.against_whom, game), armorers = [option.armorer_usage, False], brutal_tactics = option.brutal_tactics_usage)
+    # Sappers
+    sappers_option_defender = get_sappers_usage(option.against_whom, game)
+    sappers_choice = random_choose(sappers_option_defender)
+    logging.debug(f"{option.against_whom} Sappers choice: {sappers_choice}")
+
+    # Armorers
+    armorers_option_defender = get_armorers_usage(option.against_whom, game)
+    armorers_choice_defender = random_choose(armorers_option_defender)
+    logging.debug(f"Attaccker Alliance Armorers choice: {option.armorer_usage}")
+    logging.debug(f"Defender {option.against_whom} Armorers choice: {armorers_choice_defender}")
+
+    dmg_attacker, dmg_defender = game.get_battle_damages('alliance', option.against_whom, dice_rolls, option.where, sappers = sappers_choice, armorers = [option.armorer_usage, armorers_choice_defender], brutal_tactics = option.brutal_tactics_usage)
     wounded_cat_soldiers = game.resolve_battle(game.map.places[option.where], 'alliance', option.against_whom, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces, card_to_give_if_sympathy=None)
     if wounded_cat_soldiers:
         option = game.marquise.get_field_hospital_options(placename=option.where, map=game.map)
@@ -143,14 +182,25 @@ def battle_vagabond(game, option):
         counterambush_choice = random_choose(options_attacker)
         logging.debug(f"Vagabond counterambushed? {counterambush_choice}")
         game.ambush(placename = option.where, attacker=game.vagabond, defender=option.against_whom, bird_or_suit_defender=ambush_option, bird_or_suit_attacker=counterambush_choice)
-    # BATTLE
+    # BATTLE INFO
     dice_rolls = roll_dice()
     logging.debug(f"Rolls {dice_rolls[0], {dice_rolls[1]}}")
     card_to_give_if_sympathy = game.vagabond.card_to_give_to_alliace_options(game.map.places[option.where].suit)
     card = random_choose(card_to_give_if_sympathy)
     attacker_chosen_pieces = game.priority_to_list(get_loss_prios('vagabond'), option.where, 'vagabond')
     defender_chosen_pieces = game.priority_to_list(get_loss_prios(option.against_whom), option.where, option.against_whom)
-    dmg_attacker, dmg_defender = game.get_battle_damages('vagabond', option.against_whom, dice_rolls, option.where, sappers = get_sappers_usage(option.against_whom, game), armorers = [option.armorer_usage, False], brutal_tactics = option.brutal_tactics_usage)
+    # Sappers
+    sappers_option_defender = get_sappers_usage(option.against_whom, game)
+    sappers_choice = random_choose(sappers_option_defender)
+    logging.debug(f"{option.against_whom} Sappers choice: {sappers_choice}")
+
+    # Armorers
+    armorers_option_defender = get_armorers_usage(option.against_whom, game)
+    armorers_choice_defender = random_choose(armorers_option_defender)
+    logging.debug(f"Attaccker Vagabond Armorers choice: {option.armorer_usage}")
+    logging.debug(f"Defender {option.against_whom} Armorers choice: {armorers_choice_defender}")
+
+    dmg_attacker, dmg_defender = game.get_battle_damages('vagabond', option.against_whom, dice_rolls, option.where, sappers = sappers_choice, armorers = [option.armorer_usage, armorers_choice_defender], brutal_tactics = option.brutal_tactics_usage)
     wounded_cat_soldiers = game.resolve_battle(game.map.places[option.where], 'vagabond', option.against_whom, dmg_attacker, dmg_defender, attacker_chosen_pieces, defender_chosen_pieces, card_to_give_if_sympathy=card)
     if wounded_cat_soldiers:
         option = game.marquise.get_field_hospital_options(placename=option.where, map=game.map)
@@ -234,7 +284,7 @@ def cat_daylight_actions(game, choice, recruited_already=False):
         game.recruit_cat()
     # BUILD
     elif len(choice) == 3:
-        logging.debug(f"Cat built {choice[1]} at {choice[0]}")
+        logging.debug(f"Cat built {choice[1]} at {choice[0]} for {choice[2]}")
         game.build(place=game.map.places[choice[0]], building=choice[1], actor=game.marquise, cost = choice[2])
     # OVERWORK
 
@@ -499,7 +549,7 @@ def eyrie_birdsong(game):
     options.append(False)
     choice = random_choose(options)
     if choice:
-        logging.debug(f"{game.eyrie.name} added {choice[1]} to decree")
+        logging.debug(f"{game.eyrie.name} added {choice[1]} to the {choice[0]} decree")
         game.add_card_to_decree(*choice)
     options = game.eyrie.get_no_roosts_left_options(game.map)
     if options:

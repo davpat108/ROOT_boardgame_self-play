@@ -1,362 +1,535 @@
-DEBUG:root:cat moved from G to E with 1 pieces
-DEBUG:root:cat moved from J to K with 1 pieces
+DEBUG:root:Cat built sawmill at K
+DEBUG:root:cat moved from B to C with 1 pieces
+DEBUG:root:cat moved from I to L with 1 pieces
+DEBUG:root:cat moved from A to E with 1 pieces
+DEBUG:root:cat moved from E to A with 1 pieces
+DEBUG:root:bird added 41 to the recruit decree
+DEBUG:root:bird added 53 to the move decree
+DEBUG:root:bird recruited at L
+DEBUG:root:bird moved from L to K with 3 pieces
+DEBUG:root:bird moved from F to G with 1 pieces
+DEBUG:root:bird built at J
+DEBUG:root:alliance spread sympathy to B
+DEBUG:root:Alliance crafted boot
+DEBUG:root:vagabond slipped to G
+DEBUG:root:vagabond moved from G to K with 0 pieces
+DEBUG:root:Vagabond stole from bird
+DEBUG:root:Vagabond initiated a battler agaisntcat
+DEBUG:root:Rolls (1, {0})
+DEBUG:root:cat Sappers choice: False
+DEBUG:root:Attaccker Vagabond Armorers choice: False
+DEBUG:root:Defender cat Armorers choice: False
+DEBUG:root:Battle damages: attacker 1, defender 0
+DEBUG:root:vagabond is getting 1 points
+DEBUG:root:vagabond became hostile with cat
+DEBUG:root:cat lost 1 soldiers
+DEBUG:root:cat moved from E to F with 1 pieces
+DEBUG:root:cat moved from D to C with 1 pieces
 DEBUG:root:Cat used bird card to gain a move
 DEBUG:root:cat moved from B to C with 1 pieces
-DEBUG:root:cat moved from A to E with 1 pieces
-DEBUG:root:Cat built workshop at B
-DEBUG:root:cat moved from E to A with 1 pieces
-DEBUG:root:cat moved from J to F with 1 pieces
-DEBUG:root:bird added 14 to the build decree
-DEBUG:root:bird added 24 to decree
-DEBUG:root:bird recruited at L
-DEBUG:root:bird fell into turmoil
-DEBUG:root:bird chose Charismatic as its new leader
-DEBUG:root:alliance spread sympathy to I
-DEBUG:root:Alliance mobilized with 7
-DEBUG:root:Alliance mobilized with 1
-DEBUG:root:vagabond slipped to G
-DEBUG:root:vagabond moved from G to E with 0 pieces
-DEBUG:root:Vagabond aided at <actors.Marquise object at 0x0000022B8F3D2190>
-DEBUG:root:Vagabond completed quest 11
-DEBUG:root:Vagabond aided at <actors.Marquise object at 0x0000022B8F3D2190>
-DEBUG:root:Vagabond aided at <actors.Marquise object at 0x0000022B8F3D2190>
-DEBUG:root:Vagabond aided at <actors.Marquise object at 0x0000022B8F3D2190>
-DEBUG:root:cat crafted boot
-DEBUG:root:cat moved from F to E with 1 pieces
-DEBUG:root:cat moved from E to G with 3 pieces
-DEBUG:root:cat moved from G to K with 3 pieces
-DEBUG:root:cat moved from J to K with 1 pieces
-DEBUG:root:Cat used bird card to gain a move
-DEBUG:root:cat moved from F to J with 2 pieces
+DEBUG:root:cat moved from B to A with 2 pieces
 DEBUG:root:cat moved from A to B with 1 pieces
-DEBUG:root:cat moved from K to J with 3 pieces
-DEBUG:root:cat moved from F to J with 4 pieces
-DEBUG:root:Cat used bird card to gain a move
-DEBUG:root:cat moved from B to A with 4 pieces
-DEBUG:root:cat moved from I to H with 1 pieces
-DEBUG:root:bird added 26 to the build decree
-DEBUG:root:bird added 47 to decree
-DEBUG:root:bird recruited at L
-DEBUG:root:bird recruited at L
-DEBUG:root:bird fell into turmoil
-DEBUG:root:bird chose Commander as its new leader
-DEBUG:root:alliance revolted at I
-DEBUG:root:Marquise lost 0 points
-DEBUG:root:Alliance moved to H with 1 pieces
-DEBUG:root:vagabond slipped to N
-DEBUG:root:Cat built sawmill at B
-DEBUG:root:cat moved from A to B with 1 pieces
-DEBUG:root:cat moved from A to D with 3 pieces
-DEBUG:root:cat moved from F to J with 1 pieces
-DEBUG:root:cat moved from D to G with 4 pieces
-DEBUG:root:bird added 5 to the move decree
-DEBUG:root:bird moved from L to K with 11 pieces
-DEBUG:root:bird moved from F to J with 6 pieces
-DEBUG:root:Bird initiated a battler agaisntcat
-DEBUG:root:Rolls (3, {2})
-DEBUG:root:cat lost 1 soldiers
-DEBUG:root:bird lost 1 soldiers
-DEBUG:root:Alliance mobilized with 43
-DEBUG:root:Alliance trained with 53
-DEBUG:root:Alliance initiated a battler agaisntcat
-DEBUG:root:Rolls (3, {0})
-DEBUG:root:cat lost 1 soldiers
-DEBUG:root:alliance lost 0 soldiers
-DEBUG:root:Cat used field_hospital saving 1 soldiers 
-DEBUG:root:Alliance moved to I with 1 pieces
-DEBUG:root:vagabond slipped to G
-DEBUG:root:vagabond moved from G to H with 1 pieces
-DEBUG:root:Vagabond stole from cat
-DEBUG:root:cat moved from A to E with 1 pieces
-DEBUG:root:cat moved from H to I with 1 pieces
-DEBUG:root:cat moved from G to D with 2 pieces
-DEBUG:root:cat moved from G to E with 1 pieces
-DEBUG:root:cat moved from E to F with 1 pieces
-DEBUG:root:cat moved from E to A with 1 pieces
-DEBUG:root:bird added 25 to the move decree
-DEBUG:root:bird moved from F to J with 2 pieces
-DEBUG:root:bird moved from K to L with 10 pieces
-DEBUG:root:bird moved from L to H with 4 pieces
-DEBUG:root:Bird initiated a battler agaisntvagabond
-DEBUG:root:Rolls (2, {3})
-DEBUG:root:Vagabond getting ['a', torch, boot] damaged
-DEBUG:root:bird lost 3 soldiers
-DEBUG:root:Alliance trained with 32
-DEBUG:root:Alliance moved to C with 1 pieces
-DEBUG:root:Alliance initiated a battler agaisntcat
-DEBUG:root:Rolls (0, {2})
-DEBUG:root:cat lost 0 soldiers
-DEBUG:root:alliance lost 1 soldiers
-DEBUG:root:Alliance recruited at I
-DEBUG:root:vagabond slipped to G
+DEBUG:root:cat moved from A to B with 2 pieces
 DEBUG:root:cat moved from F to G with 1 pieces
-DEBUG:root:cat moved from G to D with 1 pieces
-DEBUG:root:cat moved from D to A with 1 pieces
-DEBUG:root:cat moved from D to G with 1 pieces
-DEBUG:root:Cat overworked B with 4
-DEBUG:root:bird added 15 to the battle decree
+DEBUG:root:cat moved from H to L with 1 pieces
+DEBUG:root:bird added 33 to the battle decree
+DEBUG:root:bird recruited at L
+DEBUG:root:bird moved from K to L with 1 pieces
 DEBUG:root:bird moved from L to I with 4 pieces
-DEBUG:root:bird moved from L to I with 1 pieces
-DEBUG:root:bird moved from H to G with 1 pieces
 DEBUG:root:Bird initiated a battler agaisntcat
-DEBUG:root:Rolls (1, {3})
+DEBUG:root:Rolls (1, {2})
+DEBUG:root:cat Sappers choice: False
+DEBUG:root:Attaccker Bird Armorers choice: False
+DEBUG:root:Defender cat Armorers choice: False
+DEBUG:root:Battle damages: attacker 1, defender 2
 DEBUG:root:cat lost 1 soldiers
 DEBUG:root:bird lost 1 soldiers
-DEBUG:root:bird fell into turmoil
-DEBUG:root:bird chose Despot as its new leader
-DEBUG:root:alliance spread sympathy to L
-DEBUG:root:Alliance mobilized with 17
-DEBUG:root:Alliance trained with 37
-DEBUG:root:Alliance crafted armorers
-DEBUG:root:Alliance recruited at I
-DEBUG:root:Alliance recruited at I
-DEBUG:root:Alliance initiated a battler agaisntbird
-DEBUG:root:Rolls (1, {1})
-DEBUG:root:bird lost 1 soldiers
-DEBUG:root:alliance lost 0 soldiers
-DEBUG:root:Alliance initiated a battler agaisntbird
-DEBUG:root:bird has ambushed!
-DEBUG:root:Alliance counterambushed? False
-DEBUG:root:Rolls (0, {3})
-DEBUG:root:bird lost 0 soldiers
-DEBUG:root:alliance lost 1 soldiers
-DEBUG:root:alliance lost sympathy
-DEBUG:root:vagabond slipped to K
-DEBUG:root:cat crafted money
-DEBUG:root:Cat built workshop at E
-DEBUG:root:Cat built sawmill at C
-DEBUG:root:Cat recruited
-DEBUG:root:bird added 3 to the move decree
-DEBUG:root:bird moved from I to C with 3 pieces
-DEBUG:root:bird moved from L to I with 1 pieces
-DEBUG:root:bird built at J
-DEBUG:root:alliance spread sympathy to K
-DEBUG:root:Alliance mobilized with 8
-DEBUG:root:Alliance trained with 46
-DEBUG:root:Alliance mobilized with 29
-DEBUG:root:vagabond slipped to T
-DEBUG:root:cat crafted sack
-DEBUG:root:Cat battled bird at G
-DEBUG:root:Cat initiated a battler agaisntbird
-DEBUG:root:bird has ambushed!
-DEBUG:root:Cat counterambushed? False
-DEBUG:root:Rolls (1, {2})
-DEBUG:root:Cat dmg: 0,bird dmg 1
-DEBUG:root:No attacker because no soldiers
-DEBUG:root:Cat recruited
-DEBUG:root:cat moved from A to E with 2 pieces
-DEBUG:root:cat moved from E to F with 1 pieces
-DEBUG:root:bird added 36 to the recruit decree
-DEBUG:root:bird recruited at J
-DEBUG:root:bird moved from J to F with 1 pieces
-DEBUG:root:bird moved from F to J with 2 pieces
+DEBUG:root:Cat used field_hospital saving 1 soldiers 
 DEBUG:root:bird built at I
-DEBUG:root:alliance revolted at L
+DEBUG:root:alliance revolted at B
+DEBUG:root:sawmill demolished
 DEBUG:root:Marquise lost 0 points
-DEBUG:root:alliance spread sympathy to I
-DEBUG:root:Alliance moved to I with 1 pieces
-DEBUG:root:Alliance moved to L with 1 pieces
-DEBUG:root:Alliance recruited at L
-DEBUG:root:Alliance moved to I with 1 pieces
-DEBUG:root:Alliance moved to L with 1 pieces
-DEBUG:root:Alliance moved to H with 2 pieces
-DEBUG:root:vagabond slipped to L
-DEBUG:root:Vagabond aided at <actors.Alliance object at 0x0000022B8F308C90>
-DEBUG:root:Vagabond aided at <actors.Alliance object at 0x0000022B8F308C90>
-DEBUG:root:Vagabond aided at <actors.Alliance object at 0x0000022B8F308C90>
-DEBUG:root:Vagabond completed quest 5
-DEBUG:root:Cat battled bird at F
-DEBUG:root:Cat initiated a battler agaisntbird
-DEBUG:root:Rolls (3, {0})
-DEBUG:root:Cat dmg: 1,bird dmg 0
-DEBUG:root:bird lost 1 soldiers
-DEBUG:root:cat lost 0 soldiers
-DEBUG:root:cat moved from E to F with 1 pieces
-DEBUG:root:cat moved from D to A with 1 pieces
-DEBUG:root:cat moved from C to D with 2 pieces
-DEBUG:root:cat moved from A to B with 1 pieces
-DEBUG:root:bird added 10 to the move decree
-DEBUG:root:bird added 18 to decree
-DEBUG:root:bird recruited at I
-DEBUG:root:bird moved from F to G with 1 pieces
-DEBUG:root:bird moved from C to D with 1 pieces
-DEBUG:root:bird moved from B to C with 1 pieces
-DEBUG:root:bird built at K
-DEBUG:root:bird built at G
-DEBUG:root:alliance revolted at I
-DEBUG:root:Marquise lost 0 points
-DEBUG:root:Alliance mobilized with 30
-DEBUG:root:Alliance moved to C with 1 pieces
-DEBUG:root:Alliance moved to G with 1 pieces
-DEBUG:root:Alliance organized at H
-DEBUG:root:Alliance initiated a battler agaisntcat
+DEBUG:root:wood destroyed
+DEBUG:root:2 cat soldiers wounded
+DEBUG:root:1 bird soldiers wounded
+DEBUG:root:alliance spread sympathy to C
+DEBUG:root:Alliance trained with 0
+DEBUG:root:Alliance trained with 4
+DEBUG:root:Alliance mobilized with 50
+DEBUG:root:Alliance organized at K
+DEBUG:root:Alliance recruited at B
+DEBUG:root:Alliance initiated a battler agaisntbird
 DEBUG:root:Rolls (0, {2})
-DEBUG:root:cat lost 0 soldiers
-DEBUG:root:alliance lost 1 soldiers
-DEBUG:root:Alliance recruited at L
-DEBUG:root:Alliance recruited at L
-DEBUG:root:Alliance initiated a battler agaisntvagabond
-DEBUG:root:Rolls (3, {3})
-DEBUG:root:Vagabond getting ['l', 'a'] damaged
-DEBUG:root:alliance lost 2 soldiers
-DEBUG:root:alliance lost sympathy
-DEBUG:root:vagabond slipped to T
-DEBUG:root:cat swapped dominance card
-DEBUG:root:cat crafted sack
-DEBUG:root:cat moved from E to F with 1 pieces
-DEBUG:root:cat moved from F to J with 1 pieces
-DEBUG:root:cat moved from D to A with 1 pieces
+DEBUG:root:bird Sappers choice: False
+DEBUG:root:Attaccker Alliance Armorers choice: False
+DEBUG:root:Defender bird Armorers choice: False
+DEBUG:root:Battle damages: attacker 0, defender 0
+DEBUG:root:bird lost 0 soldiers
+DEBUG:root:alliance lost 0 soldiers
+DEBUG:root:vagabond slipped to L
+DEBUG:root:Cat battled bird at L
+DEBUG:root:Cat initiated a battler agaisntbird
+DEBUG:root:Rolls (3, {1})
+DEBUG:root:bird Sappers choice: False
+DEBUG:root:Attaccker Cat Armorers choice: False
+DEBUG:root:Defender bird Armorers choice: False
+DEBUG:root:Battle damages: attacker 2, defender 1
+DEBUG:root:Cat dmg: 2,bird dmg 1
+DEBUG:root:bird lost 2 soldiers
+DEBUG:root:cat lost 1 soldiers
 DEBUG:root:cat moved from A to B with 1 pieces
-DEBUG:root:cat moved from C to I with 3 pieces
-DEBUG:root:cat moved from I to H with 3 pieces
-DEBUG:root:bird added 32 to the move decree
-DEBUG:root:bird added 40 to decree
-DEBUG:root:bird recruited at G
-DEBUG:root:bird moved from J to F with 1 pieces
-DEBUG:root:bird moved from J to F with 1 pieces
-DEBUG:root:bird moved from F to J with 1 pieces
-DEBUG:root:bird moved from F to G with 1 pieces
-DEBUG:root:bird fell into turmoil
-DEBUG:root:bird chose None as its new leader
-DEBUG:root:Alliance trained with 44
-DEBUG:root:Alliance crafted crossbow
-DEBUG:root:Alliance recruited at I
-DEBUG:root:Alliance moved to C with 1 pieces
-DEBUG:root:Alliance initiated a battler agaisntcat
-DEBUG:root:cat has ambushed!
-DEBUG:root:Alliance counterambushed? False
-DEBUG:root:Rolls (0, {1})
-DEBUG:root:No attacker because no soldiers
-DEBUG:root:Alliance moved to F with 1 pieces
-DEBUG:root:Alliance organized at B
-DEBUG:root:Alliance recruited at I
-DEBUG:root:Alliance recruited at L
-DEBUG:root:Alliance moved to H with 1 pieces
-DEBUG:root:vagabond slipped to J
-DEBUG:root:cat moved from H to L with 2 pieces
-DEBUG:root:cat moved from H to L with 1 pieces
-DEBUG:root:cat moved from L to K with 3 pieces
-DEBUG:root:cat moved from J to F with 2 pieces
-DEBUG:root:Cat battled vagabond at J
+DEBUG:root:cat moved from G to H with 1 pieces
+DEBUG:root:Cat battled vagabond at L
 DEBUG:root:Cat initiated a battler agaisntvagabond
 DEBUG:root:Rolls (1, {0})
+DEBUG:root:vagabond Sappers choice: False
+DEBUG:root:Attaccker Cat Armorers choice: False
+DEBUG:root:Defender vagabond Armorers choice: False
+DEBUG:root:Battle damages: attacker 1, defender 0
 DEBUG:root:Cat dmg: 1,vagabond dmg 0
-DEBUG:root:Vagabond getting ['a'] damaged
+DEBUG:root:Vagabond getting [boot] damaged
 DEBUG:root:cat lost 0 soldiers
-DEBUG:root:bird added 47 to the battle decree
-DEBUG:root:bird added 37 to decree
-DEBUG:root:bird recruited at J
-DEBUG:root:bird recruited at G
-DEBUG:root:bird moved from G to D with 5 pieces
-DEBUG:root:bird moved from D to A with 5 pieces
-DEBUG:root:bird moved from A to B with 2 pieces
-DEBUG:root:bird moved from F to J with 2 pieces
+DEBUG:root:bird added 13 to the battle decree
+DEBUG:root:bird recruited at I
+DEBUG:root:bird moved from I to H with 5 pieces
+DEBUG:root:bird moved from H to G with 5 pieces
+DEBUG:root:bird fell into turmoil
+DEBUG:root:bird chose Charismatic as its new leader
+DEBUG:root:Alliance initiated a battler agaisntcat
+DEBUG:root:Rolls (3, {2})
+DEBUG:root:cat Sappers choice: False
+DEBUG:root:Attaccker Alliance Armorers choice: False
+DEBUG:root:Defender cat Armorers choice: False
+DEBUG:root:Battle damages: attacker 1, defender 1
+DEBUG:root:cat lost 1 soldiers
+DEBUG:root:alliance lost 1 soldiers
+DEBUG:root:Cat used field_hospital saving 1 soldiers 
+DEBUG:root:Alliance recruited at B
+DEBUG:root:Alliance organized at F
+DEBUG:root:vagabond slipped to R
+DEBUG:root:Cat recruited
+DEBUG:root:Cat battled bird at L
+DEBUG:root:Cat initiated a battler agaisntbird
+DEBUG:root:Rolls (2, {2})
+DEBUG:root:bird Sappers choice: False
+DEBUG:root:Attaccker Cat Armorers choice: False
+DEBUG:root:Defender bird Armorers choice: False
+DEBUG:root:Battle damages: attacker 1, defender 0
+DEBUG:root:Cat dmg: 1,bird dmg 0
+DEBUG:root:bird lost 0 soldiers
+DEBUG:root:bird lost a roost
+DEBUG:root:cat lost 0 soldiers
+DEBUG:root:cat moved from E to A with 1 pieces
+DEBUG:root:cat moved from A to D with 1 pieces
+DEBUG:root:bird added 38 to the battle decree
+DEBUG:root:bird added 27 to the move decree
+DEBUG:root:bird recruited at I
+DEBUG:root:bird moved from I to L with 1 pieces
 DEBUG:root:Bird initiated a battler agaisntcat
 DEBUG:root:Rolls (1, {0})
+DEBUG:root:cat Sappers choice: False
+DEBUG:root:Attaccker Bird Armorers choice: False
+DEBUG:root:Defender cat Armorers choice: False
+DEBUG:root:Battle damages: attacker 1, defender 0
 DEBUG:root:cat lost 1 soldiers
+DEBUG:root:bird lost 0 soldiers
+DEBUG:root:Cat used field_hospital saving 1 soldiers 
+DEBUG:root:bird fell into turmoil
+DEBUG:root:bird chose Commander as its new leader
+DEBUG:root:Alliance mobilized with 11
+DEBUG:root:Alliance trained with 6
+DEBUG:root:Alliance mobilized with 35
+DEBUG:root:Alliance recruited at B
+DEBUG:root:Alliance moved to A with 1 pieces
+DEBUG:root:Alliance organized at A
+DEBUG:root:Alliance recruited at B
+DEBUG:root:vagabond slipped to L
+DEBUG:root:Vagabond completed quest 5
+DEBUG:root:vagabond moved from L to K with 0 pieces
+DEBUG:root:Vagabond aided at <actors.Alliance object at 0x0000029AF13BDD90>
+DEBUG:root:vagabond moved from K to G with 0 pieces
+DEBUG:root:Cat built recruiter at E
+DEBUG:root:cat moved from A to D with 2 pieces
+DEBUG:root:cat moved from H to G with 1 pieces
+DEBUG:root:cat moved from D to G with 2 pieces
+DEBUG:root:cat moved from D to A with 1 pieces
+DEBUG:root:bird added 44 to the build decree
+DEBUG:root:bird added 45 to the build decree
+DEBUG:root:bird moved from L to K with 1 pieces
+DEBUG:root:Bird initiated a battler agaisntcat
+DEBUG:root:Rolls (0, {1})
+DEBUG:root:cat Sappers choice: False
+DEBUG:root:Attaccker Bird Armorers choice: False
+DEBUG:root:Defender cat Armorers choice: False
+DEBUG:root:Battle damages: attacker 1, defender 0
+DEBUG:root:cat lost 0 soldiers
+DEBUG:root:cat lost a recruiter
+DEBUG:root:Marquise lost 2 VPs, as it lost a recruiter
 DEBUG:root:bird lost 0 soldiers
 DEBUG:root:bird built at F
-DEBUG:root:bird fell into turmoil
-DEBUG:root:bird chose None as its new leader
-DEBUG:root:alliance revolted at H
+DEBUG:root:bird built at K
+DEBUG:root:alliance revolted at C
 DEBUG:root:Marquise lost 0 points
-DEBUG:root:Cat used field_hospital saving 1 soldiers 
+DEBUG:root:0 cat soldiers wounded
+DEBUG:root:1 bird soldiers wounded
 DEBUG:root:alliance spread sympathy to G
-DEBUG:root:Alliance mobilized with 53
-DEBUG:root:Alliance organized at L
-DEBUG:root:Alliance moved to L with 1 pieces
+DEBUG:root:Alliance mobilized with 18
+DEBUG:root:Alliance mobilized with 36
 DEBUG:root:Alliance moved to I with 1 pieces
 DEBUG:root:Alliance moved to C with 1 pieces
-DEBUG:root:Alliance initiated a battler agaisntcat
+DEBUG:root:Alliance moved to I with 1 pieces
+DEBUG:root:Alliance recruited at B
+DEBUG:root:vagabond slipped to F
+DEBUG:root:Vagabond stole from alliance
+DEBUG:root:Vagabond aided at <actors.Alliance object at 0x0000029AF13BDD90>
+DEBUG:root:vagabond moved from F to E with 0 pieces
+DEBUG:root:Vagabond initiated a battler agaisntcat
 DEBUG:root:Rolls (1, {0})
-DEBUG:root:cat lost 1 soldiers
-DEBUG:root:alliance lost 0 soldiers
-DEBUG:root:Alliance organized at F
-DEBUG:root:Alliance recruited at L
-DEBUG:root:Alliance moved to H with 1 pieces
-DEBUG:root:Alliance moved to I with 1 pieces
-DEBUG:root:vagabond slipped to T
-DEBUG:root:Cat battled bird at C
-DEBUG:root:Cat initiated a battler agaisntbird
-DEBUG:root:Rolls (3, {1})
-DEBUG:root:Cat dmg: 1,bird dmg 1
-DEBUG:root:bird lost 1 soldiers
-DEBUG:root:cat lost 1 soldiers
-DEBUG:root:Cat recruited
-DEBUG:root:cat moved from E to A with 2 pieces
-DEBUG:root:cat moved from D to A with 1 pieces
-DEBUG:root:bird added 21 to the battle decree
-DEBUG:root:bird added 23 to decree
-DEBUG:root:bird recruited at J
-DEBUG:root:bird recruited at G
-DEBUG:root:bird fell into turmoil
-DEBUG:root:bird chose None as its new leader
-DEBUG:root:Alliance mobilized with 50
-DEBUG:root:Alliance crafted sword
-DEBUG:root:Alliance crafted command_warren
-DEBUG:root:Alliance moved to H with 1 pieces
-DEBUG:root:Alliance moved to L with 1 pieces
-DEBUG:root:Alliance moved to I with 1 pieces
-DEBUG:root:Alliance moved to L with 1 pieces
-DEBUG:root:Alliance moved to K with 1 pieces
-DEBUG:root:Alliance organized at J
-DEBUG:root:Alliance recruited at H
-DEBUG:root:Alliance moved to L with 1 pieces
-DEBUG:root:Alliance moved to K with 1 pieces
-DEBUG:root:vagabond slipped to L
-DEBUG:root:Vagabond initiated a battler agaisntalliance
-DEBUG:root:Rolls (2, {2})
+DEBUG:root:cat Sappers choice: False
+DEBUG:root:Attaccker Vagabond Armorers choice: False
+DEBUG:root:Defender cat Armorers choice: False
+DEBUG:root:Battle damages: attacker 1, defender 0
 DEBUG:root:vagabond is getting 0 points
-DEBUG:root:alliance lost 0 soldiers
-DEBUG:root:alliance lost sympathy
-DEBUG:root:alliance is getting 6
-DEBUG:root:Vagabond initiated a battler agaisntalliance
-DEBUG:root:Rolls (3, {1})
-DEBUG:root:vagabond is getting 0 points
-DEBUG:root:alliance lost 0 soldiers
-DEBUG:root:Removing [53, 50, 51, 6] from the Alliance's supporter deck because of a base loss
+DEBUG:root:cat lost 0 soldiers
+DEBUG:root:cat lost a recruiter
+DEBUG:root:Marquise lost 1 VPs, as it lost a recruiter
 DEBUG:root:cat swapped dominance card
-DEBUG:root:cat moved from A to B with 4 pieces
-DEBUG:root:cat moved from C to I with 2 pieces
-DEBUG:root:cat moved from C to B with 1 pieces
-DEBUG:root:cat moved from F to E with 2 pieces
-DEBUG:root:cat moved from I to L with 1 pieces
-DEBUG:root:cat moved from L to I with 1 pieces
-DEBUG:root:bird added 41 to the build decree
-DEBUG:root:bird added 19 to decree
+DEBUG:root:cat moved from G to D with 1 pieces
+DEBUG:root:cat moved from A to E with 1 pieces
+DEBUG:root:cat moved from G to E with 1 pieces
+DEBUG:root:cat moved from G to D with 1 pieces
+DEBUG:root:cat moved from D to C with 2 pieces
+DEBUG:root:cat moved from K to L with 1 pieces
+DEBUG:root:bird added 16 to the battle decree
+DEBUG:root:bird added 47 to the recruit decree
+DEBUG:root:bird recruited at I
+DEBUG:root:bird moved from G to H with 5 pieces
+DEBUG:root:Bird initiated a battler agaisntalliance
+DEBUG:root:alliance has ambushed!
+DEBUG:root:Bird counterambushed? False
+DEBUG:root:Rolls (0, {1})
+DEBUG:root:alliance Sappers choice: False
+DEBUG:root:Attaccker Bird Armorers choice: False
+DEBUG:root:Defender alliance Armorers choice: False
+DEBUG:root:Battle damages: attacker 1, defender 0
+DEBUG:root:No attacker because no soldiers
 DEBUG:root:bird fell into turmoil
-DEBUG:root:bird chose None as its new leader
-DEBUG:root:alliance revolted at B
+DEBUG:root:bird chose Builder as its new leader
+DEBUG:root:alliance revolted at G
 DEBUG:root:Marquise lost 0 points
-DEBUG:root:alliance used command warren
+DEBUG:root:0 cat soldiers wounded
+DEBUG:root:0 bird soldiers wounded
+DEBUG:root:Alliance crafted tax_collector
+DEBUG:root:Alliance crafted root_tea
+DEBUG:root:Alliance mobilized with 19
+DEBUG:root:Alliance moved to I with 1 pieces
+DEBUG:root:Alliance moved to H with 2 pieces
 DEBUG:root:Alliance initiated a battler agaisntbird
-DEBUG:root:Rolls (2, {2})
+DEBUG:root:Rolls (0, {3})
+DEBUG:root:bird Sappers choice: False
+DEBUG:root:Attaccker Alliance Armorers choice: False
+DEBUG:root:Defender bird Armorers choice: False
+DEBUG:root:Battle damages: attacker 0, defender 0
 DEBUG:root:bird lost 0 soldiers
 DEBUG:root:alliance lost 0 soldiers
-DEBUG:root:Alliance mobilized with 28
-DEBUG:root:Alliance crafted hammer
-DEBUG:root:Alliance crafted codebreakers
-DEBUG:root:Alliance crafted boot
-DEBUG:root:Alliance moved to B with 1 pieces
-DEBUG:root:Alliance moved to A with 1 pieces
 DEBUG:root:Alliance initiated a battler agaisntbird
-DEBUG:root:Rolls (3, {0})
-DEBUG:root:bird lost 1 soldiers
+DEBUG:root:Rolls (3, {2})
+DEBUG:root:bird Sappers choice: False
+DEBUG:root:Attaccker Alliance Armorers choice: False
+DEBUG:root:Defender bird Armorers choice: False
+DEBUG:root:Battle damages: attacker 1, defender 0
+DEBUG:root:bird lost 0 soldiers
+DEBUG:root:bird lost a roost
 DEBUG:root:alliance lost 0 soldiers
-DEBUG:root:Alliance organized at A
-DEBUG:root:Alliance recruited at H
+DEBUG:root:vagabond slipped to P
+DEBUG:root:vagabond moved from P to G with 0 pieces
+DEBUG:root:vagabond moved from G to H with 0 pieces
+DEBUG:root:Vagabond stole from bird
+DEBUG:root:Vagabond initiated a battler agaisntbird
+DEBUG:root:Rolls (2, {1})
+DEBUG:root:bird Sappers choice: False
+DEBUG:root:Attaccker Vagabond Armorers choice: False
+DEBUG:root:Defender bird Armorers choice: False
+DEBUG:root:Battle damages: attacker 1, defender 1
+DEBUG:root:vagabond is getting 1 points
+DEBUG:root:vagabond became hostile with bird
+DEBUG:root:bird lost 1 soldiers
+DEBUG:root:Vagabond initiated a battler agaisntbird
+DEBUG:root:Rolls (1, {2})
+DEBUG:root:bird Sappers choice: False
+DEBUG:root:Attaccker Vagabond Armorers choice: False
+DEBUG:root:Defender bird Armorers choice: False
+DEBUG:root:Battle damages: attacker 1, defender 2
+DEBUG:root:vagabond is getting 1 points
+DEBUG:root:bird lost 1 soldiers
+DEBUG:root:cat swapped dominance card
+DEBUG:root:cat moved from E to F with 2 pieces
+DEBUG:root:cat moved from F to G with 3 pieces
+DEBUG:root:cat moved from G to D with 2 pieces
+DEBUG:root:cat moved from L to H with 1 pieces
+DEBUG:root:Cat battled vagabond at H
+DEBUG:root:Cat initiated a battler agaisntvagabond
+DEBUG:root:Rolls (3, {0})
+DEBUG:root:vagabond Sappers choice: False
+DEBUG:root:Attaccker Cat Armorers choice: False
+DEBUG:root:Defender vagabond Armorers choice: False
+DEBUG:root:Battle damages: attacker 1, defender 0
+DEBUG:root:Cat dmg: 1,vagabond dmg 0
+DEBUG:root:Vagabond getting [boot] damaged
+DEBUG:root:cat lost 0 soldiers
+DEBUG:root:bird added 15 to the battle decree
+DEBUG:root:bird recruited at K
+DEBUG:root:bird moved from H to I with 3 pieces
+DEBUG:root:Bird initiated a battler agaisntalliance
+DEBUG:root:alliance has ambushed!
+DEBUG:root:Bird counterambushed? False
+DEBUG:root:Rolls (1, {1})
+DEBUG:root:alliance Sappers choice: False
+DEBUG:root:Attaccker Bird Armorers choice: False
+DEBUG:root:Defender alliance Armorers choice: False
+DEBUG:root:Battle damages: attacker 0, defender 0
+DEBUG:root:No attacker because no soldiers
+DEBUG:root:alliance spread sympathy to D
+DEBUG:root:Alliance mobilized with 46
+DEBUG:root:Alliance moved to C with 1 pieces
+DEBUG:root:Alliance moved to C with 1 pieces
+DEBUG:root:Alliance moved to L with 2 pieces
 DEBUG:root:Alliance moved to I with 1 pieces
-DEBUG:root:Alliance moved to H with 1 pieces
-DEBUG:root:Alliance moved to L with 1 pieces
-DEBUG:root:Alliance moved to I with 1 pieces
-DEBUG:root:vagabond slipped to H
+DEBUG:root:vagabond slipped to G
+DEBUG:root:Vagabond stole from alliance
+DEBUG:root:Vagabond initiated a battler agaisntcat
+DEBUG:root:Rolls (1, {0})
+DEBUG:root:cat Sappers choice: False
+DEBUG:root:Attaccker Vagabond Armorers choice: False
+DEBUG:root:Defender cat Armorers choice: False
+DEBUG:root:Battle damages: attacker 1, defender 0
+DEBUG:root:vagabond is getting 1 points
+DEBUG:root:cat lost 1 soldiers
+DEBUG:root:Cat used field_hospital saving 1 soldiers 
+DEBUG:root:vagabond moved from G to E with 0 pieces
+DEBUG:root:vagabond moved from E to G with 0 pieces
 DEBUG:root:Vagabond initiated a battler agaisntalliance
 DEBUG:root:alliance has ambushed!
 DEBUG:root:Vagabond counterambushed? False
-DEBUG:root:Rolls (3, {1})
+DEBUG:root:Rolls (2, {3})
+DEBUG:root:alliance Sappers choice: False
+DEBUG:root:Attaccker Vagabond Armorers choice: False
+DEBUG:root:Defender alliance Armorers choice: False
+DEBUG:root:Battle damages: attacker 1, defender 0
 DEBUG:root:vagabond is getting 0 points
 DEBUG:root:alliance lost 0 soldiers
 DEBUG:root:alliance lost sympathy
 DEBUG:root:alliance choose a card
-DEBUG:root:vagabond moved from H to L with 0 pieces
+DEBUG:root:cat swapped dominance card
+DEBUG:root:cat moved from D to A with 2 pieces
+DEBUG:root:cat moved from A to E with 1 pieces
+DEBUG:root:cat moved from H to L with 1 pieces
+DEBUG:root:cat moved from E to A with 1 pieces
+DEBUG:root:cat moved from A to E with 1 pieces
+DEBUG:root:cat moved from A to E with 2 pieces
+DEBUG:root:bird added 25 to the move decree
+DEBUG:root:bird added 21 to the move decree
+DEBUG:root:bird recruited at J
+DEBUG:root:bird moved from K to J with 1 pieces
+DEBUG:root:bird moved from I to C with 2 pieces
+DEBUG:root:bird moved from K to G with 1 pieces
+DEBUG:root:Bird initiated a battler agaisntalliance
+DEBUG:root:Rolls (2, {3})
+DEBUG:root:alliance Sappers choice: False
+DEBUG:root:Attaccker Bird Armorers choice: False
+DEBUG:root:Defender alliance Armorers choice: False
+DEBUG:root:Battle damages: attacker 2, defender 1
+DEBUG:root:alliance lost 1 soldiers
+DEBUG:root:alliance lost sympathy
+DEBUG:root:bird lost 1 soldiers
+DEBUG:root:alliance drew a card from the deck
+DEBUG:root:alliance spread sympathy to C
+DEBUG:root:alliance used tax collector
+DEBUG:root:Alliance mobilized with 4
+DEBUG:root:Alliance crafted root_tea
+DEBUG:root:Alliance organized at L
+DEBUG:root:Alliance recruited at G
+DEBUG:root:Alliance recruited at B
+DEBUG:root:Alliance initiated a battler agaisntbird
+DEBUG:root:bird has ambushed!
+DEBUG:root:Alliance counterambushed? False
+DEBUG:root:Rolls (3, {3})
+DEBUG:root:bird Sappers choice: False
+DEBUG:root:Attaccker Alliance Armorers choice: False
+DEBUG:root:Defender bird Armorers choice: False
+DEBUG:root:Battle damages: attacker 0, defender 1
+DEBUG:root:No attacker because no soldiers
+DEBUG:root:vagabond slipped to K
+DEBUG:root:Vagabond initiated a battler agaisntbird
+DEBUG:root:Rolls (1, {3})
+DEBUG:root:bird Sappers choice: False
+DEBUG:root:Attaccker Vagabond Armorers choice: False
+DEBUG:root:Defender bird Armorers choice: False
+DEBUG:root:Battle damages: attacker 1, defender 1
+DEBUG:root:vagabond is getting 1 points
+DEBUG:root:bird lost 1 soldiers
+DEBUG:root:cat swapped dominance card
+DEBUG:root:Cat recruited
+DEBUG:root:cat moved from E to F with 2 pieces
+DEBUG:root:cat moved from L to H with 1 pieces
+DEBUG:root:Cat built workshop at E
+DEBUG:root:bird added 37 to the recruit decree
+DEBUG:root:bird recruited at F
+DEBUG:root:bird recruited at J
+DEBUG:root:bird moved from K to L with 2 pieces
+DEBUG:root:bird fell into turmoil
+DEBUG:root:bird chose None as its new leader
+DEBUG:root:alliance spread sympathy to G
+DEBUG:root:alliance used tax collector
+DEBUG:root:Alliance crafted better_burrow_bank
+DEBUG:root:Alliance crafted boot
+DEBUG:root:Alliance trained with 39
+DEBUG:root:Alliance mobilized with 12
+DEBUG:root:Alliance mobilized with 38
+DEBUG:root:Alliance recruited at B
+DEBUG:root:Alliance initiated a battler agaisntbird
+DEBUG:root:Rolls (0, {1})
+DEBUG:root:bird Sappers choice: False
+DEBUG:root:Attaccker Alliance Armorers choice: False
+DEBUG:root:Defender bird Armorers choice: False
+DEBUG:root:Battle damages: attacker 0, defender 0
+DEBUG:root:bird lost 0 soldiers
+DEBUG:root:alliance lost 0 soldiers
+DEBUG:root:Alliance initiated a battler agaisntvagabond
+DEBUG:root:Rolls (1, {0})
+DEBUG:root:vagabond Sappers choice: False
+DEBUG:root:Attaccker Alliance Armorers choice: False
+DEBUG:root:Defender vagabond Armorers choice: False
+DEBUG:root:Battle damages: attacker 1, defender 0
+DEBUG:root:Vagabond getting [sword] damaged
+DEBUG:root:alliance lost 0 soldiers
+DEBUG:root:Alliance initiated a battler agaisntcat
+DEBUG:root:Rolls (3, {3})
+DEBUG:root:cat Sappers choice: False
+DEBUG:root:Attaccker Alliance Armorers choice: False
+DEBUG:root:Defender cat Armorers choice: False
+DEBUG:root:Battle damages: attacker 1, defender 2
+DEBUG:root:cat lost 1 soldiers
+DEBUG:root:alliance lost 1 soldiers
+DEBUG:root:alliance lost sympathy
+DEBUG:root:Alliance recruited at G
+DEBUG:root:vagabond slipped to L
+DEBUG:root:Vagabond stole from alliance
+DEBUG:root:vagabond moved from L to I with 0 pieces
+DEBUG:root:cat swapped dominance card
+DEBUG:root:cat crafted better_burrow_bank
+DEBUG:root:cat moved from E to F with 1 pieces
+DEBUG:root:cat moved from J to F with 1 pieces
+DEBUG:root:Cat battled bird at J
+DEBUG:root:Cat initiated a battler agaisntbird
+DEBUG:root:Rolls (3, {1})
+DEBUG:root:bird Sappers choice: False
+DEBUG:root:Attaccker Cat Armorers choice: False
+DEBUG:root:Defender bird Armorers choice: False
+DEBUG:root:Battle damages: attacker 1, defender 0
+DEBUG:root:Cat dmg: 1,bird dmg 0
+DEBUG:root:bird lost 0 soldiers
+DEBUG:root:bird lost a roost
+DEBUG:root:cat lost 0 soldiers
+DEBUG:root:cat moved from F to J with 1 pieces
+DEBUG:root:cat moved from F to J with 1 pieces
+DEBUG:root:bird added 51 to the move decree
+DEBUG:root:bird swapped dominance card
+DEBUG:root:bird recruited at K
+DEBUG:root:bird fell into turmoil
+DEBUG:root:bird chose None as its new leader
+DEBUG:root:alliance used Better burrow bank with vagabond
+DEBUG:root:alliance spread sympathy to I
+DEBUG:root:alliance used tax collector
+DEBUG:root:Alliance trained with 32
+DEBUG:root:Alliance mobilized with 3
+DEBUG:root:Alliance trained with 40
+DEBUG:root:Alliance crafted royal_claim
+DEBUG:root:Alliance recruited at G
+DEBUG:root:Alliance recruited at C
+DEBUG:root:Alliance moved to G with 1 pieces
+DEBUG:root:Alliance recruited at G
+DEBUG:root:Alliance moved to K with 2 pieces
+DEBUG:root:Alliance moved to K with 1 pieces
+DEBUG:root:Alliance initiated a battler agaisntbird
+DEBUG:root:Rolls (2, {2})
+DEBUG:root:bird Sappers choice: False
+DEBUG:root:Attaccker Alliance Armorers choice: False
+DEBUG:root:Defender bird Armorers choice: False
+DEBUG:root:Battle damages: attacker 2, defender 1
+DEBUG:root:bird lost 1 soldiers
+DEBUG:root:alliance lost 1 soldiers
+DEBUG:root:vagabond slipped to S
+DEBUG:root:vagabond moved from S to L with 0 pieces
+DEBUG:root:Vagabond initiated a battler agaisntalliance
+DEBUG:root:Rolls (2, {0})
+DEBUG:root:alliance Sappers choice: False
+DEBUG:root:Attaccker Vagabond Armorers choice: False
+DEBUG:root:Defender alliance Armorers choice: False
+DEBUG:root:Battle damages: attacker 0, defender 0
+DEBUG:root:vagabond is getting 0 points
+DEBUG:root:alliance lost 0 soldiers
+DEBUG:root:cat used Better burrow bank with bird
+DEBUG:root:cat swapped dominance card
+DEBUG:root:Cat overworked A with 30
+DEBUG:root:Cat battled alliance at K
+DEBUG:root:Cat initiated a battler agaisntalliance
+DEBUG:root:Rolls (2, {1})
+DEBUG:root:alliance Sappers choice: False
+DEBUG:root:Attaccker Cat Armorers choice: False
+DEBUG:root:Defender alliance Armorers choice: False
+DEBUG:root:Battle damages: attacker 1, defender 2
+DEBUG:root:Cat dmg: 1,alliance dmg 2
+DEBUG:root:alliance lost 1 soldiers
+DEBUG:root:cat lost 2 soldiers
+DEBUG:root:Cat built recruiter at H
+DEBUG:root:bird added 26 to the recruit decree
+DEBUG:root:bird swapped dominance card
+DEBUG:root:bird recruited at K
+DEBUG:root:bird fell into turmoil
+DEBUG:root:bird chose None as its new leader
+DEBUG:root:alliance used Better burrow bank with vagabond
+DEBUG:root:alliance used royal heir
+DEBUG:root:alliance spread sympathy to F
+DEBUG:root:alliance used tax collector
+DEBUG:root:Alliance crafted sack
+DEBUG:root:Alliance trained with 33
+DEBUG:root:Alliance trained with 43
+DEBUG:root:Alliance mobilized with 44
+DEBUG:root:Alliance mobilized with 52
+DEBUG:root:Alliance crafted sack
+DEBUG:root:Alliance mobilized with 39
+DEBUG:root:Alliance recruited at C
+DEBUG:root:Alliance moved to B with 1 pieces
+DEBUG:root:Alliance moved to I with 1 pieces
+DEBUG:root:Alliance initiated a battler agaisntbird
+DEBUG:root:Rolls (2, {0})
+DEBUG:root:bird Sappers choice: False
+DEBUG:root:Attaccker Alliance Armorers choice: False
+DEBUG:root:Defender bird Armorers choice: False
+DEBUG:root:Battle damages: attacker 1, defender 0
+DEBUG:root:bird lost 1 soldiers
+DEBUG:root:alliance lost 0 soldiers
+DEBUG:root:Alliance moved to H with 1 pieces
+DEBUG:root:Alliance initiated a battler agaisntcat
+DEBUG:root:Rolls (2, {2})
+DEBUG:root:cat Sappers choice: False
+DEBUG:root:Attaccker Alliance Armorers choice: False
+DEBUG:root:Defender cat Armorers choice: False
+DEBUG:root:Battle damages: attacker 1, defender 1
+DEBUG:root:cat lost 1 soldiers
+DEBUG:root:alliance lost 1 soldiers
+DEBUG:root:Cat used field_hospital saving 1 soldiers 
+DEBUG:root:Alliance recruited at C
+DEBUG:root:Alliance initiated a battler agaisntbird
+DEBUG:root:Rolls (0, {2})
+DEBUG:root:bird Sappers choice: False
+DEBUG:root:Attaccker Alliance Armorers choice: False
+DEBUG:root:Defender bird Armorers choice: False
+DEBUG:root:Battle damages: attacker 0, defender 1
+DEBUG:root:bird lost 0 soldiers
+DEBUG:root:alliance lost 1 soldiers
+DEBUG:root:Alliance recruited at C
+DEBUG:root:vagabond slipped to S
+DEBUG:root:vagabond moved from S to L with 0 pieces
 DEBUG:root:Game 1 winner is alliance, they won with a points victory

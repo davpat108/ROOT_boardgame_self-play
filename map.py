@@ -1,4 +1,5 @@
 from item import Item
+import logging
 class Place:
 	def __init__(self, name, suit, building_slot_num, vagabond_is_here=False, forest=False, ruin=False):
 		self.neighbors = list()
@@ -34,6 +35,8 @@ class Place:
 		removed_buildings = 0
 		for i in range(len(self.building_slots)):
 			if self.building_slots[i][0] != "ruin" and self.building_slots[i][1] != exception_faction:
+				if self.building_slots[i][0] != 'empty':
+					logging.debug(f"{self.building_slots[i][0]} demolished")
 				self.building_slots[i] = ('empty', 'No one')
 				removed_buildings += 1
 		return removed_buildings
@@ -51,6 +54,7 @@ class Place:
 			if self.tokens[i] in exception_tokens:
 				new_tokens.append(self.tokens[i])
 			else:
+				logging.debug(f"{self.tokens[i]} destroyed")
 				removed_tokens += 1
 		self.tokens = new_tokens
 		return removed_tokens
@@ -61,6 +65,7 @@ class Place:
 			if faction != exception_faction and faction != "vagabond":
 				if faction == "cat":
 					wounded_cat_soldiers = self.soldiers[faction]
+				logging.debug(f"{self.soldiers[faction]} {faction} soldiers wounded")
 				self.soldiers[faction] = 0
 		return wounded_cat_soldiers
 

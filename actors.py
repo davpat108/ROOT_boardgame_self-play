@@ -105,7 +105,12 @@ class Actor():
 
     def get_sappers_options(self):
         if not self.sappers:
-            return
+            return [False]
+        return [True, False]
+    
+    def get_armorers_options(self):
+        if not self.armorers:
+            return [False]
         return [True, False]
     
     def get_ambush_options(self, place):
