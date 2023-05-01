@@ -98,6 +98,10 @@ class Game():
             self.vagabond.quest_deck.add_card(self.quest_deck.draw_card())
             self.vagabond.quest_deck.add_card(self.quest_deck.draw_card())
 
+
+    def encode(self):
+        pass
+
     def stand_and_deliver(self, taker, victim):
         if not victim:
             return
@@ -942,9 +946,9 @@ class Game():
         item2 = vagabond_quest_card_info[quest_card_ID][2]
         self.vagabond.exhaust_item(item1)
         self.vagabond.exhaust_item(item2)
-        self.vagabond.quest_deck.add_card(self.quest_deck.draw_card())
-
-
+        if len(self.quest_deck.cards) > 0:
+            self.vagabond.quest_deck.add_card(self.quest_deck.draw_card())
+            
     def strike(self, placename, opponent, target, card_to_give_if_sympathy):
         self.vagabond.exhaust_item(Item("crossbow"))
         if target == "wood" or target == "keep" or target == "sympathy":

@@ -6,6 +6,9 @@ from item import Item
 from copy import copy
 import logging
 import random
+
+class ExhaustbootERROR(Exception):
+    pass
 class Actor():
 
     def __init__(self, map) -> None:
@@ -899,11 +902,6 @@ class Vagabond(Actor):
         exhausted_items = [item for item in all_items if item.exhausted]
         return exhausted_items
     
-    #def get_damage_options(self, num_dmged):
-    #    all_items = self.satchel + self.other_items
-    #    non_damaged_items = [item for item in all_items if not item.damaged]
-    #    non_damaged_items += self.allied_soldiers
-    #    return list(combinations(non_damaged_items, min(num_dmged, len(non_damaged_items))))
 
     def get_repair_options(self):
         hammer_avaible = any(item for item in self.satchel if item.name == "hammer" and not item.damaged and not item.exhausted)
@@ -1119,7 +1117,7 @@ class Vagabond(Actor):
             if item.name == other_item.name and not item.exhausted:
                 item.exhausted = True
                 return
-        raise ValueError("Item not found or exhausted")
+        raise ExhaustbootERROR(f"Item:{other_item.name} not found or exhausted")
 
     def repair_item(self, other_item):
         for item in self.satchel:
