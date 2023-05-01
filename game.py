@@ -112,17 +112,17 @@ class Game():
                 self.winner = ("marquise", "points")
             elif self.marquise.win_condition == "coalition_major":
                 self.winner = ("marquise", "coalition")
-        elif self.eyrie.victory_points >= 30 and not self.winner:
+        if self.eyrie.victory_points >= 30 and not self.winner:
             if self.eyrie.win_condition == "points":
                 self.winner = ("eyrie", "points")
             elif self.eyrie.win_condition == "coalition_major":
                 self.winner = ("eyrie", "coalition")
-        elif self.alliance.victory_points >= 30 and not self.winner:
+        if self.alliance.victory_points >= 30 and not self.winner:
             if self.alliance.win_condition == "points":
                 self.winner = ("alliance", "points")
             elif self.alliance.win_condition == "coalition_major":
                 self.winner = ("alliance", "coalition")
-        elif self.vagabond.victory_points >= 30 and not self.winner:
+        if self.vagabond.victory_points >= 30 and not self.winner:
             if self.vagabond.win_condition == "points":
                 self.winner = ("vagabond", "points")
 
@@ -689,6 +689,8 @@ class Game():
         for place in self.map.places.values():
             if place.suit == suit:
                 wounded_cats = place.clear_soldiers(exception_faction=actor.name)
+                victory_points += place.clear_buildings(exception_faction=actor.name)
+                victory_points += place.clear_tokens(exception_faction=actor.name)
                 if ('base', 'alliance') in place.building_slots and actor.name != "alliance":
                     self.alliance.losing_a_base(place_suit=place.suit, discard_deck=self.discard_deck)
                 if actor.name != 'marquise':
@@ -696,8 +698,6 @@ class Game():
                 if actor.name != "vagabond" and place.vagabond_is_here:
                     for item in self.vagabond.items_to_damage[:3]:
                         self.vagabond.damage_item(item)
-                victory_points += place.clear_buildings(exception_faction=actor.name)
-                victory_points += place.clear_tokens(exception_faction=actor.name)
         actor.victory_points += victory_points
         self.check_victory_points()
         self.map.update_owners()

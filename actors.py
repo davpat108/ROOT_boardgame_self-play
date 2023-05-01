@@ -281,7 +281,7 @@ class Marquise(Actor):
 
         for building in ["sawmill", "workshop", "recruiter"]:
             count = map.count_on_map(("building", building))
-            if count == 6:
+            if count >= 6:
                 continue
             cost = bulding_costs[count]
             for key in sorted(list(map.places.keys())):

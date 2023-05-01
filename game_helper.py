@@ -184,6 +184,7 @@ def battle_vagabond(game, option):
         logging.debug(f"Vagabond counterambushed? {counterambush_choice}")
         game.ambush(placename = option.where, attacker=game.vagabond, defender=option.against_whom, bird_or_suit_defender=ambush_option, bird_or_suit_attacker=counterambush_choice)
     # BATTLE INFO
+    game.vagabond.get_item_dmg_options(game.map)
     dice_rolls = roll_dice()
     logging.debug(f"Rolls {dice_rolls[0], {dice_rolls[1]}}")
     card_to_give_if_sympathy = game.vagabond.card_to_give_to_alliace_options(game.map.places[option.where].suit)
@@ -580,7 +581,7 @@ def eyrie_daylight(game):
             logging.debug(f"{game.eyrie.name} crafted {choice.card.craft}")
             wounded_cat_soldiers = game.craft(game.eyrie, choice)
             if wounded_cat_soldiers:
-                option = game.marquise.get_field_hospital_options(placename = option.where, map = game.map)
+                option = game.marquise.get_field_hospital_options(suit=choice.card.card_suit, map = game.map)
                 choice = random_choose(option)
                 if choice:
                     game.field_hospital(wounded_cat_soldiers, choice)
