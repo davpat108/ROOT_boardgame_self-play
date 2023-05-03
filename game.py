@@ -8,10 +8,24 @@ from game_helper import alliance_choose_card, choose_card_prios
 from copy import copy
 import random
 import logging
+import torch
+import numpy as np
 
 
 class Game():
     def __init__(self, debug = True) -> None:
+        self.encoced_adjacencies_forest = np.array(([0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+                                                    [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                                    [0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0],
+                                                    [1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+                                                    [1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0],
+                                                    [0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0],
+                                                    [0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0],
+                                                    [0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1]
+                                                    [0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1],
+                                                    [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0],
+                                                    [0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1],
+                                                    [0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0]))
         if debug:
             self.map = build_regular_forest()
             self.marquise = Marquise(map=self.map)
@@ -100,8 +114,50 @@ class Game():
 
 
     def encode(self):
-        pass
+        map_encoded = np.zeros((12,16))
+        map_adjacency_encoded = self.encoced_adjacencies_forest # Hard coded until we only use forest
+        for i, place in enumerate(self.map.places.values()):
+            if i < 12:
+                for slot in place.building_slots:
+                    map_encoded[i][0] += 1 if slot[0] == "sawmill" else 0
+                    map_encoded[i][1] += 1 if slot[0] == "workshop" else 0
+                    map_encoded[i][2] += 1 if slot[0] == "recruiter" else 0
+                    map_encoded[i][3] += 1 if slot[0] == "roost" else 0
+                    map_encoded[i][4] += 1 if slot[0] == "base" else 0
+                    map_encoded[i][5] += 1 if slot[0] == "ruin" else 0
+                for token in place.tokens:
+                    map_encoded[i][6] += 1 if token == "sympathy" else 0
+                    map_encoded[i][7] += 1 if token == "keep" else 0
+                    map_encoded[i][8] += 1 if token == "wood" else 0
+                map_encoded[i][9] = place.soldiers['cat']
+                map_encoded[i][10] = place.soldiers['bird']
+                map_encoded[i][11] = place.soldiers['alliance']
+                map_encoded[i][12] = len(place.building_slots)
+                map_encoded[i][13] = 1 if place.vagabond_is_here else 0
+                map_encoded[i][14] = 0 if place.suit == "fox" else 1 if place.suit == "mouse" else 2
+                neighbouring_vagabonds = 0
+                for neighbor in place.neighbors:
+                    neighbouring_vagabonds += 1 if self.map.places[neighbor].vagaond_is_here else 0
+                map_encoded[i][15] = min(neighbouring_vagabonds, 1)
 
+        craftables = np.zeros((12))
+        craftables[0] = 1 if self.map.craftables.count(Item("sack")) > 0 else 0
+        craftables[1] = 1 if self.map.craftables.count(Item("sack")) > 1 else 0
+        craftables[2] = 1 if self.map.craftables.count(Item("boot")) > 0 else 0
+        craftables[3] = 1 if self.map.craftables.count(Item("boot")) > 1 else 0
+        craftables[4] = 1 if self.map.craftables.count(Item("money")) > 0 else 0
+        craftables[5] = 1 if self.map.craftables.count(Item("money")) > 1 else 0
+        craftables[6] = 1 if self.map.craftables.count(Item("sword")) > 0 else 0
+        craftables[7] = 1 if self.map.craftables.count(Item("sword")) > 1 else 0
+        craftables[8] = 1 if self.map.craftables.count(Item("root_tea")) > 0 else 0
+        craftables[9] = 1 if self.map.craftables.count(Item("root_tea")) > 1 else 0
+        craftables[10] = Item("crossbow") in self.map.craftables
+        craftables[11] = Item("hammer") in self.map.craftables
+
+        encoded_discard_deck, encoded_discard_suits = self.discard_deck.encode_deck()
+        _, encoded_domimance_discard_suits = self.dominance_discard_deck.encode_deck()
+
+        # ACTORS
     def stand_and_deliver(self, taker, victim):
         if not victim:
             return
