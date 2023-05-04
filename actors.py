@@ -6,6 +6,7 @@ from item import Item
 from copy import copy
 import logging
 import random
+import numpy as np
 
 class ExhaustbootERROR(Exception):
     pass
@@ -17,7 +18,6 @@ class Actor():
         self.cobbler = False
         self.tax_collector = False
         self.armorers = False
-        self.sappers = False
         self.command_warren = False
         self.scouting_party = False
         self.codebreakers = False
@@ -42,6 +42,41 @@ class Actor():
         self.card_prios = []
         self.persistent_effect_deck = Deck(empty=True)
     
+    def encode_actor(self):
+        encoded_deck, encoded_suits = self.deck.encode_deck()
+
+        encoded_buffs = np.zeros((11, 1))
+        encoded_buffs[0][0] = self.sappers
+        encoded_buffs[1][0] = self.cobbler
+        encoded_buffs[2][0] = self.tax_collector
+        encoded_buffs[3][0] = self.armorers
+        encoded_buffs[4][0] = self.command_warren
+        encoded_buffs[5][0] = self.scouting_party
+        encoded_buffs[6][0] = self.codebreakers
+        encoded_buffs[7][0] = self.stand_and_deliver
+        encoded_buffs[8][0] = self.better_burrow_bank
+        encoded_buffs[9][0] = self.royal_claim
+        encoded_buffs[10][0] = self.brutal_tactics
+
+        encoded_VP = np.array([[self.victory_points]])
+
+        encoded_win_condition = np.zeros((6, 1))
+        if self.win_condition == "points":
+            encoded_win_condition[0][0] = 1
+        elif self.win_condition == "rabbit":
+            encoded_win_condition[1][0] = 1
+        elif self.win_condition == "mouse":
+            encoded_win_condition[2][0] = 1
+        elif self.win_condition == "fox":
+            encoded_win_condition[3][0] = 1
+        elif self.win_condition == "bird":
+            encoded_win_condition[4][0] = 1
+        elif self.win_condition == "coalition_major" or self.win_condition == "coalition_minor":
+            encoded_win_condition[5][0] = 1
+
+        return encoded_deck, encoded_suits, encoded_buffs, encoded_VP, encoded_win_condition
+
+
     def __lt__(self, other):
         return self.name < other.name
 
@@ -155,6 +190,20 @@ class Marquise(Actor):
         self.items = []
         self.name = 'cat'
     
+    def encode_actor(self):
+        encoded_deck, encoded_suits, encoded_buffs, encoded_VP, encoded_win_condition = super().encode_actor()
+
+        encoded_items = np.zeros((7, 1))
+        encoded_items[0][0] = self.items.count(Item("sack"))
+        encoded_items[1][0] = self.items.count(Item("root_tea"))
+        encoded_items[2][0] = self.items.count(Item("money"))
+        encoded_items[3][0] = self.items.count(Item("boot"))
+        encoded_items[4][0] = self.items.count(Item("sword"))
+        encoded_items[5][0] = self.items.count(Item("crossbow"))
+        encoded_items[6][0] = self.items.count(Item("hammer"))
+
+        return encoded_deck, encoded_suits, encoded_buffs, encoded_VP, encoded_win_condition, encoded_items
+
     def refresh_craft_activations(self, map):
         self.craft_activations = map.count_on_map(("building", "workshop"), per_suit=True)
 
@@ -335,6 +384,50 @@ class Eyrie(Actor):
             "battle": [],
             "build": [],
         } # Remove cards from this decree while resolving
+
+    def encode_actor(self):
+
+        encoded_deck, encoded_suits, encoded_buffs, encoded_VP, encoded_win_condition = super().encode_actor()
+
+        encoded_items = np.zeros((7, 1))
+        encoded_items[0][0] = self.items.count(Item("sack"))
+        encoded_items[1][0] = self.items.count(Item("root_tea"))
+        encoded_items[2][0] = self.items.count(Item("money"))
+        encoded_items[3][0] = self.items.count(Item("boot"))
+        encoded_items[4][0] = self.items.count(Item("sword"))
+        encoded_items[5][0] = self.items.count(Item("crossbow"))
+        encoded_items[6][0] = self.items.count(Item("hammer"))
+
+        encoded_role = np.zeros((4, 1))
+        if self.leader == "Despot":
+            encoded_role[0][0] = 1
+        elif self.leader == "Commander":
+            encoded_role[1][0] = 1
+        elif self.leader == "Builder":
+            encoded_role[2][0] = 1
+        elif self.leader == "Charismatic":
+            encoded_role[3][0] = 1
+        
+        encoded_avaible_leaders = np.ones((4, 1))
+        if "Despot" not in self.avaible_leaders:
+            encoded_avaible_leaders[0][0] = 0
+        if "Commander" not in self.avaible_leaders:
+            encoded_avaible_leaders[1][0] = 0
+        if "Builder" not in self.avaible_leaders:
+            encoded_avaible_leaders[2][0] = 0
+        if "Charismatic" not in self.avaible_leaders:
+            encoded_avaible_leaders[3][0] = 0
+        
+        encoded_decree = np.zeros((4, 4))
+        for i, decree in enumerate(self.decree.values()): 
+            encoded_decree[i][0] = [card[1] for card in decree].count("fox")
+            encoded_decree[i][1] = [card[1] for card in decree].count("mouse")
+            encoded_decree[i][2] = [card[1] for card in decree].count("rabbit")
+            encoded_decree[i][3] = [card[1] for card in decree].count("bird")
+
+        encoded_decree_deck, _ = self.decree_deck.encode_deck()
+
+        return encoded_deck, encoded_suits, encoded_buffs, encoded_VP, encoded_win_condition, encoded_items, encoded_role, encoded_avaible_leaders, encoded_decree, encoded_decree_deck
 
     def pieces_to_lose_in_battle(self):
         return ['roost']
@@ -578,7 +671,25 @@ class Alliance(Actor):
         self.items = []
         self.total_officers = 0
         self.name = "alliance"
-    
+
+    def encode_actor(self):
+        encoded_deck, encoded_suits, encoded_buffs, encoded_VP, encoded_win_condition = super().encode_actor()
+
+        encoded_items = np.zeros((7, 1))
+        encoded_items[0][0] = self.items.count(Item("sack"))
+        encoded_items[1][0] = self.items.count(Item("root_tea"))
+        encoded_items[2][0] = self.items.count(Item("money"))
+        encoded_items[3][0] = self.items.count(Item("boot"))
+        encoded_items[4][0] = self.items.count(Item("sword"))
+        encoded_items[5][0] = self.items.count(Item("crossbow"))
+        encoded_items[6][0] = self.items.count(Item("hammer"))
+
+        encoded_supporter_deck, encoded_supporter_suits = self.supporter_deck.encode_deck()
+        encoded_total_officers = np.array([[self.total_officers]])
+
+        return encoded_deck, encoded_suits, encoded_buffs, encoded_VP, encoded_win_condition, encoded_items, encoded_supporter_deck, encoded_supporter_suits, encoded_total_officers
+        
+
     def pieces_to_lose_in_battle(self):
         return ['sympathy', 'base']
 
@@ -835,6 +946,41 @@ class Vagabond(Actor):
             self.refresh_items_to_damage()
         else:
             raise NotImplementedError("Only thief yet")
+
+    def encode_actor(self):
+        encoded_deck, encoded_suits, encoded_buffs, encoded_VP, encoded_win_condition = super().encode_actor()
+
+        encoded_items = np.zeros((8,3)) # first three other items, satchel last 5
+        encoded_items[0][0] = self.other_items.count(Item("sack"))
+        encoded_items[0][1] = sum([1 if item.name == "sack" and item.exhausted else 0 for item in self.other_items])
+        encoded_items[0][2] = sum([1 if item.name == "sack" and item.damaged else 0 for item in self.other_items])
+
+        encoded_items[1][0] = self.other_items.count(Item("root_tea"))
+        encoded_items[1][1] = sum([1 if item.name == "root_tea" and item.exhausted else 0 for item in self.other_items])
+        encoded_items[1][2] = sum([1 if item.name == "root_tea" and item.damaged else 0 for item in self.other_items])
+
+        encoded_items[2][0] = self.other_items.count(Item("money"))
+        encoded_items[2][1] = sum([1 if item.name == "money" and item.exhausted else 0 for item in self.other_items])
+        encoded_items[2][2] = sum([1 if item.name == "money" and item.damaged else 0 for item in self.other_items])
+
+        encoded_items[3][0] = self.other_items.count(Item("boot"))
+        encoded_items[3][1] = sum([1 if item.name == "boot" and item.exhausted else 0 for item in self.satchel])
+        encoded_items[3][2] = sum([1 if item.name == "boot" and item.damaged else 0 for item in self.satchel])
+
+        encoded_items[4][0] = self.other_items.count(Item("sword"))
+        encoded_items[4][1] = sum([1 if item.name == "sword" and item.exhausted else 0 for item in self.satchel])
+        encoded_items[4][2] = sum([1 if item.name == "sword" and item.damaged else 0 for item in self.satchel])
+
+        encoded_items[5][0] = self.other_items.count(Item("crossbow"))
+        encoded_items[5][1] = sum([1 if item.name == "crossbow" and item.exhausted else 0 for item in self.satchel])
+        encoded_items[5][2] = sum([1 if item.name == "crossbow" and item.damaged else 0 for item in self.satchel])
+
+        encoded_items[5][0] = self.other_items.count(Item("hammer"))
+        encoded_items[5][1] = sum([1 if item.name == "hammer" and item.exhausted else 0 for item in self.satchel])
+        encoded_items[5][2] = sum([1 if item.name == "hammer" and item.damaged else 0 for item in self.satchel])
+
+
+        return encoded_deck, encoded_suits, encoded_buffs, encoded_VP, encoded_win_condition, encoded_items
 
     def refresh_craft_activations(self, map):
         pass

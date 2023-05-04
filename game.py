@@ -140,24 +140,33 @@ class Game():
                     neighbouring_vagabonds += 1 if self.map.places[neighbor].vagaond_is_here else 0
                 map_encoded[i][15] = min(neighbouring_vagabonds, 1)
 
-        craftables = np.zeros((12))
-        craftables[0] = 1 if self.map.craftables.count(Item("sack")) > 0 else 0
-        craftables[1] = 1 if self.map.craftables.count(Item("sack")) > 1 else 0
-        craftables[2] = 1 if self.map.craftables.count(Item("boot")) > 0 else 0
-        craftables[3] = 1 if self.map.craftables.count(Item("boot")) > 1 else 0
-        craftables[4] = 1 if self.map.craftables.count(Item("money")) > 0 else 0
-        craftables[5] = 1 if self.map.craftables.count(Item("money")) > 1 else 0
-        craftables[6] = 1 if self.map.craftables.count(Item("sword")) > 0 else 0
-        craftables[7] = 1 if self.map.craftables.count(Item("sword")) > 1 else 0
-        craftables[8] = 1 if self.map.craftables.count(Item("root_tea")) > 0 else 0
-        craftables[9] = 1 if self.map.craftables.count(Item("root_tea")) > 1 else 0
-        craftables[10] = Item("crossbow") in self.map.craftables
-        craftables[11] = Item("hammer") in self.map.craftables
+        craftables = np.zeros((7,1))
+        craftables[0][0] = self.map.craftables.count(Item("sack"))
+        craftables[2][0] = self.map.craftables.count(Item("root_tea"))
+        craftables[4][0] = self.map.craftables.count(Item("money"))
+        craftables[6][0] = self.map.craftables.count(Item("boot"))
+        craftables[8][0] = self.map.craftables.count(Item("sword"))
+        craftables[10][0] = Item("crossbow") in self.map.craftables
+        craftables[11][0] = Item("hammer") in self.map.craftables
+
 
         encoded_discard_deck, encoded_discard_suits = self.discard_deck.encode_deck()
         _, encoded_domimance_discard_suits = self.dominance_discard_deck.encode_deck()
 
         # ACTORS
+        cat_encoded_deck, cat_encoded_suits, cat_encoded_buffs, cat_encoded_VP, cat_encoded_win_condition, cat_encoded_items = self.marquise.encode_actor()
+        bird_encoded_deck, bird_encoded_suits, bird_encoded_buffs, bird_encoded_VP, bird_encoded_win_condition, bird_encoded_items, encoded_role, encoded_avaible_leaders, encoded_decree, encoded_decree_deck = self.eyrie.encode_actor()
+        alliance_encoded_deck, alliance_encoded_suits, alliance_encoded_buffs, alliance_encoded_VP, alliance_encoded_win_condition, alliance_encoded_items, encoded_supporter_deck, encoded_supporter_suits, encoded_total_officers = self.alliance.encode_actor()
+        vagabond_encoded_deck, vagabond_encoded_suits, vagabond_encoded_buffs, vagabond_encoded_VP, vagabond_encoded_win_condition, vagabond_encoded_items = self.vagabond.encode_actor()
+
+        # MAP
+        map_info = np.concatenate((map_encoded, map_adjacency_encoded), axis=1)
+        # ACTORS
+        non_vagabond_item_info = np.concatenate((craftables, cat_encoded_items, bird_encoded_items, alliance_encoded_items), axis=1)
+        actor_buffs = np.concatenate((cat_encoded_buffs, bird_encoded_buffs, alliance_encoded_buffs, vagabond_encoded_buffs), axis=1)
+        actor_VPS = np.concatenate((cat_encoded_VP, bird_encoded_VP, alliance_encoded_VP, vagabond_encoded_VP), axis=1)
+
+
     def stand_and_deliver(self, taker, victim):
         if not victim:
             return
