@@ -113,7 +113,7 @@ class Game():
             self.vagabond.quest_deck.add_card(self.quest_deck.draw_card())
 
 
-    def encode(self):
+    def encode(self, gamestate):
         map_encoded = np.zeros((12,16))
         map_adjacency_encoded = self.encoced_adjacencies_forest # Hard coded until we only use forest
         for i, place in enumerate(self.map.places.values()):
@@ -149,22 +149,30 @@ class Game():
         craftables[10][0] = Item("crossbow") in self.map.craftables
         craftables[11][0] = Item("hammer") in self.map.craftables
 
+        gamestate_encoded = np.zeros((14, 1))
+        gamestate_encoded[gamestate][0] = 1
 
         encoded_discard_deck, encoded_discard_suits = self.discard_deck.encode_deck()
         _, encoded_domimance_discard_suits = self.dominance_discard_deck.encode_deck()
 
-        # ACTORS
+        # ACTORS, ENCODED SUPPORTER DECK MIGHT NOT BE USEFUL
         cat_encoded_deck, cat_encoded_suits, cat_encoded_buffs, cat_encoded_VP, cat_encoded_win_condition, cat_encoded_items = self.marquise.encode_actor()
         bird_encoded_deck, bird_encoded_suits, bird_encoded_buffs, bird_encoded_VP, bird_encoded_win_condition, bird_encoded_items, encoded_role, encoded_avaible_leaders, encoded_decree, encoded_decree_deck = self.eyrie.encode_actor()
         alliance_encoded_deck, alliance_encoded_suits, alliance_encoded_buffs, alliance_encoded_VP, alliance_encoded_win_condition, alliance_encoded_items, encoded_supporter_deck, encoded_supporter_suits, encoded_total_officers = self.alliance.encode_actor()
         vagabond_encoded_deck, vagabond_encoded_suits, vagabond_encoded_buffs, vagabond_encoded_VP, vagabond_encoded_win_condition, vagabond_encoded_items = self.vagabond.encode_actor()
 
-        # MAP
-        map_info = np.concatenate((map_encoded, map_adjacency_encoded), axis=1)
-        # ACTORS
-        non_vagabond_item_info = np.concatenate((craftables, cat_encoded_items, bird_encoded_items, alliance_encoded_items), axis=1)
-        actor_buffs = np.concatenate((cat_encoded_buffs, bird_encoded_buffs, alliance_encoded_buffs, vagabond_encoded_buffs), axis=1)
-        actor_VPS = np.concatenate((cat_encoded_VP, bird_encoded_VP, alliance_encoded_VP, vagabond_encoded_VP), axis=1)
+        # ALL NON MAP INFO TO A VECTOR
+        encoded_decks = np.concatenate((encoded_discard_deck, cat_encoded_deck, bird_encoded_deck, alliance_encoded_deck, vagabond_encoded_deck), axis=0)
+        encoded_suits = np.concatenate((encoded_discard_suits, encoded_domimance_discard_suits, cat_encoded_suits, bird_encoded_suits, alliance_encoded_suits, encoded_supporter_suits, vagabond_encoded_suits), axis=0)
+        encoded_buffs = np.concatenate((cat_encoded_buffs, bird_encoded_buffs, alliance_encoded_buffs, vagabond_encoded_buffs), axis=0)
+        encoded_items = np.concatenate((craftables, cat_encoded_items, bird_encoded_items, alliance_encoded_items, vagabond_encoded_items.flatten()), axis=0)
+        encoded_VPs = np.concatenate((cat_encoded_VP, bird_encoded_VP, alliance_encoded_VP, vagabond_encoded_VP), axis=0)
+        encoded_win_conditions = np.concatenate((cat_encoded_win_condition, bird_encoded_win_condition, alliance_encoded_win_condition, vagabond_encoded_win_condition), axis=0)
+        encoded_other_actor_info = np.concatenate((encoded_role, encoded_avaible_leaders, encoded_decree.flatten(), encoded_decree_deck, encoded_total_officers), axis=0)
+
+        total_other_info = np.concatenate((encoded_decks, encoded_suits, encoded_buffs, encoded_items, encoded_VPs, encoded_win_conditions, encoded_other_actor_info, gamestate_encoded), axis=0)
+
+        return  total_other_info, map_encoded, map_adjacency_encoded
 
 
     def stand_and_deliver(self, taker, victim):
