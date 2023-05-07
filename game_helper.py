@@ -288,7 +288,6 @@ def cat_daylight_actions(game, choice, recruited_already=False):
     elif len(choice) == 3:
         logging.debug(f"Cat built {choice[1]} at {choice[0]} for {choice[2]}")
         game.build(place=game.map.places[choice[0]], building=choice[1], actor=game.marquise, cost = choice[2])
-    # OVERWORK
 
     return recruited, moved
 

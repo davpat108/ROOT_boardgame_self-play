@@ -21,7 +21,7 @@ class Game():
                                                     [1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0],
                                                     [0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0],
                                                     [0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0],
-                                                    [0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1]
+                                                    [0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1],
                                                     [0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1],
                                                     [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0],
                                                     [0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1],
@@ -113,7 +113,7 @@ class Game():
             self.vagabond.quest_deck.add_card(self.quest_deck.draw_card())
 
 
-    def encode(self, gamestate):
+    def encode(self, gamestate, player_id = 0):
         map_encoded = np.zeros((12,16))
         map_adjacency_encoded = self.encoced_adjacencies_forest # Hard coded until we only use forest
         for i, place in enumerate(self.map.places.values()):
@@ -137,20 +137,23 @@ class Game():
                 map_encoded[i][14] = 0 if place.suit == "fox" else 1 if place.suit == "mouse" else 2
                 neighbouring_vagabonds = 0
                 for neighbor in place.neighbors:
-                    neighbouring_vagabonds += 1 if self.map.places[neighbor].vagaond_is_here else 0
+                    neighbouring_vagabonds += 1 if self.map.places[neighbor[0]].vagabond_is_here else 0
                 map_encoded[i][15] = min(neighbouring_vagabonds, 1)
 
         craftables = np.zeros((7,1))
         craftables[0][0] = self.map.craftables.count(Item("sack"))
-        craftables[2][0] = self.map.craftables.count(Item("root_tea"))
-        craftables[4][0] = self.map.craftables.count(Item("money"))
-        craftables[6][0] = self.map.craftables.count(Item("boot"))
-        craftables[8][0] = self.map.craftables.count(Item("sword"))
-        craftables[10][0] = Item("crossbow") in self.map.craftables
-        craftables[11][0] = Item("hammer") in self.map.craftables
+        craftables[1][0] = self.map.craftables.count(Item("root_tea"))
+        craftables[2][0] = self.map.craftables.count(Item("money"))
+        craftables[3][0] = self.map.craftables.count(Item("boot"))
+        craftables[4][0] = self.map.craftables.count(Item("sword"))
+        craftables[5][0] = Item("crossbow") in self.map.craftables
+        craftables[6][0] = Item("hammer") in self.map.craftables
 
-        gamestate_encoded = np.zeros((14, 1))
+        gamestate_encoded = np.zeros((15, 1))
         gamestate_encoded[gamestate][0] = 1
+
+        player_id_encoded = np.zeros((4, 1))
+        player_id_encoded[player_id][0] = 1
 
         encoded_discard_deck, encoded_discard_suits = self.discard_deck.encode_deck()
         _, encoded_domimance_discard_suits = self.dominance_discard_deck.encode_deck()
@@ -162,17 +165,18 @@ class Game():
         vagabond_encoded_deck, vagabond_encoded_suits, vagabond_encoded_buffs, vagabond_encoded_VP, vagabond_encoded_win_condition, vagabond_encoded_items = self.vagabond.encode_actor()
 
         # ALL NON MAP INFO TO A VECTOR
-        encoded_decks = np.concatenate((encoded_discard_deck, cat_encoded_deck, bird_encoded_deck, alliance_encoded_deck, vagabond_encoded_deck), axis=0)
+        encoded_decks = np.concatenate((encoded_discard_deck, cat_encoded_deck, bird_encoded_deck, alliance_encoded_deck, encoded_supporter_deck, vagabond_encoded_deck), axis=0)
         encoded_suits = np.concatenate((encoded_discard_suits, encoded_domimance_discard_suits, cat_encoded_suits, bird_encoded_suits, alliance_encoded_suits, encoded_supporter_suits, vagabond_encoded_suits), axis=0)
         encoded_buffs = np.concatenate((cat_encoded_buffs, bird_encoded_buffs, alliance_encoded_buffs, vagabond_encoded_buffs), axis=0)
-        encoded_items = np.concatenate((craftables, cat_encoded_items, bird_encoded_items, alliance_encoded_items, vagabond_encoded_items.flatten()), axis=0)
+        encoded_items = np.concatenate((craftables, cat_encoded_items, bird_encoded_items, alliance_encoded_items, vagabond_encoded_items.reshape((-1,1))), axis=0)
         encoded_VPs = np.concatenate((cat_encoded_VP, bird_encoded_VP, alliance_encoded_VP, vagabond_encoded_VP), axis=0)
         encoded_win_conditions = np.concatenate((cat_encoded_win_condition, bird_encoded_win_condition, alliance_encoded_win_condition, vagabond_encoded_win_condition), axis=0)
-        encoded_other_actor_info = np.concatenate((encoded_role, encoded_avaible_leaders, encoded_decree.flatten(), encoded_decree_deck, encoded_total_officers), axis=0)
+        encoded_other_actor_info = np.concatenate((encoded_role, encoded_avaible_leaders, encoded_decree.reshape((-1,1)), encoded_decree_deck, encoded_total_officers), axis=0)
 
-        total_other_info = np.concatenate((encoded_decks, encoded_suits, encoded_buffs, encoded_items, encoded_VPs, encoded_win_conditions, encoded_other_actor_info, gamestate_encoded), axis=0)
+        total_other_info = np.concatenate((encoded_decks, encoded_suits, encoded_buffs, encoded_items, encoded_VPs, encoded_win_conditions, encoded_other_actor_info, gamestate_encoded, player_id_encoded), axis=0)
+        encoding = np.concatenate((map_encoded.reshape((-1,1)), map_adjacency_encoded.reshape((-1,1)), total_other_info), axis=0)
 
-        return  total_other_info, map_encoded, map_adjacency_encoded
+        return  torch.tensor(encoding.T, dtype = torch.float)
 
 
     def stand_and_deliver(self, taker, victim):
