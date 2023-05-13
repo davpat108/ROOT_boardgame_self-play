@@ -4,7 +4,7 @@ from dtos import CraftDTO
 from map import build_regular_forest
 from deck import Deck, QuestDeck
 from configs import sympathy_VPs, eyrie_roost_VPs, persistent_effects, Immediate_non_item_effects, eyrie_leader_config, buildings_list_marquise, vagabond_quest_card_info, total_common_card_info
-from game_helper import alliance_choose_card, choose_card_prios
+from game_helper_random import alliance_choose_card, choose_card_prios
 from copy import copy
 import random
 import logging

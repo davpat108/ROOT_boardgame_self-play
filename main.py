@@ -1,7 +1,7 @@
 
 from deck import Deck
 from game import Game
-from game_helper import marquise_birdsong, marquise_daylight, marquise_evening, alliance_birsong, alliance_daylight, alliance_evening, vagabond_birdsong, vagabond_daylight, vagabond_evening, get_all_daylight_option_alliance, move_and_account_to_sympathy, eyrie_birdsong, eyrie_daylight, eyrie_eveing, alliance_daylight_actions, alliance_evening_actions, get_all_evening_option_alliance
+from game_helper_random import marquise_birdsong, marquise_daylight, marquise_evening, alliance_birsong, alliance_daylight, alliance_evening, vagabond_birdsong, vagabond_daylight, vagabond_evening, get_all_daylight_option_alliance, move_and_account_to_sympathy, eyrie_birdsong, eyrie_daylight, eyrie_eveing, alliance_daylight_actions, alliance_evening_actions, get_all_evening_option_alliance
 from actors import ExhaustbootERROR
 import random
 import logging

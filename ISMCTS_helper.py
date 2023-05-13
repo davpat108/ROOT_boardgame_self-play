@@ -3,6 +3,7 @@ from dtos import Battle_DTO, OverworkDTO, MoveDTO, CraftDTO, Item
 from deck import Deck
 from copy import copy
 import logging
+
 def random_choose(options):
     if options is None:
         return None
