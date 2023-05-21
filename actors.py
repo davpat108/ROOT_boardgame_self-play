@@ -436,17 +436,12 @@ class Eyrie(Actor):
         if self.leader in self.avaible_leaders:
             self.avaible_leaders.remove(self.leader)
             return
-        elif len(self.avaible_leaders) == 0:
-            return "Eyrie dead."
         else:
             raise ValueError("Invalid role for Eyrie")
 
     def change_role(self, role):
         self.leader = role
-        if self.check_role() != 'Eyrie dead.':
-            self.setup_based_on_leader()
-        else:
-            return 'Eyrie dead.'
+        self.setup_based_on_leader()
 
     def count_for_card_draw(self, map):
         draws = 1
@@ -470,6 +465,8 @@ class Eyrie(Actor):
                 self.decree[action] += [(-1, "bird")]
 
     def get_turmoil_options(self):
+        if len(self.avaible_leaders) == 0:
+            self.avaible_leaders = ["Despot", "Commander", "Builder", "Charismatic"]
         return self.avaible_leaders
 
     def get_decree_options(self):

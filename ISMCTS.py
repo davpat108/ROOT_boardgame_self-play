@@ -269,3 +269,202 @@ class Set:
                 if discard_options:
                     choice = random_choose(discard_options)
                     game_sample.discard_deck.add_card(game_sample.marquise.deck.get_the_card(choice))
+
+        if self.state == 11:
+            ### BBB BIRD
+            options = game_sample.eyrie.bbb_options((game_sample.eyrie, game_sample.eyrie, game_sample.alliance, game_sample.vagabond))
+            if options is None:
+                self.state = 12
+                return 
+            choice = random_choose(options)
+            if choice:
+                logging.debug(f"Cats used Better burrow bank with {choice.name}")
+                game_sample.better_burrow_bank(game_sample.eyrie, choice)
+
+        if self.state == 12:
+            # STAND AND DELIVER BIRD
+            options = game_sample.eyrie.stand_and_deliver_options((game_sample.marquise, game_sample.eyrie, game_sample.alliance, game_sample.vagabond))
+            if options is None:
+                self.state = 13
+                return 
+            choice = random_choose(options)
+            if choice:
+                logging.debug(f"{game_sample.eyrie.name} used stand and deliver with {choice.name}")
+                game_sample.stand_and_deliver(game_sample.eyrie, choice)
+
+        if self.state == 13:
+            # ROYAL CLAIM BIRD
+            options = game_sample.eyrie.get_royal_claim_options()
+            if options is None:
+                self.state = 14
+                return 
+            choice = random_choose(options)
+            if choice:
+                logging.debug(f"{game_sample.eyrie.name} used royal heir")
+                game_sample.activate_royal_claim(game_sample.eyrie)
+        
+        if self.state == 14:
+            options = game_sample.eyrie.get_decree_options()
+            choice = random_choose(options)
+            if choice:
+                logging.debug(f"{game_sample.eyrie.name} added {choice[1]} to the {choice[0]} decree")
+                game_sample.add_card_to_decree(*choice)
+            else:
+                logging.debug(f"{game_sample.eyrie.name} did not add a card to the decree")
+            options = game_sample.eyrie.get_decree_options()
+            options.append(False)
+            choice = random_choose(options)
+            if choice:
+                logging.debug(f"{game_sample.eyrie.name} added {choice[1]} to the {choice[0]} decree")
+                game_sample.add_card_to_decree(*choice)
+            options = game_sample.eyrie.get_no_roosts_left_options(game_sample.map)
+            if options:
+                logging.debug(f"{game_sample.eyrie.name} Has no roosts left")
+                choice = random_choose(options)
+                game_sample.place_roost_if_zero_roost(choice)
+        
+        if self.state == 15:
+            # SWAP DOMINANCE CARD BIRD
+            options = game_sample.eyrie.swap_discarded_dominance_card_options(game_sample.dominance_discard_deck)
+            if options is None:
+                self.state = 16
+                return 
+            choice = random_choose(options)
+            if choice:
+                logging.debug(f"{game_sample.eyrie.name} swapped dominance card")
+                game_sample.swap_discarded_dominance_card(game_sample.eyrie, choice[0], choice[1])
+
+        if self.state == 16:
+            if game_sample.eyrie.command_warren:
+                #TODO BATTLE
+                pass
+            else:
+                self.state = 17
+                return
+        
+        if self.state == 17:
+            # CODEBREAKERS
+            if game_sample.eyrie.codebreakers:
+                options = game_sample.eyrie.codebreakers_options((game_sample.marquise, game_sample.eyrie, game_sample.alliance, game_sample.vagabond))
+                choice = random_choose(options)
+                if choice:
+                    logging.debug(f"{game_sample.eyrie.name} used Codebreakers")
+                    game_sample.eyrie.known_hands[choice] = True
+            else:
+                self.state = 18
+                return
+
+        if self.state == 18:
+            # TAX COLLECTOR
+            if game_sample.eyrie.tax_collector:
+                options = game_sample.eyrie.get_tax_collector_options(game_sample.map)
+                choice = random_choose(options)
+                if choice:
+                    logging.debug(f"{game_sample.eyrie.name} used tax collector")
+                    game_sample.tax_collection(game_sample.eyrie, choice)
+            else:
+                self.state = 19
+                return
+
+        if self.state == 19:
+            # CRAFT
+            choice = True
+            game_sample.eyrie.refresh_craft_activations(game_sample.map)
+            while choice:
+                options = game_sample.eyrie.get_options_craft(game_sample.map)
+                options.append(False)
+                choice = random_choose(options)
+                if choice:
+                    logging.debug(f"{game_sample.eyrie.name} crafted {choice.card.craft}")
+                    wounded_cat_soldiers = game_sample.craft(game_sample.eyrie, choice)
+                    if wounded_cat_soldiers:
+                        option = game_sample.marquise.get_field_hospital_options(suit=choice.card.card_suit, map = game_sample.map)
+                        choice = random_choose(option)
+                        if choice:
+                            game_sample.field_hospital(wounded_cat_soldiers, choice)
+
+        if self.state == 20:
+            game_sample.eyrie.refresh_temp_decree()
+            turmoil = False
+
+            if not turmoil:
+                for _ in range(len(game_sample.eyrie.decree['recruit'])):
+                    options = game_sample.eyrie.get_resolve_recruit(game_sample.map)
+                    if options:
+                        choice = random_choose(options)
+                        logging.debug(f"{game_sample.eyrie.name} recruited at {choice[0]}")
+                        game_sample.recruit(placename = choice[0], actor = game_sample.eyrie, card_ID=choice[1])
+                    else:
+                        turmoil = True
+                        logging.debug(f"{game_sample.eyrie.name} fell into turmoil")
+                        break
+            if not turmoil:
+                for _ in range(len(game_sample.eyrie.decree['move'])):
+                    options = game_sample.eyrie.get_resolve_move(game_sample.map)
+                    if options:
+                        choice = random_choose(options)
+                        move_and_account_to_sympathy(game_sample, choice)
+                    else:
+                        turmoil = True
+                        logging.debug(f"{game_sample.eyrie.name} fell into turmoil")
+                        break
+            if not turmoil:      
+                for _ in range(len(game_sample.eyrie.decree['battle'])):
+                    options = game_sample.eyrie.get_resolve_battle(game_sample.map)
+                    if options:
+                        choice = random_choose(options)
+                        # TODO BATTLE
+                    else:
+                        logging.debug(f"{game_sample.eyrie.name} fell into turmoil")
+                        turmoil = True
+                        break
+
+            if not turmoil:
+                for _ in range(len(game_sample.eyrie.decree['build'])):
+                    options = game_sample.eyrie.get_resolve_building(game_sample.map)
+                    if options:
+                        choice = random_choose(options)
+                        logging.debug(f"{game_sample.eyrie.name} built at {choice[0]}")
+                        game_sample.build(place=game_sample.map.places[choice[0]], building="roost", actor=game_sample.eyrie, card_ID = choice[1])
+                    else:
+                        logging.debug(f"{game_sample.eyrie.name} fell into turmoil")
+                        turmoil = True
+                        break
+    
+        if self.state == 21:
+            if turmoil:
+                options = game_sample.eyrie.get_turmoil_options()
+                choice = random_choose(options)
+                logging.debug(f"{game_sample.eyrie.name} chose {choice} as its new leader")
+                game_sample.bird_turmoil(choice)
+            else:
+                self.state = 22
+                return
+    
+        if self.state == 22:
+            # COBBLER
+            if game_sample.eyrie.cobbler:
+                options = game_sample.eyrie.get_cobbler_move_options(game_sample.map)
+                choice = random_choose(options)
+                if choice:
+                    logging.debug(f"{game_sample.eyrie.name} used cobbler")
+                    move_and_account_to_sympathy(game_sample, choice)
+            else:
+                self.state = 23
+                return
+        
+        if self.state == 23:
+            game_sample.eyrie_get_points()
+            draws = game_sample.eyrie.count_for_card_draw(game_sample.map)
+            for _ in range(draws):
+                game_sample.eyrie.deck.add_card(game_sample.deck.draw_card())
+                if len(game_sample.deck.cards) <= 0: # DECK ONE LINER
+                    game_sample.deck = copy(game_sample.discard_deck)
+                    game_sample.deck.shuffle_deck()
+                    game_sample.discard_deck = Deck(empty=True)
+            discard_options = True
+            while discard_options:
+                discard_options = game_sample.eyrie.discard_down_to_five_options()
+                if discard_options:
+                    choice = random_choose(discard_options)
+                    game_sample.discard_deck.add_card(game_sample.eyrie.deck.get_the_card(choice))

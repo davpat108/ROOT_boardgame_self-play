@@ -37,7 +37,6 @@ class Game():
             self.dominance_discard_deck = Deck(empty=True)
             self.quest_deck = QuestDeck()
             self.discard_quest_deck = QuestDeck(empty=True)
-            self.eyrie_dead = False
             self.winner = None
 
             self.marquise.deck.add_card(self.deck.get_the_card(5))
@@ -80,7 +79,6 @@ class Game():
             self.alliance = Alliance(map=self.map)
             self.vagabond = Vagabond(map=self.map, role=random.choice(vagabond_roles))
             self.winner = None
-            self.eyrie_dead = False
 
             self.deck = Deck()
             self.discard_deck = Deck(empty=True)
@@ -516,6 +514,7 @@ class Game():
                 logging.debug(f"vagabond became hostile with {defender}")
                 self.vagabond.relations[defender] = "hostile"
                 victory_points_attacker-=1 # THAT one soldier doesn't count as VP
+                logging.debug(f"vagabond is getting getting 1 less points due to the first soldier was killed without being hostile points")
             if extra_dmg_attacker <=0:
                 logging.debug(f"{defender} lost {dmg_attacker} soldiers")
                 total_lost_soldiers_defender = dmg_attacker
@@ -914,10 +913,7 @@ class Game():
         self.eyrie.victory_points -= vp_loss
         self.eyrie.victory_points = max(self.eyrie.victory_points, 0)
 
-        success = self.eyrie.change_role(new_commander)
-        if success == 'Eyrie dead.':
-            self.eyrie_dead = True
-            return
+        self.eyrie.change_role(new_commander)
         self.eyrie.setup_based_on_leader()
 
         # ALL cards to the discard_deck! Loyal viziers are not here.
