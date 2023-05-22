@@ -5,7 +5,7 @@ import random
 from copy import copy
 from deck import Deck, QuestDeck
 import logging
-from game_helper_random import get_all_daylight_option_cat, cat_daylight_actions, get_loss_prios, get_ambush_usage, get_sappers_usage, get_armorers_usage, roll_dice, move_and_account_to_sympathy
+from game_helper_random import get_all_daylight_option_cat, cat_daylight_actions, get_loss_prios, get_ambush_usage, get_sappers_usage, get_armorers_usage, roll_dice, move_and_account_to_sympathy, get_all_daylight_option_alliance, alliance_daylight_actions, get_all_evening_option_alliance, alliance_evening_actions
 
 
 def random_choose(options):
@@ -468,3 +468,160 @@ class Set:
                 if discard_options:
                     choice = random_choose(discard_options)
                     game_sample.discard_deck.add_card(game_sample.eyrie.deck.get_the_card(choice))
+
+        if self.state == 24:
+            ### BBB ALLIANCE
+            options = game_sample.alliance.bbb_options((game_sample.marquise, game_sample.eyrie, game_sample.alliance, game_sample.vagabond))
+            if options is None:
+                self.state = 25
+                return 
+            choice = random_choose(options)
+            if choice:
+                logging.debug(f"Cats used Better burrow bank with {choice.name}")
+                game_sample.better_burrow_bank(game_sample.alliance, choice)
+
+        if self.state == 25:
+            # STAND AND DELIVER ALLIANCE
+            options = game_sample.alliance.stand_and_deliver_options((game_sample.marquise, game_sample.eyrie, game_sample.alliance, game_sample.vagabond))
+            if options is None:
+                self.state = 26
+                return 
+            choice = random_choose(options)
+            if choice:
+                logging.debug(f"{game_sample.alliance.name} used stand and deliver with {choice.name}")
+                game_sample.stand_and_deliver(game_sample.alliance, choice)
+
+        if self.state == 26:
+            # ROYAL CLAIM ALLIANCE
+            options = game_sample.alliance.get_royal_claim_options()
+            if options is None:
+                self.state = 27
+                return 
+            choice = random_choose(options)
+            if choice:
+                logging.debug(f"{game_sample.alliance.name} used royal heir")
+                game_sample.activate_royal_claim(game_sample.alliance)
+
+        if self.state == 27:
+            options = game_sample.alliance.get_revolt_options(game_sample.map)
+            options.append(False)
+            choice = random_choose(options)
+            if choice:
+                logging.debug(f"{game_sample.alliance.name} revolted at {choice[0].name}")
+                wounded_cat_soldiers = game_sample.revolt(*choice)
+                if wounded_cat_soldiers:
+                    self.state = 57
+                    return 27
+                    # TODO FIELD HOSPITAL
+            else:
+                self.state = 28
+                return
+
+        if self.state == 28:
+            choice = True
+            while choice:
+                options = game_sample.alliance.get_spread_sympathy_options(game_sample.map)
+                options.append(False)
+                choice = random_choose(options)
+                if choice:
+                    logging.debug(f"{game_sample.alliance.name} spread sympathy to {choice[0]}")
+                    game_sample.spread_sympathy(*choice)
+            
+        if self.state == 29:
+            # SWAP DOMINANCE CARD BIRD
+            options = game_sample.alliance.swap_discarded_dominance_card_options(game_sample.dominance_discard_deck)
+            if options is None:
+                self.state = 30
+                return 
+            choice = random_choose(options)
+            if choice:
+                logging.debug(f"{game_sample.alliance.name} swapped dominance card")
+                game_sample.swap_discarded_dominance_card(game_sample.alliance, choice[0], choice[1])
+
+        if self.state == 30:
+            if game_sample.alliance.command_warren:
+                #TODO BATTLE
+                pass
+            else:
+                self.state = 31
+                return
+        
+        if self.state == 31:
+            # CODEBREAKERS
+            if game_sample.alliance.codebreakers:
+                options = game_sample.alliance.codebreakers_options((game_sample.marquise, game_sample.eyrie, game_sample.alliance, game_sample.vagabond))
+                choice = random_choose(options)
+                if choice:
+                    logging.debug(f"{game_sample.alliance.name} used Codebreakers")
+                    game_sample.alliance.known_hands[choice] = True
+            else:
+                self.state = 32
+                return
+
+        if self.state == 32:
+            # TAX COLLECTOR
+            if game_sample.alliance.tax_collector:
+                options = game_sample.alliance.get_tax_collector_options(game_sample.map)
+                choice = random_choose(options)
+                if choice:
+                    logging.debug(f"{game_sample.alliance.name} used tax collector")
+                    game_sample.tax_collection(game_sample.alliance, choice)
+            else:
+                self.state = 33
+                return
+            
+        if self.state == 33:
+            # ACTIONS
+            game_sample.alliance.refresh_craft_activations(game_sample.map)
+            choice = True
+            while choice:
+                options = get_all_daylight_option_alliance(game_sample)
+                choice = random_choose(options)
+                if choice:
+                    alliance_daylight_actions(game_sample, choice)
+
+        if self.state == 34:
+            # COBBLER
+            if game_sample.alliance.cobbler:
+                options = game_sample.alliance.get_cobbler_move_options(game_sample.map)
+                choice = random_choose(options)
+                if choice:
+                    logging.debug(f"{game_sample.alliance.name} used cobbler")
+                    move_and_account_to_sympathy(game_sample, choice)
+            else:
+                self.state = 35
+                return
+    
+        if self.state == 35:
+            for _ in range(game_sample.alliance.total_officers):
+                options = get_all_evening_option_alliance(game_sample)
+                choice = random_choose(options) 
+                if choice:
+                    alliance_evening_actions(game_sample, choice)
+                else:
+                    break
+
+        if self.state == 36:
+            draws = game_sample.alliance.count_for_card_draw(game_sample.map)
+            for _ in range(draws):
+                game_sample.alliance.deck.add_card(game_sample.deck.draw_card())
+                if len(game_sample.deck.cards) <= 0: # DECK ONE LINER
+                    game_sample.deck = copy(game_sample.discard_deck)
+                    game_sample.deck.shuffle_deck()
+                    game_sample.discard_deck = Deck(empty=True)
+
+            discard_options = True
+            while discard_options:
+                discard_options = game_sample.alliance.discard_down_to_five_options()
+                if discard_options:
+                    choice = random_choose(discard_options)
+                    game_sample.discard_deck.add_card(game_sample.alliance.deck.get_the_card(choice))
+
+            discard_options = True
+            while discard_options:
+                discard_options = game_sample.alliance.discard_down_to_five_supporters_options(game_sample.map)
+                if discard_options:
+                    choice = random_choose(discard_options)
+                    game_sample.discard_deck.add_card(game_sample.alliance.supporter_deck.get_the_card(choice))
+
+        

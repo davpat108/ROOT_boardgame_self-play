@@ -669,12 +669,14 @@ def alliance_birsong(game):
             choice = random_choose(option)
             if choice:
                 game.field_hospital(wounded_cat_soldiers, choice)
-    options = game.alliance.get_spread_sympathy_options(game.map)
-    options.append(False)
-    choice = random_choose(options)
-    if choice:
-        logging.debug(f"{game.alliance.name} spread sympathy to {choice[0]}")
-        game.spread_sympathy(*choice)
+    choice = True
+    while choice:
+        options = game.alliance.get_spread_sympathy_options(game.map)
+        options.append(False)
+        choice = random_choose(options)
+        if choice:
+            logging.debug(f"{game.alliance.name} spread sympathy to {choice[0]}")
+            game.spread_sympathy(*choice)
 
 def alliance_daylight(game):
     options = game.alliance.swap_discarded_dominance_card_options(game.dominance_discard_deck)
