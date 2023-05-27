@@ -5,7 +5,9 @@ import random
 from copy import copy
 from deck import Deck, QuestDeck
 import logging
-from game_helper_random import get_all_daylight_option_cat, cat_daylight_actions, get_loss_prios, get_ambush_usage, get_sappers_usage, get_armorers_usage, roll_dice, move_and_account_to_sympathy, get_all_daylight_option_alliance, alliance_daylight_actions, get_all_evening_option_alliance, alliance_evening_actions
+from game_helper_random import get_all_daylight_option_cat, cat_daylight_actions, move_and_account_to_sympathy, get_all_daylight_option_alliance, alliance_daylight_actions, get_all_evening_option_alliance, alliance_evening_actions, battle_vagabond, battle_cat, battle_bird, battle_alliance, get_all_daylight_actions_vagabond, vagabond_daylight_actions
+from item import Item
+
 
 
 def random_choose(options):
@@ -174,8 +176,12 @@ class Set:
 
         if self.state == 4:
             if game_sample.marquise.command_warren:
-                #TODO BATTLE
-                pass
+                options = game_sample.marquise.get_battles(game_sample.map)
+                options.append(False)
+                choice = random_choose(options)
+                if choice:
+                    logging.debug(f"{game_sample.marquise.name} used command warren")
+                    battle_cat(game_sample, choice)
             else:
                 self.state = 5
                 return
@@ -336,8 +342,12 @@ class Set:
 
         if self.state == 16:
             if game_sample.eyrie.command_warren:
-                #TODO BATTLE
-                pass
+                options = game_sample.eyrie.get_command_warren_battle(game_sample.map)
+                options.append(False)
+                choice = random_choose(options)
+                if choice:
+                    logging.debug(f"{game_sample.eyrie.name} used command warren")
+                    battle_bird(game_sample, choice)
             else:
                 self.state = 17
                 return
@@ -413,7 +423,7 @@ class Set:
                     options = game_sample.eyrie.get_resolve_battle(game_sample.map)
                     if options:
                         choice = random_choose(options)
-                        # TODO BATTLE
+                        battle_bird(game_sample, choice)
                     else:
                         logging.debug(f"{game_sample.eyrie.name} fell into turmoil")
                         turmoil = True
@@ -477,7 +487,7 @@ class Set:
                 return 
             choice = random_choose(options)
             if choice:
-                logging.debug(f"Cats used Better burrow bank with {choice.name}")
+                logging.debug(f"Alliance used Better burrow bank with {choice.name}")
                 game_sample.better_burrow_bank(game_sample.alliance, choice)
 
         if self.state == 25:
@@ -510,9 +520,10 @@ class Set:
                 logging.debug(f"{game_sample.alliance.name} revolted at {choice[0].name}")
                 wounded_cat_soldiers = game_sample.revolt(*choice)
                 if wounded_cat_soldiers:
-                    self.state = 57
-                    return 27
-                    # TODO FIELD HOSPITAL
+                    option = game_sample.marquise.get_field_hospital_options(placename=choice[0].name, map=game_sample.map)
+                    choice = random_choose(option)
+                    if choice:
+                        game_sample.field_hospital(wounded_cat_soldiers, choice)
             else:
                 self.state = 28
                 return
@@ -540,8 +551,12 @@ class Set:
 
         if self.state == 30:
             if game_sample.alliance.command_warren:
-                #TODO BATTLE
-                pass
+                options = game_sample.alliance.get_battles(game_sample.map)
+                options.append(False)
+                choice = random_choose(options)
+                if choice:
+                    logging.debug(f"{game_sample.alliance.name} used command warren")
+                    battle_alliance(game_sample, choice)
             else:
                 self.state = 31
                 return
@@ -623,5 +638,115 @@ class Set:
                 if discard_options:
                     choice = random_choose(discard_options)
                     game_sample.discard_deck.add_card(game_sample.alliance.supporter_deck.get_the_card(choice))
-
         
+        if self.state == 37:
+            ### BBB VAGABOND
+            options = game_sample.vagabond.bbb_options((game_sample.marquise, game_sample.eyrie, game_sample.alliance, game_sample.vagabond))
+            if options is None:
+                self.state = 38
+                return 
+            choice = random_choose(options)
+            if choice:
+                logging.debug(f"Vagabond used Better burrow bank with {choice.name}")
+                game_sample.better_burrow_bank(game_sample.vagabond, choice)  
+
+        if self.state == 38:
+            # STAND AND DELIVER Vagabond
+            options = game_sample.vagabond.stand_and_deliver_options((game_sample.marquise, game_sample.eyrie, game_sample.alliance, game_sample.vagabond))
+            if options is None:
+                self.state = 39
+                return 
+            choice = random_choose(options)
+            if choice:
+                logging.debug(f"{game_sample.vagabond.name} used stand and deliver with {choice.name}")
+                game_sample.stand_and_deliver(game_sample.vagabond, choice)
+
+        if self.state == 39:
+            for _ in range(game_sample.vagabond.other_items.count(Item("root_tea"))*2 + 3):
+                options = game_sample.vagabond.get_refresh_options()
+                if options:
+                    choice = random_choose(options)
+                    logging.debug(f"{game_sample.vagabond.name} refreshed {choice}")
+                    game_sample.vagabond.refresh_item(choice)
+                else:
+                    break
+
+        if self.state == 40:
+            options = game_sample.vagabond.get_slip_options(game_sample.map)
+            choice = random_choose(options)
+            card_to_give_if_sympathy = game_sample.vagabond.card_to_give_to_alliace_options(game_sample.map.places[choice.end].suit)
+            card = random_choose(card_to_give_if_sympathy)
+            logging.debug(f"{game_sample.vagabond.name} slipped to {choice.end}")
+            game_sample.slip(choice.end, card_to_give_if_sympathy=card)
+
+        if self.state == 41:
+            options = game_sample.vagabond.swap_discarded_dominance_card_options(game_sample.dominance_discard_deck)
+            choice = random_choose(options)
+            if choice:
+                game_sample.swap_discarded_dominance_card(game_sample.vagabond, choice[0], choice[1])
+        
+        if self.state == 42:
+            if game_sample.vagabond.command_warren:
+                options = game_sample.vagabond.get_battle_options(game_sample.map)
+                options.append(False)
+                choice = random_choose(options)
+                if choice:
+                    logging.debug(f"{game_sample.vagabond.name} used command warren")
+                    battle_vagabond(game_sample, choice)
+            else:
+                self.state = 43
+                return
+
+        if self.state == 43:
+            if game_sample.codebreakers:
+                options = game_sample.vagabond.codebreakers_options((game_sample.marquise, game_sample.eyrie, game_sample.alliance, game_sample.vagabond))
+                choice = random_choose(options)
+                if choice:
+                    logging.debug(f"{game_sample.vagabond.name} used Codebreakers")
+                    game_sample.vagabond.known_hands[choice] = True
+            else:
+                self.state = 44
+                return
+        
+        if self.state == 44:
+            choice = True
+            consequitive_aids = 0
+            while choice:
+                options = get_all_daylight_actions_vagabond(game_sample)
+                choice = random_choose(options)
+                if choice:
+                    consequitive_aids = vagabond_daylight_actions(game_sample, choice, consequitive_aids)
+
+        if self.state == 45:
+            if game_sample.vagabond.cobbler:
+                options = game_sample.vagabond.get_cobbler_move_options(game_sample.vagabond.map)
+                choice = random_choose(options)
+                if choice:
+                    logging.debug(f"{game_sample.vagabond.name} used cobbler")
+                    move_and_account_to_sympathy(game_sample, choice)
+        
+        
+        if self.state == 46:
+            if ord(game_sample.map.vagabond_position) > ord('L'):
+                game_sample.vagabond.repair_and_refresh_all()
+            draws = game_sample.vagabond.count_for_card_draw()
+            for _ in range(draws):
+                game_sample.vagabond.deck.add_card(game_sample.deck.draw_card())
+                if len(game_sample.deck.cards) <= 0: # DECK ONE LINER
+                    game_sample.deck = copy(game_sample.discard_deck)
+                    game_sample.deck.shuffle_deck()
+                    game_sample.discard_deck = Deck(empty=True)
+            discard_options = True
+            while discard_options:
+                discard_options = game_sample.vagabond.discard_down_to_five_options()
+                if discard_options:
+                    choice = random_choose(discard_options)
+                    game_sample.discard_deck.add_card(game_sample.vagabond.deck.get_the_card(choice))
+
+        if self.state == 47:
+            discard_options = True
+            while discard_options:
+                discard_options = game_sample.vagabond.get_discard_items_down_to_sack_options()
+                if discard_options:
+                    choice = random_choose(discard_options)
+                    game_sample.vagabond.satchel.remove(choice)

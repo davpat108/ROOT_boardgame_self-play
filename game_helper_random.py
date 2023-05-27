@@ -757,7 +757,8 @@ def vagabond_daylight(game):
 
 def vagabond_evening(game):
     evening_card_actions(game, game.vagabond)
-    game.vagabond.repair_and_refresh_all()
+    if ord(game.map.vagabond_position) > ord('L'):
+        game.vagabond.repair_and_refresh_all()
     draws = game.vagabond.count_for_card_draw()
     for _ in range(draws):
         game.vagabond.deck.add_card(game.deck.draw_card())
