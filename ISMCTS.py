@@ -5,8 +5,11 @@ import random
 from copy import copy
 from deck import Deck, QuestDeck
 import logging
-from game_helper_random import get_all_daylight_option_cat, cat_daylight_actions, move_and_account_to_sympathy, get_all_daylight_option_alliance, alliance_daylight_actions, get_all_evening_option_alliance, alliance_evening_actions, battle_vagabond, battle_cat, battle_bird, battle_alliance, get_all_daylight_actions_vagabond, vagabond_daylight_actions
+from game_helper_random import get_all_daylight_option_cat, cat_daylight_actions, move_and_account_to_sympathy, get_all_daylight_option_alliance, alliance_daylight_actions, get_all_evening_option_alliance, alliance_evening_actions, battle_vagabond, battle_cat, battle_bird, battle_alliance
+from game_helper_random import marquise_birdsong, marquise_daylight, marquise_evening, alliance_birdsong, alliance_daylight, alliance_evening, vagabond_birdsong, vagabond_daylight, vagabond_evening, eyrie_birdsong, eyrie_daylight, eyrie_evening, get_all_daylight_actions_vagabond, vagabond_daylight_actions
+from ISMCTS_rollout_helper import play
 from item import Item
+from actors import ExhaustbootERROR
 import math
 
 
@@ -37,7 +40,7 @@ class Node:
             return float("inf")
         return self.value/self.number_of_visits + c_param * (math.sqrt(math.log(self.parent.number_of_visits)/self.number_of_visits))
     
-    def rollout(self, player):
+    def rollout_placeholder(self, player, turn_order):
         # Returns if the player won or not
         return False
 
@@ -133,7 +136,113 @@ class Node:
             for _ in range(prev_supporter_size):
                 new_game.alliance.supporter_deck.add_card(avalible_deck.draw_card())
 
-    def expand(self, player_gave_card_to_another=None, player_drew_card=None, card_count=None, expand_count=3):
+    def expand_simplified(self, player_gave_card_to_another=None, player_drew_card=None, card_count=None, expand_count=5, player_orders=['cat', 'bird', 'alliance', 'vagabond']):
+        for _ in range(expand_count):
+            if self.previous_random_samples is None:
+                game_sample = self.generate_samples_base()
+            if player_gave_card_to_another is not None:
+                game_sample = self.generate_samples_one_player_gives_a_card_to_another(player1=player_gave_card_to_another[0], player2=player_gave_card_to_another[1], to_supporter_deck=len(player_gave_card_to_another)==3)
+            if player_drew_card is not None:
+                game_sample = self.generate_samples_someone_draws_a_cards(drawing_player=player_drew_card, card_count=card_count)
+            
+            if self.state == 0:
+                marquise_birdsong(game_sample)
+                marquise_daylight(game_sample)
+                marquise_evening(game_sample)
+            
+            if self.state == 1:
+                eyrie_birdsong(game_sample)
+                eyrie_daylight(game_sample)
+                eyrie_evening(game_sample)
+            
+            if self.state == 2:
+                alliance_birdsong(game_sample)
+                alliance_daylight(game_sample)
+                alliance_evening(game_sample)
+            
+            if self.state == 3:
+                vagabond_birdsong(game_sample)
+                vagabond_daylight(game_sample)
+                vagabond_evening(game_sample)
+
+            if self.state == 4:
+                # CAT FIELD HOSPITAL
+                pass
+            
+            if self.state == 5:
+                # CAT AMBUSH
+                pass
+
+            if self.state == 6:
+                # BIRD AMBUSH
+                pass
+                
+            if self.state == 7:
+                # ALLIANCE AMBUSH
+                pass
+
+            if self.state == 8:
+                # VAGABOND AMBUSH
+                pass
+            
+            if self.state == 9:
+                # CAT ARMOERERS_SAPPERS_BRUTAL_TACTICS
+                pass
+
+            if self.state == 9:
+                # BIRD ARMOERERS_SAPPERS_BRUTAL_TACTICS
+                pass
+
+            if self.state == 9:
+                # ALLIANCE ARMOERERS_SAPPERS_BRUTAL_TACTICS
+                pass
+
+            if self.state == 9:
+                # VAGABOND ARMOERERS_SAPPERS_BRUTAL_TACTICS
+                pass
+            
+            self.children.append(game_sample)
+
+    def rollout_simplified(self, player_orders=['cat', 'bird', 'alliance', 'vagabond']):
+        # Returns if the player won or not with random choices till game end, the result is used to backpropagate
+        next_player = player_orders[player_orders.index(self.game.current_player.name)+1]
+        start = True
+
+        while 1:
+            try:
+                game = Game(debug=False)
+                print(game_num)
+                while 1:
+                    logging.basicConfig(filename=f'{game_num}thgame.log', encoding='utf-8', level=logging.DEBUG)
+                    if not start or player_orders[0] == next_player:
+                        play(player_orders[0])
+                        start = False
+                    if not start or player_orders[1] == next_player:
+                        play(player_orders[1])
+                        start = False
+                    if not start or player_orders[2] == next_player:
+                        play(player_orders[2])
+                        start = False
+                    if not start or player_orders[3] == next_player:
+                        play(player_orders[3])
+                        start = False
+
+                    if game.winner:
+                        game_num += 1
+                        logging.debug(f"Game {game_num} winner is {game.winner[0]}, they won with a {game.winner[1]} victory")
+                        if game.winner[0] == self.player:
+                            return True
+                        else:
+                            return False
+                        break
+            except Exception as e:
+                if isinstance(e, ExhaustbootERROR):
+                    #There's an elusive 1 in 4000 game error when the vagabond runs out of boots to exhaust
+                    print("Boot error")
+                else:
+                    raise e
+
+    def expand_old(self, player_gave_card_to_another=None, player_drew_card=None, card_count=None, expand_count=3):
         # FIRST EXPAND 
         for _ in range(expand_count):
             if self.previous_random_samples is None:
@@ -779,9 +888,13 @@ class Node:
         if self.parent:
             self.parent.backpropagate(reward)
 
+    def player_finish_round(self, turn_order, state):
+        pass
+
+
 def ISMCTS_decide(state, game, itermax, player):
     rootnode = Node(state=state, parent=None, game=game, previous_random_samples=None, player=player)
-    rootnode.expand()
+    rootnode.expand_old()
     for _ in range(itermax):
         current_node = rootnode
 
@@ -789,7 +902,7 @@ def ISMCTS_decide(state, game, itermax, player):
         current_node = current_node.selection()
 
         # Expansion
-        current_node.expand()
+        current_node.expand_old()
 
         # Simulation
         reward = current_node.rollout(player)

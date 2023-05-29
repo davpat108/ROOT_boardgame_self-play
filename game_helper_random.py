@@ -638,7 +638,7 @@ def eyrie_daylight(game):
         logging.debug(f"{game.eyrie.name} chose {choice} as its new leader")
         game.bird_turmoil(choice)
     
-def eyrie_eveing(game):
+def eyrie_evening(game):
     evening_card_actions(game, game.eyrie)
     game.eyrie_get_points()
     draws = game.eyrie.count_for_card_draw(game.map)
@@ -655,7 +655,7 @@ def eyrie_eveing(game):
             choice = random_choose(discard_options)
             game.discard_deck.add_card(game.eyrie.deck.get_the_card(choice))
 
-def alliance_birsong(game):
+def alliance_birdsong(game):
     game.check_dominance(game.alliance)
     birdsong_card_actions(game, game.alliance)
     options = game.alliance.get_revolt_options(game.map)

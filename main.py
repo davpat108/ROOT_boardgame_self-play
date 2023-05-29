@@ -1,7 +1,7 @@
 
 from deck import Deck
 from game import Game
-from game_helper_random import marquise_birdsong, marquise_daylight, marquise_evening, alliance_birsong, alliance_daylight, alliance_evening, vagabond_birdsong, vagabond_daylight, vagabond_evening, get_all_daylight_option_alliance, move_and_account_to_sympathy, eyrie_birdsong, eyrie_daylight, eyrie_eveing, alliance_daylight_actions, alliance_evening_actions, get_all_evening_option_alliance
+from game_helper_random import marquise_birdsong, marquise_daylight, marquise_evening, alliance_birdsong, alliance_daylight, alliance_evening, vagabond_birdsong, vagabond_daylight, vagabond_evening, get_all_daylight_option_alliance, move_and_account_to_sympathy, eyrie_birdsong, eyrie_daylight, eyrie_evening, alliance_daylight_actions, alliance_evening_actions, get_all_evening_option_alliance
 from actors import ExhaustbootERROR
 import random
 import logging
@@ -14,12 +14,12 @@ def play(player):
         marquise_evening(game)
 
     elif player == "bird":
-            eyrie_birdsong(game)
-            eyrie_daylight(game)
-            eyrie_eveing(game)
+        eyrie_birdsong(game)
+        eyrie_daylight(game)
+        eyrie_evening(game)
             
     elif player == "alliance":
-        alliance_birsong(game)
+        alliance_birdsong(game)
         alliance_daylight(game)
         alliance_evening(game)
 
