@@ -888,9 +888,6 @@ class Node:
         if self.parent:
             self.parent.backpropagate(reward)
 
-    def player_finish_round(self, turn_order, state):
-        pass
-
 
 def ISMCTS_decide(state, game, itermax, player):
     rootnode = Node(state=state, parent=None, game=game, previous_random_samples=None, player=player)
@@ -902,10 +899,10 @@ def ISMCTS_decide(state, game, itermax, player):
         current_node = current_node.selection()
 
         # Expansion
-        current_node.expand_old()
+        current_node.expand_simplified()
 
         # Simulation
-        reward = current_node.rollout(player)
+        reward = current_node.rollout_simplified(player)
 
         # Backpropagation
         current_node.backpropagate(reward)

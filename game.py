@@ -188,14 +188,14 @@ class Game():
     def check_victory_points(self):
         if self.marquise.victory_points >= 30 and not self.winner:
             if self.marquise.win_condition == "points":
-                self.winner = ("marquise", "points")
+                self.winner = ("cat", "points")
             elif self.marquise.win_condition == "coalition_major":
-                self.winner = ("marquise", "coalition")
+                self.winner = ("cat", "coalition")
         if self.eyrie.victory_points >= 30 and not self.winner:
             if self.eyrie.win_condition == "points":
-                self.winner = ("eyrie", "points")
+                self.winner = ("bird", "points")
             elif self.eyrie.win_condition == "coalition_major":
-                self.winner = ("eyrie", "coalition")
+                self.winner = ("bird", "coalition")
         if self.alliance.victory_points >= 30 and not self.winner:
             if self.alliance.win_condition == "points":
                 self.winner = ("alliance", "points")

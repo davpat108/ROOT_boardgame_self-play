@@ -319,7 +319,7 @@ def player_finish_actions_old(turn_order, state, game):
 
 def play(player, game):
 
-    if player == "cat" and start:
+    if player == "cat":
         marquise_birdsong(game)
         marquise_daylight(game)
         marquise_evening(game)
