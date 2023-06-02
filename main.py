@@ -38,7 +38,7 @@ if __name__ == "__main__":
     'alliance': 0,
     'vagabond': 0
     }
-    max_games = 1000
+    max_games = 5
     while 1:
         try:
             game = Game(debug=False)

@@ -339,3 +339,4 @@ def play(player, game):
         vagabond_daylight(game)
         vagabond_evening(game)
 
+    return game

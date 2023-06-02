@@ -1003,14 +1003,14 @@ class Game():
 
     def complete_quest(self, quest_card_ID, draw_or_VP):
         self.discard_quest_deck.add_card(self.vagabond.quest_deck.get_the_card(quest_card_ID))
-        self.vagabond.quest_deck.add_card(self.quest_deck.draw_card())
 
         if draw_or_VP == "draw":
-            self.vagabond.deck.add_card(self.deck.draw_card())
-            if len(self.deck.cards) <=0:
-                self.deck = self.discard_deck
-                self.deck.shuffle_deck()
-                self.discard_deck = Deck(empty=True)
+            for i in range(2):
+                self.vagabond.deck.add_card(self.deck.draw_card())
+                if len(self.deck.cards) <=0:
+                    self.deck = self.discard_deck
+                    self.deck.shuffle_deck()
+                    self.discard_deck = Deck(empty=True)
         if draw_or_VP == "VP":
             self.vagabond.victory_points += sum([card.suit == vagabond_quest_card_info[quest_card_ID][-1] for card in self.discard_quest_deck.cards])
             self.check_victory_points()

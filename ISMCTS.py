@@ -2,7 +2,7 @@
 
 from game import Game
 import random
-from copy import copy
+from copy import copy, deepcopy
 from deck import Deck, QuestDeck
 import logging
 from game_helper_random import get_all_daylight_option_cat, cat_daylight_actions, move_and_account_to_sympathy, get_all_daylight_option_alliance, alliance_daylight_actions, get_all_evening_option_alliance, alliance_evening_actions, battle_vagabond, battle_cat, battle_bird, battle_alliance
@@ -48,39 +48,38 @@ class Node:
         """
         Generate samples at the start of a search
         """
-        new_game = copy(self.game)
+        new_game = deepcopy(self.game)
         # Card I'm not seeing = deck+hands together
-        avalible_deck = new_game.deck.cards
         for player in [new_game.marquise, new_game.eyrie, new_game.alliance, new_game.vagabond]:
             if player.name != self.player:
-                avalible_deck.cards += player.deck.cards
+                new_game.deck.cards += player.deck.cards
         
         if self.player != "Alliance":
-            avalible_deck.cards += new_game.alliance.supporter_deck.cards
+            new_game.deck.cards += new_game.alliance.supporter_deck.cards
 
-        avalible_deck.random.shuffle()
+        new_game.deck.shuffle_deck()
 
         for player in [new_game.marquise, new_game.eyrie, new_game.alliance, new_game.vagabond]:
             if player.name != self.player:
                 prev_hand_size = len(player.deck.cards)
                 player.deck = Deck(empty=True)
                 for _ in range(prev_hand_size):
-                    player.deck.add_card(avalible_deck.draw_card())
+                    player.deck.add_card(new_game.deck.draw_card())
         
         if self.player != "Alliance":
             prev_supporter_size = len(new_game.alliance.supporter_deck.cards)
             new_game.alliance.supporter_deck = Deck(empty=True)
             for _ in range(prev_supporter_size):
-                new_game.alliance.supporter_deck.add_card(avalible_deck.draw_card())
+                new_game.alliance.supporter_deck.add_card(new_game.deck.draw_card())
         
 
         if self.player != "Vagabond":
-            avalible_quest_deck = new_game.quest_deck.cards
-            avalible_quest_deck.random.shuffle()
+            new_game.quest_deck.shuffle_deck()
             vagabond_quest_deck_size = len(new_game.vagabond.quest_deck.cards)
             new_game.vagabond.quest_deck = QuestDeck(empty=True)
             for _ in range(vagabond_quest_deck_size):
-                new_game.vagabond.quest_deck.add_card(avalible_quest_deck.draw_card())
+                if len(new_game.quest_deck.cards) > 0:
+                    new_game.vagabond.quest_deck.add_card(new_game.quest_deck.draw_card())
         
         return new_game
     
@@ -88,7 +87,7 @@ class Node:
         """
         Generate samples knowing the previous random samples, and someone draws a card
         """
-        new_game = copy(self.game)
+        new_game = deepcopy(self.game)
         avalible_deck = new_game.deck.cards
         avalible_deck.random.shuffle()
         for player in [new_game.marquise, new_game.eyrie, new_game.alliance, new_game.vagabond]: 
@@ -101,13 +100,13 @@ class Node:
         """
         Generate samples knowing the previous random samples and a player gives a card to another player
         """
-        new_game = copy(self.game)
+        new_game = deepcopy(self.game)
         if not to_supporter_deck:
-            avalible_deck = new_game.deck.cards
+            avalible_deck = new_game.deck
             for player in [new_game.marquise, new_game.eyrie, self.game.alliance, self.game.vagabond]:
                 if player.name == player1 or player.name == player2:
                     avalible_deck.cards += player.deck.cards
-            avalible_deck.random.shuffle()
+            avalible_deck.shuffle_deck()
             for player in [new_game.marquise, new_game.eyrie, self.game.alliance, self.game.vagabond]:
                 if player.name == player1 or player.name == player2:
                     prev_hand_size = len(player.deck.cards)
@@ -118,13 +117,13 @@ class Node:
         else:
             if not player2 == "Alliance":
                 raise Exception("Can't give to supporter deck if not alliance")
-            avalible_deck = new_game.deck.cards
+            avalible_deck = new_game.deck
 
             for player in [new_game.marquise, new_game.eyrie, self.game.vagabond]:
                 if player.name == player1:
                     avalible_deck.cards += player.deck.cards
             avalible_deck.cards += new_game.alliance.supporter_deck.cards
-            avalible_deck.random.shuffle()
+            avalible_deck.shuffle_deck()
             for player in [new_game.marquise, new_game.eyrie, self.game.vagabond]:
                 if player.name == player1:
                     prev_hand_size = len(player.deck.cards)
@@ -136,7 +135,7 @@ class Node:
             for _ in range(prev_supporter_size):
                 new_game.alliance.supporter_deck.add_card(avalible_deck.draw_card())
 
-    def expand_simplified(self, player_gave_card_to_another=None, player_drew_card=None, card_count=None, expand_count=5, player_orders=['cat', 'bird', 'alliance', 'vagabond']):
+    def expand_simplified(self, turn_order, player_gave_card_to_another=None, player_drew_card=None, card_count=None, expand_count=5):
         for _ in range(expand_count):
             if self.previous_random_samples is None:
                 game_sample = self.generate_samples_base()
@@ -145,96 +144,95 @@ class Node:
             if player_drew_card is not None:
                 game_sample = self.generate_samples_someone_draws_a_cards(drawing_player=player_drew_card, card_count=card_count)
             
-            if self.state == 0:
+            if self.state == "cat":
                 marquise_birdsong(game_sample)
                 marquise_daylight(game_sample)
                 marquise_evening(game_sample)
             
-            if self.state == 1:
+            if self.state == "bird":
                 eyrie_birdsong(game_sample)
                 eyrie_daylight(game_sample)
                 eyrie_evening(game_sample)
             
-            if self.state == 2:
+            if self.state == "alliance":
                 alliance_birdsong(game_sample)
                 alliance_daylight(game_sample)
                 alliance_evening(game_sample)
             
-            if self.state == 3:
+            if self.state == "vagabond":
                 vagabond_birdsong(game_sample)
                 vagabond_daylight(game_sample)
                 vagabond_evening(game_sample)
 
-            if self.state == 4:
+            if self.state == "field_hospital":
                 # CAT FIELD HOSPITAL
                 pass
             
-            if self.state == 5:
+            if self.state == "cat_ambush":
                 # CAT AMBUSH
                 pass
 
-            if self.state == 6:
+            if self.state == "bird_ambush":
                 # BIRD AMBUSH
                 pass
                 
-            if self.state == 7:
+            if self.state == "alliance_ambush":
                 # ALLIANCE AMBUSH
                 pass
 
-            if self.state == 8:
+            if self.state == "vagabond_ambush":
                 # VAGABOND AMBUSH
                 pass
             
-            if self.state == 9:
+            if self.state == "cat_battle_stuff":
                 # CAT ARMOERERS_SAPPERS_BRUTAL_TACTICS
                 pass
 
-            if self.state == 9:
+            if self.state == "bird_battle_stuff":
                 # BIRD ARMOERERS_SAPPERS_BRUTAL_TACTICS
                 pass
 
-            if self.state == 9:
+            if self.state == "alliance_battle_stuff":
                 # ALLIANCE ARMOERERS_SAPPERS_BRUTAL_TACTICS
                 pass
 
-            if self.state == 9:
+            if self.state == "vagabond_battle_stuff":
                 # VAGABOND ARMOERERS_SAPPERS_BRUTAL_TACTICS
                 pass
             
-            self.children.append(game_sample)
+            #TODO prev random samples
+            next_player = turn_order[(turn_order.index(self.player) + 1) % len(turn_order)]
+            self.children.append(Node(state=next_player, parent=self, game=deepcopy(game_sample), player=next_player, previous_random_samples=None))
 
-    def rollout_simplified(self, player_orders=['cat', 'bird', 'alliance', 'vagabond']):
+    def rollout_simplified(self, turn_order, original_player):
         # Returns if the player won or not with random choices till game end, the result is used to backpropagate
-        next_player = player_orders[player_orders.index(self.game.current_player.name)+1]
+        next_player = turn_order[(turn_order.index(self.player) + 1) % len(turn_order)]
         start = True
 
         while 1:
             try:
-                game = Game(debug=False)
-                print(game_num)
+                game = deepcopy(self.game)
                 while 1:
-                    logging.basicConfig(filename=f'{game_num}thgame.log', encoding='utf-8', level=logging.DEBUG)
-                    if not start or player_orders[0] == next_player:
-                        play(player_orders[0])
+                    logging.basicConfig(filename=f'rollout.log', encoding='utf-8', level=logging.DEBUG)
+                    if not start or turn_order[0] == next_player:
+                        game = play(turn_order[0], game)
                         start = False
-                    if not start or player_orders[1] == next_player:
-                        play(player_orders[1])
+                    if not start or turn_order[1] == next_player:
+                        game = play(turn_order[1], game)
                         start = False
-                    if not start or player_orders[2] == next_player:
-                        play(player_orders[2])
+                    if not start or turn_order[2] == next_player:
+                        game = play(turn_order[2], game)
                         start = False
-                    if not start or player_orders[3] == next_player:
-                        play(player_orders[3])
+                    if not start or turn_order[3] == next_player:
+                        game = play(turn_order[3], game)
                         start = False
 
                     if game.winner:
-                        game_num += 1
-                        logging.debug(f"Game {game_num} winner is {game.winner[0]}, they won with a {game.winner[1]} victory")
-                        if game.winner[0] == self.player:
+                        if game.winner[0] == original_player:
                             return True
                         else:
                             return False
-                        break
+    
             except Exception as e:
                 if isinstance(e, ExhaustbootERROR):
                     #There's an elusive 1 in 4000 game error when the vagabond runs out of boots to exhaust
@@ -889,23 +887,24 @@ class Node:
             self.parent.backpropagate(reward)
 
 
-def ISMCTS_decide(state, game, itermax, player):
-    rootnode = Node(state=state, parent=None, game=game, previous_random_samples=None, player=player)
-    rootnode.expand_old()
-    for _ in range(itermax):
+def ISMCTS_decide(game, itermax, player, turn_order):
+    rootnode = Node(state=player, parent=None, game=game, previous_random_samples=None, player=player)
+    rootnode.expand_simplified(turn_order=turn_order)
+    for i in range(itermax):
+        print(f"ISMCTS iteration {i}")
         current_node = rootnode
 
         # Selection
         current_node = current_node.selection()
 
         # Expansion
-        current_node.expand_simplified()
+        current_node.expand_simplified(turn_order=turn_order)
 
         # Simulation
-        reward = current_node.rollout_simplified(player)
+        reward = current_node.rollout_simplified(turn_order=turn_order, original_player=player)
 
         # Backpropagation
         current_node.backpropagate(reward)
 
-    decision = rootnode.selection()
-    return decision
+    decided_node = rootnode.selection()
+    return decided_node.game
