@@ -1,3 +1,6 @@
+# Status:
+Taking a little bit of rest from this project, will carry on shortly
+
 # ROOT_boardgame_self-play
 Implementation of the popular boardgame ROOT, and training a self play AI on it. The game backbone is made out of 3 parts. The first part contains all the info that represents the gamestate (map.py, actors.py), the secound all the possible actions in that gamestate (actors.py), the third carries out the options and changes the gamestate (game.py).
 
