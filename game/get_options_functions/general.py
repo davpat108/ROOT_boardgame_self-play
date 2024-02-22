@@ -1,39 +1,41 @@
+from game.option import option
+
     # General actor options
-def card_to_give_to_alliace_options(actor, suit):
+def card_to_give_to_alliace_options(perpetrator, game):
     options = []
-    for card in actor.deck.cards:
-        if card.card_suit == suit or card.card_suit == "bird":
-            options.append(card.ID)
+    for card in perpetrator.deck.cards:
+        if card.card_suit == game.last_alliance_outrage_suit or card.card_suit == "bird":
+            options.append(option(name="card_to_give_to_alliace", perpetrator=perpetrator.name, target_card=card.ID))
     return options
 
-def codebreakers_options(actor, actors):
-    if not actor.codebreakers:
+def codebreakers_options(perpetrator, game):
+    if not perpetrator.codebreakers:
         return
     options = []
-    for actor in actors:
-        if actor != actor:
-            options.append(actor.name)
+    for actor in game.actors:
+        if actor != perpetrator:
+            options.append(option(name="codebrakers", target_player=actor.name, perpetrator=perpetrator.name))
     return options
 
-def stand_and_deliver_options(actor, actors):
+def stand_and_deliver_options(perpetrator, game):
     if not actor.stand_and_deliver:
         return [False]
     options = [False] # Maybe you can take from supporter deck but its not implemented
-    for actor in actors:
-        if actor != actor and len(actor.deck.cards) > 0:
-            options.append(actor)
+    for actor in game.actors:
+        if actor != perpetrator and len(actor.deck.cards) > 0:
+            options.append(option(name="stand_and_deliver", perpetrator=perpetrator.name, target_player=actor.name))
     return options
 
-def bbb_options(actor, actors):
+def bbb_options(actor, game):
     if not actor.better_burrow_bank:
         return
     options = []
-    for actor in actors:
+    for actor in game.actors:
         if actor != actor:
             options.append(actor)
     return options
 
-def discard_down_to_five_options(actor):
+def discard_down_to_five_options(actor, game):
     if len(actor.deck.cards) <= 5:
         return
     card_IDs = []

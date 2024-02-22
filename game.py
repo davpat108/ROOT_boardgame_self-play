@@ -110,6 +110,8 @@ class Game():
             self.vagabond.quest_deck.add_card(self.quest_deck.draw_card())
             self.vagabond.quest_deck.add_card(self.quest_deck.draw_card())
 
+        last_alliance_outrage_suit = None 
+        self.actors = [self.marquise, self.eyrie, self.alliance, self.vagabond]
 
     def encode(self, gamestate, player_id = 0):
         map_encoded = np.zeros((12,16))
@@ -221,7 +223,7 @@ class Game():
                 new_items.append(item)
         return new_items
     
-   def priority_to_list(self, priorities, placename, owner):
+    def priority_to_list(self, priorities, placename, owner):
        """
        :param priority: str
        :return: list

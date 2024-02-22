@@ -99,7 +99,7 @@ def get_options_craft(actor, map):
                craft_options.append(CraftDTO(card))
     return craft_options
 
-def get_mobilize_options(actor):
+def get_mobilize_options(actor, map):
     return [card.ID for card in actor.deck.cards]
 
 def get_train_options(actor, map):
